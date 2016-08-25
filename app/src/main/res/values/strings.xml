@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">New100FM</string>
+    <string name="action_settings">Settings</string>
+    <string name="drawer_opened">Drawer Opened</string>
+    <string name="drawer_closed">Drawer Closed</string>
+
+    <!-- setting strings and string array for the urls -->
+    <string name="Hits">http://213.8.143.168:80/100Hits</string>
+    <string name="Retro">http://213.8.143.168:80/100Retro</string>
+    <string name="Oldies">http://213.8.143.168:80/100Oldies</string>
+    <string name="Love">http://213.8.143.168:80/100Love</string>
+    <string name="Israeli">http://213.8.143.168:80/100Israeli</string>
+    <string name="Dance">http://213.8.143.168:80/100Dance</string>
+    <string name="Top40">http://213.8.143.168:80/100Top40</string>
+    <string name="Number1s">http://213.8.143.168:80/100Number1</string>
+    <string name="Rock">http://213.8.143.168:80/100Rock</string>
+    <string name="Hiphop">http://213.8.143.168:80/100Hiphop</string>
+    <string name="Club">http://213.8.143.168:80/100Club</string>
+    <string name="Latin">http://213.8.143.168:80/100Latin</string>
+    <string name="Ku">http://213.8.143.168:80/100Ku</string>
+    <string name="Special">http://213.8.143.168:80/100Special</string>
+    <string name="Chillout">http://213.8.143.168:80/100Chillout</string>
+
+    <string name="SongFromHits">http://www.fmplayer.co.il/NowPlaying/Ch1-Hits.xml</string>
+    <string name="SongFromRetro">http://www.fmplayer.co.il/NowPlaying/Ch2-Retro.xml</string>
+    <string name="SongFromOldies">http://www.fmplayer.co.il/NowPlaying/Ch3-Oldies.xml</string>
+    <string name="SongFromLove">http://www.fmplayer.co.il/NowPlaying/Ch4-Love.xml</string>
+    <string name="SongFromIsraeli">http://www.fmplayer.co.il/NowPlaying/Ch5-Israeli.xml</string>
+    <string name="SongFromDance">http://www.fmplayer.co.il/NowPlaying/Ch6-Dance.xml</string>
+    <string name="SongFromTop40">http://www.fmplayer.co.il/NowPlaying/Ch7-Top40.xml</string>
+    <string name="SongFromNumber1s">http://www.fmplayer.co.il/NowPlaying/Ch8-Number1.xml</string>
+    <string name="SongFromRock">http://www.fmplayer.co.il/NowPlaying/Ch9-Rock.xml</string>
+    <string name="SongFromHiphop">http://www.fmplayer.co.il/NowPlaying/Ch10-Hiphop.xml</string>
+    <string name="SongFromClub">http://www.fmplayer.co.il/NowPlaying/Ch11-Club.xml</string>
+    <string name="SongFromLatin">http://www.fmplayer.co.il/NowPlaying/Ch12-Latin.xml</string>
+    <string name="SongFromKu">http://www.fmplayer.co.il/NowPlaying/Ch13-KU.xml</string>
+    <string name="SongFromSpecial">http://www.fmplayer.co.il/NowPlaying/Ch14-Special.xml</string>
+    <string name="SongFromChillout">http://www.fmplayer.co.il/NowPlaying/Ch15-Chillout.xml</string>
+
+
+    <string name="notidirsttext">    לא נבחרה תחנה</string>
+
+    <string-array name="channles_urls">
+        <item>@string/Hits</item>
+        <item>@string/Retro</item>
+        <item>@string/Oldies</item>
+        <item>@string/Love</item>
+        <item>@string/Israeli</item>
+        <item>@string/Dance</item>
+        <item>@string/Top40</item>
+        <item>@string/Number1s</item>
+        <item>@string/Rock</item>
+        <item>@string/Hiphop</item>
+        <item>@string/Club</item>
+        <item>@string/Latin</item>
+        <item>@string/Ku</item>
+        <item>@string/Special</item>
+        <item>@string/Chillout</item>
+    </string-array>
+    <string-array name="channles_names">
+        <item>Hits</item>
+        <item>Retro</item>
+        <item>Oldies</item>
+        <item>Love</item>
+        <item>Israeli</item>
+        <item>Dance</item>
+        <item>Top40</item>
+        <item>Number1s</item>
+        <item>Rock</item>
+        <item>Hiphop</item>
+        <item>Club</item>
+        <item>Latin</item>
+        <item>Ku</item>
+        <item>Special</item>
+        <item>Chillout</item>
+    </string-array>
+    <string-array name="songs_data_urls">
+        <item>@string/SongFromHits</item>
+        <item>@string/SongFromRetro</item>
+        <item>@string/SongFromOldies</item>
+        <item>@string/SongFromLove</item>
+        <item>@string/SongFromIsraeli</item>
+        <item>@string/SongFromDance</item>
+        <item>@string/SongFromTop40</item>
+        <item>@string/SongFromNumber1s</item>
+        <item>@string/SongFromRock</item>
+        <item>@string/SongFromHiphop</item>
+        <item>@string/SongFromClub</item>
+        <item>@string/SongFromLatin</item>
+        <item>@string/SongFromKu</item>
+        <item>@string/SongFromSpecial</item>
+        <item>@string/SongFromChillout</item>
+    </string-array>
+
+
+</resources>

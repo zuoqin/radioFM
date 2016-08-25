@@ -1,0 +1,77 @@
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/drawer_layout"
+    tools:context="com.demo.slidingmenu_tabhostviewpager.MainActivity"
+    android:background="@drawable/mainoutlinewithbg">
+
+    <!-- Main content (main screen) -->
+
+    <RelativeLayout
+        android:id="@+id/main_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="2dp"
+        android:clickable="false"
+        android:background="#ffffff">
+    </RelativeLayout>
+
+    <!-- Drawer Pane -->
+
+    <RelativeLayout
+        android:id="@+id/drawer_pane"
+        android:layout_width="220dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@drawable/mainoutlinesemitrans">
+
+        <!-- Profile box ; currently not displaying anything can display current channel or something-->
+
+        <RelativeLayout
+            android:id="@+id/profile_box"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_margin="2dp"
+            android:gravity="center_vertical" >
+
+        </RelativeLayout>
+
+        <!-- Navigation Listview -->
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/inDrawLayout">
+
+            <ListView
+                android:id="@+id/nav_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/profile_box"
+                android:layout_margin="2dp"
+                android:choiceMode="singleChoice">
+            </ListView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="תחנות"
+                android:id="@+id/textView4"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:textColor="#afe8e8e8"
+                android:layout_marginRight="20dp"
+                android:layout_marginLeft="20dp" />
+
+            <ListView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/stationsLv" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</android.support.v4.widget.DrawerLayout>

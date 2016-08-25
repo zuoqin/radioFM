@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="line" >
+    <solid android:color="#ff213442" /> <!-- original colour #ff213442 / lighter colour ff435662-->
+    <stroke android:width="1dip" android:color="#ff192127"
+        android:dashWidth="40dp"
+        android:dashGap="20dp"/>
+    <padding
+        android:left="20dp"
+        android:right="20dp"
+        />
+</shape>
+

@@ -415,12 +415,6 @@ public class MainActivity extends ActionBarActivity {
     public class ReadFileTask extends AsyncTask<String, Void, String> {
 
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            Toast.makeText(getApplicationContext() , "please wait few seconds for channels to load" , Toast.LENGTH_LONG).show();
-        }
-
-        @Override
         protected String doInBackground(String... params) {
             String temp="";
             try {

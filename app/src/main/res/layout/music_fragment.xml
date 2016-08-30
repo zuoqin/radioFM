@@ -26,15 +26,24 @@
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true" />
 
+            <ProgressBar
+                style="?android:attr/progressBarStyleLarge"
+                android:id="@+id/lvProgress"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:visibility="visible"
+                android:padding="100dp" />
+
             <ListView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/channelLv"
                 android:layout_gravity="center_horizontal"
-                android:layout_below="@+id/channelNameTv"
                 android:layout_alignParentStart="true"
                 android:divider="@null"
-                android:dividerHeight="0dp"/>
+                android:dividerHeight="0dp"
+                android:layout_alignParentTop="true" />
 
         </RelativeLayout>
 
@@ -141,7 +150,7 @@
 
                 <ProgressBar
                     android:id="@+id/progress"
-                    style="?android:attr/progressBarStyleSmall"
+                    style="?android:attr/progressBarStyleLarge"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_centerInParent="true"

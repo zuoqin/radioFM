@@ -1,6 +1,7 @@
 package fm100.co.il.inner.fragments;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
@@ -68,6 +69,8 @@ public class Music extends Fragment {
 
 	private ProgressBar progressView;
 
+	private ProgressBar lvProgressView;
+
 	//default channel url
 	Channel currentChannel = new Channel("Special" , "http://213.8.143.168:80/100Special" , "http://www.fmplayer.co.il/NowPlaying/Ch14-Special.xml");
 	Channel lastChannel = new Channel("100fm" , "http://audio.100fm.co.il/100fmAudio" , "http://digital.100fm.co.il/label/Ch0-100fm.xml");
@@ -133,6 +136,9 @@ public class Music extends Fragment {
 		artistNameTv = (TextView) v.findViewById(R.id.artistNameTv);
 
 		progressView = (ProgressBar) v.findViewById(R.id.progress);
+
+		lvProgressView = (ProgressBar) v.findViewById(R.id.lvProgress);
+
 		itunesIb = (ImageButton) v.findViewById(R.id.itunesIb);
 		itunesIb.setVisibility(View.INVISIBLE);
 
@@ -520,7 +526,11 @@ public class Music extends Fragment {
 			channelsLv.setAdapter(myCustomAdapter);
 			channelsLv.setOnItemClickListener(itemClickListener);
 			listCreated = 1;
+			//progressView.setVisibility(View.INVISIBLE);
+			//channelsLv.setBackgroundColor(Color.RED);
+			lvProgressView.setVisibility(View.INVISIBLE);
 		}
+
 	}
 
 	public List<Station> StationsFromJson(String jsonString){

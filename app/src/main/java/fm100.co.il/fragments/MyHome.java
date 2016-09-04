@@ -1,5 +1,6 @@
 package fm100.co.il.fragments;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
@@ -95,14 +96,20 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 		Drawable music = getResources().getDrawable(R.drawable.radio_off);
 		Drawable running = getResources().getDrawable(R.drawable.run_off);
 
-		Drawable[] drawables = {video, music , running };
+		Drawable[] drawables = new Drawable[]{video, music, running};
+
 
 		setTabsIcons(drawables);
 		tabHost.setOnTabChangedListener(this);
 	}
 
 	private void setTabsIcons(Drawable[] drawables) {
-		String[] tabsNames = {"video" , "music" , "running"};
+		String[] tabsNames = null;
+
+			//tabsNames = new String[]{"running", "music", "video"};
+
+			tabsNames = new String[]{"video", "music", "running"};
+
 
 		for (int i=drawables.length-1 ; i>=0 ; i--){
 			TabHost.TabSpec myTabSpec = tabHost.newTabSpec(tabsNames[i]);
@@ -144,28 +151,52 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 	}
 
 	private void highlightCurrentTab(int selectedItem) {
-		ImageView videoIv = (ImageView) tabHost.getTabWidget().getChildAt(2).findViewById(R.id.tabImage);
-		videoIv.setImageResource(R.drawable.video_off);
-		ImageView musicIv = (ImageView) tabHost.getTabWidget().getChildAt(1).findViewById(R.id.tabImage);
-		musicIv.setImageResource(R.drawable.radio_off);
-		ImageView runningIv = (ImageView) tabHost.getTabWidget().getChildAt(0).findViewById(R.id.tabImage);
-		runningIv.setImageResource(R.drawable.run_off);
 
-		switch (selectedItem){
-			case 2:
-				videoIv = (ImageView) tabHost.getTabWidget().getChildAt(2).findViewById(R.id.tabImage);
-				videoIv.setImageResource(R.drawable.video_on);
-				break;
-			case 1:
-				musicIv = (ImageView) tabHost.getTabWidget().getChildAt(1).findViewById(R.id.tabImage);
-				musicIv.setImageResource(R.drawable.radio_on);
-				break;
-			case 0:
-				runningIv = (ImageView) tabHost.getTabWidget().getChildAt(0).findViewById(R.id.tabImage);
-				runningIv.setImageResource(R.drawable.run_on);
-				break;
+		if(isRTL()==false) {
+			ImageView videoIv = (ImageView) tabHost.getTabWidget().getChildAt(0).findViewById(R.id.tabImage);
+			videoIv.setImageResource(R.drawable.video_off);
+			ImageView musicIv = (ImageView) tabHost.getTabWidget().getChildAt(1).findViewById(R.id.tabImage);
+			musicIv.setImageResource(R.drawable.radio_off);
+			ImageView runningIv = (ImageView) tabHost.getTabWidget().getChildAt(2).findViewById(R.id.tabImage);
+			runningIv.setImageResource(R.drawable.run_off);
+
+			switch (selectedItem){
+				case 0:
+					videoIv = (ImageView) tabHost.getTabWidget().getChildAt(0).findViewById(R.id.tabImage);
+					videoIv.setImageResource(R.drawable.video_on);
+					break;
+				case 1:
+					musicIv = (ImageView) tabHost.getTabWidget().getChildAt(1).findViewById(R.id.tabImage);
+					musicIv.setImageResource(R.drawable.radio_on);
+					break;
+				case 2:
+					runningIv = (ImageView) tabHost.getTabWidget().getChildAt(2).findViewById(R.id.tabImage);
+					runningIv.setImageResource(R.drawable.run_on);
+					break;
+			}
+		}else{
+			ImageView videoIv = (ImageView) tabHost.getTabWidget().getChildAt(2).findViewById(R.id.tabImage);
+			videoIv.setImageResource(R.drawable.video_off);
+			ImageView musicIv = (ImageView) tabHost.getTabWidget().getChildAt(1).findViewById(R.id.tabImage);
+			musicIv.setImageResource(R.drawable.radio_off);
+			ImageView runningIv = (ImageView) tabHost.getTabWidget().getChildAt(0).findViewById(R.id.tabImage);
+			runningIv.setImageResource(R.drawable.run_off);
+
+			switch (selectedItem){
+				case 2:
+					videoIv = (ImageView) tabHost.getTabWidget().getChildAt(2).findViewById(R.id.tabImage);
+					videoIv.setImageResource(R.drawable.video_on);
+					break;
+				case 1:
+					musicIv = (ImageView) tabHost.getTabWidget().getChildAt(1).findViewById(R.id.tabImage);
+					musicIv.setImageResource(R.drawable.radio_on);
+					break;
+				case 0:
+					runningIv = (ImageView) tabHost.getTabWidget().getChildAt(0).findViewById(R.id.tabImage);
+					runningIv.setImageResource(R.drawable.run_on);
+					break;
+			}
 		}
-
 	}
 
 	@Override

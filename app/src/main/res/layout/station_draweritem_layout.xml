@@ -7,12 +7,9 @@
     android:padding="10dp"
     android:gravity="center">
 
-    <TextView
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Medium Text"
-        android:id="@+id/stationNameTv"
-        android:textColor="#bbffffff"
-        android:textAlignment="center" />
+        android:id="@+id/stationItemIv"
+        android:layout_gravity="center_vertical" />
 </LinearLayout>

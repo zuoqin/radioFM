@@ -41,6 +41,7 @@
 
 
     <string name="notidirsttext">    לא נבחרה תחנה</string>
+    <string name="highlightListSelected"><![CDATA[> <]]></string>
 
     <string-array name="channles_urls">
         <item>@string/Hits</item>

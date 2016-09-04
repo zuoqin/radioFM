@@ -11,40 +11,73 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="ערוצים דיגיטליים:"
+            android:id="@+id/channelNameTv"
+            android:textSize="20sp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:paddingBottom="5dp"
+            android:textColor="#deffffff"
+            android:layout_gravity="center_horizontal" />
+
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="2">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="No channel selected yet"
-                android:id="@+id/channelNameTv"
-                android:textSize="20sp"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true" />
-
-            <ProgressBar
-                style="?android:attr/progressBarStyleLarge"
-                android:id="@+id/lvProgress"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_centerInParent="true"
-                android:visibility="visible"
-                android:padding="100dp" />
-
-            <ListView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/channelLv"
-                android:layout_gravity="center_horizontal"
+            <FrameLayout
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/trianglepickerright"
+                android:id="@+id/wheelPickerLeft"
+                android:layout_centerVertical="true"
                 android:layout_alignParentStart="true"
-                android:divider="@null"
-                android:dividerHeight="0dp"
-                android:layout_alignParentTop="true" />
+                android:layout_alignParentEnd="false"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp" />
 
+            <FrameLayout
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:id="@+id/wheelPickerRight"
+                android:background="@drawable/trianglepickerleft"
+                android:layout_centerVertical="true"
+                android:layout_alignParentStart="false"
+                android:layout_alignParentEnd="true"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="55dp"
+                android:layout_marginRight="55dp"
+                android:gravity="center">
+
+                <ProgressBar
+                    style="?android:attr/progressBarStyleLarge"
+                    android:id="@+id/lvProgress"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="visible"
+                    android:padding="100dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true" />
+
+                <com.wx.wheelview.widget.WheelView
+                    android:id="@+id/wheelview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:layout_weight="1"
+                    android:layout_centerVertical="true"></com.wx.wheelview.widget.WheelView>
+
+            </RelativeLayout>
         </RelativeLayout>
 
         <LinearLayout
@@ -61,7 +94,7 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="7"
+            android:layout_weight="5"
             android:id="@+id/songBarLL"
             android:minHeight="200dp">
 
@@ -73,22 +106,28 @@
                 android:gravity="center">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:scrollHorizontally="true"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:id="@+id/songNameTv"
                 android:text="בחר תחנה "
-                android:textSize="24sp"
+                android:textSize="22sp"
                 android:layout_alignParentTop="true"
                 android:layout_toRightOf="@+id/songImage"
                 android:layout_toEndOf="@+id/songImage"
-                android:layout_marginLeft="10dp"
+                android:layout_marginLeft="5dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginRight="10dp"
-                android:textColor="#b5ffffff" />
+                android:layout_marginRight="5dp"
+                android:textColor="#b5ffffff"
+                android:textAlignment="textStart"
+                android:ellipsize="marquee"
+                android:singleLine="true"
+                android:marqueeRepeatLimit="marquee_forever"
+                />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textSize="12sp"
@@ -97,9 +136,12 @@
                 android:layout_toRightOf="@+id/songImage"
                 android:layout_toEndOf="@+id/songImage"
                 android:layout_marginTop="5dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:textColor="#b5ffffff" />
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:textColor="#b5ffffff"
+                android:textAlignment="textStart"
+                android:ellipsize="end"
+                android:maxLines="1"/>
 
                 <ImageButton
                     android:layout_width="match_parent"
@@ -119,13 +161,9 @@
             </LinearLayout>
 
             <RelativeLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="2"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
                 android:layout_alignTop="@+id/songImage"
                 android:layout_toEndOf="@+id/artistNameTv">
 
@@ -142,11 +180,12 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:adjustViewBounds="true"
-                    android:scaleType="fitXY"
-                    android:maxHeight="70dp"
+                    android:scaleType="fitCenter"
                     android:maxWidth="300dp"
                     android:src="@drawable/play"
-                    android:background="#00ffffff" />
+                    android:background="#00ffffff"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp" />
 
                 <ProgressBar
                     android:id="@+id/progress"
@@ -155,6 +194,8 @@
                     android:layout_height="match_parent"
                     android:layout_centerInParent="true"
                     android:visibility="invisible"/>
+
+
 
             </RelativeLayout>
 

@@ -15,6 +15,14 @@ public class Station {
     public Station() {
     }
 
+    public Station(String songInfo, String stationAudio, String stationLogo, String stationName, String stationSlug) {
+        SongInfo = songInfo;
+        StationAudio = stationAudio;
+        StationLogo = stationLogo;
+        StationName = stationName;
+        StationSlug = stationSlug;
+    }
+
     public String getSongInfo() {
         return SongInfo;
     }

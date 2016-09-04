@@ -20,6 +20,7 @@ package fm100.co.il;
         import android.app.PendingIntent;
         import android.content.Context;
         import android.content.Intent;
+        import android.graphics.Typeface;
         import android.graphics.drawable.Drawable;
         import android.os.AsyncTask;
         import android.os.Build;
@@ -38,8 +39,10 @@ package fm100.co.il;
         import android.widget.AdapterView;
         import android.widget.LinearLayout;
         import android.widget.ListView;
+        import android.widget.ProgressBar;
         import android.widget.RelativeLayout;
         import android.widget.RemoteViews;
+        import android.widget.TextView;
         import android.widget.Toast;
 
         import fm100.co.il.adapters.StationListAdapter;
@@ -73,6 +76,7 @@ public class MainActivity extends ActionBarActivity {
     Bundle myBundle;
     List<NavItem> listNavItems;
     List<Fragment> listFragments;
+    //private LinearLayout inDrawLayout;
 
     private EventBus bus = EventBus.getDefault();
     private NotificationManager notificationManager = null;
@@ -87,7 +91,7 @@ public class MainActivity extends ActionBarActivity {
     private static Context myApplicationContext = null;
 
     // ---------------------------------------
-    public ArrayList<Channel> channelsArray = new ArrayList<>();
+    public static ArrayList<Channel> channelsArray = new ArrayList<>();
     StationListAdapter myCustomAdapter;
     public List<Station> stationList = new ArrayList<>();
     public List<VideoObj> videoList = new ArrayList<>();
@@ -101,7 +105,7 @@ public class MainActivity extends ActionBarActivity {
 
     private LinearLayout inDrawLayout ;
 
-
+    private ProgressBar drawerListProgressBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,18 +116,21 @@ public class MainActivity extends ActionBarActivity {
              setContentView(R.layout.activity_main);
         myApplicationContext = this;
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-       // flipLayouts();
-        if(isRTL()==false) {
+        drawerListProgressBar = (ProgressBar) findViewById(R.id.progressBarView);
+        inDrawLayout = (LinearLayout) findViewById(R.id.inDrawLayout);
+        //flipLayouts();
+       /* if(isRTL()==false) {
             ArrayList<View> views = new ArrayList<View>();
-            for (int x = 0; x < drawerLayout.getChildCount(); x++) {
-                views.add(drawerLayout.getChildAt(x));
+            for (int x = 0; x < inDrawLayout.getChildCount(); x++) {
+                views.add(inDrawLayout.getChildAt(x));
                 Log.e("mynewlog" , "FALSE WAS HERE");
             }
-            drawerLayout.removeAllViews();
+            inDrawLayout.removeAllViews();
             for (int x = views.size() - 1; x >= 0; x--) {
-                drawerLayout.addView(views.get(x));
+                inDrawLayout.addView(views.get(x));
             }
         }
+        */
 
 
         drawerPane = (RelativeLayout) findViewById(R.id.drawer_pane);
@@ -148,7 +155,7 @@ public class MainActivity extends ActionBarActivity {
         // setting the StationsList
 
         //setting title bar background
-        Drawable titleDrawable = getResources().getDrawable(R.drawable.title100fm);
+        Drawable titleDrawable = getResources().getDrawable(R.drawable.fmtitlebar);
         getSupportActionBar().setBackgroundDrawable(titleDrawable);
 
         //setting drawer list items , Fragments and setting an adapter to the view
@@ -233,13 +240,29 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
+         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the MyHome/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        if (actionBarDrawerToggle.onOptionsItemSelected(item))
-            return true;
 
-        return super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+              Toast.makeText(this , "Pressed" , Toast.LENGTH_LONG).show();
+                Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                sharingIntent.setType("text/plain");
+                String shareBody = "http://digital.100fm.co.il/";
+                //sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
+                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                startActivity(Intent.createChooser(sharingIntent, "Share via"));
+                return true;
+
+            default:
+               // return super.onOptionsItemSelected(item);
+                if (actionBarDrawerToggle.onOptionsItemSelected(item))
+                    return true;
+
+                return super.onOptionsItemSelected(item);
+        }
+
     }
 
     @Override
@@ -327,6 +350,7 @@ public class MainActivity extends ActionBarActivity {
         // setting the texts in the textviews
         notificationView.setTextViewText(R.id.notiSongNameTv , songName);
         notificationView.setTextViewText(R.id.notiArtistNameTv , artistName);
+
 
         notificationManager.notify(1, notification);
     }
@@ -480,8 +504,10 @@ public class MainActivity extends ActionBarActivity {
         @Override
         protected void onPostExecute(List<Station> stations) {
             super.onPostExecute(stations);
+            drawerListProgressBar.setVisibility(View.GONE);
             stationList = stations;
             setListData(stationList);
+            Log.e("myloglog", "list 3: " + channelsArray);
             myCustomAdapter = new StationListAdapter(myApplicationContext, channelsArray);
             lvStations.setAdapter(myCustomAdapter);
             lvStations.setOnItemClickListener(itemClickListener);
@@ -491,7 +517,7 @@ public class MainActivity extends ActionBarActivity {
         for (int i = 0 ; i<stations.size() ; i++){
             final Channel newChannel = new Channel(stations.get(i).getStationSlug()
                     , stations.get(i).getStationAudio()
-                    , stations.get(i).getSongInfo());
+                    , stations.get(i).getSongInfo(),stations.get(i).getStationLogo());
             channelsArray.add(newChannel);
         }
     }
@@ -511,7 +537,7 @@ public class MainActivity extends ActionBarActivity {
                 String actionName = "com.example.hpuser.rad100fm.ACTION_PLAY";
                 setNotification(buttonImage, actionName, lastSongName, lastArtistName);
                 */
-              //  Toast.makeText(myApplicationContext.getApplicationContext() , "channel already selected" , Toast.LENGTH_SHORT ).show();
+              //  s.makeText(myApplicationContext.getApplicationContext() , "channel already selected" , Toast.LENGTH_SHORT ).show();
            // }
             lastItemClicked = position;
         }
@@ -572,5 +598,10 @@ public class MainActivity extends ActionBarActivity {
                 }
             }
         }
+    }
+    public static List<Channel> getStations() {
+        List<Channel> stationsArray = channelsArray;
+
+        return stationsArray;
     }
 }

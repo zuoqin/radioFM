@@ -5,8 +5,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
+
+import fm100.co.il.MainActivity;
 import fm100.co.il.R;
 import fm100.co.il.models.Channel;
 
@@ -43,9 +48,7 @@ public class StationListAdapter extends BaseAdapter{
     }
 
     static class ViewHolder{
-        public TextView channelListItem;
-        //public String channelUrl;
-        // public TextView channelName;
+        public ImageView stationItemImage;
     }
 
     @Override
@@ -55,9 +58,8 @@ public class StationListAdapter extends BaseAdapter{
         ViewHolder holder;
         if (rowView == null){
             rowView = inflater.inflate(R.layout.station_draweritem_layout, parent , false);
-
             holder = new ViewHolder();
-            holder.channelListItem = (TextView) rowView.findViewById(R.id.stationNameTv);
+            holder.stationItemImage = (ImageView) rowView.findViewById(R.id.stationItemIv);
 
             rowView.setTag(holder);
         }
@@ -65,13 +67,13 @@ public class StationListAdapter extends BaseAdapter{
             holder = (ViewHolder) rowView.getTag();
         }
         if (nameObjArray.size() <= 0){
-            holder.channelListItem.setText("There is no Names to display");
+            Toast.makeText(MainActivity.getMyApplicationContext(), "no stations to display", Toast.LENGTH_LONG).show();
         }
         else{
             tempValues = null;
             tempValues = nameObjArray.get(position);
 
-            holder.channelListItem.setText(tempValues.getChannelName());
+            Picasso.with(context).load(tempValues.getChannelLogo()).into(holder.stationItemImage);
         }
 
         return rowView;

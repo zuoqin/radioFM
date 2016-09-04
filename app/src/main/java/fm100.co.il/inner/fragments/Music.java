@@ -1,11 +1,17 @@
 package fm100.co.il.inner.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.telephony.PhoneStateListener;
@@ -22,6 +28,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wx.wheelview.adapter.SimpleWheelAdapter;
+import com.wx.wheelview.common.WheelData;
+import com.wx.wheelview.util.WheelUtils;
+import com.wx.wheelview.widget.WheelView;
+
+import fm100.co.il.adapters.MyWheelAdapter;
 import fm100.co.il.adapters.StationListAdapter;
 import fm100.co.il.busEvents.IntBusEvent;
 import fm100.co.il.busEvents.StationBusEvent;
@@ -34,6 +46,7 @@ import fm100.co.il.R;
 import fm100.co.il.helpers.SongXMLParser;
 import fm100.co.il.adapters.ChannelListAdapter;
 import fm100.co.il.models.Channel;
+import fm100.co.il.models.MyObject;
 import fm100.co.il.models.Song;
 import fm100.co.il.models.Station;
 
@@ -41,6 +54,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -72,8 +86,8 @@ public class Music extends Fragment {
 	private ProgressBar lvProgressView;
 
 	//default channel url
-	Channel currentChannel = new Channel("Special" , "http://213.8.143.168:80/100Special" , "http://www.fmplayer.co.il/NowPlaying/Ch14-Special.xml");
-	Channel lastChannel = new Channel("100fm" , "http://audio.100fm.co.il/100fmAudio" , "http://digital.100fm.co.il/label/Ch0-100fm.xml");
+	Channel currentChannel = new Channel();//("100fm" , "http://audio.100fm.co.il/100fmAudio" , "http://digital.100fm.co.il/label/Ch0-100fm.xml" , "http://demo.goufo.co.il/100fm/images/100fmlive.png" );
+	Channel lastChannel = new Channel();//("100fm" , "http://audio.100fm.co.il/100fmAudio" , "http://digital.100fm.co.il/label/Ch0-100fm.xml" , "http://demo.goufo.co.il/100fm/images/100fmlive.png");
 
 	//default songs
 	Song lastSong = new Song(" " , " ");
@@ -86,7 +100,7 @@ public class Music extends Fragment {
 	private int isPlaying = 0;
 
 	public ArrayList<Channel> channelsArray = new ArrayList<>();
-	ListView channelsLv;
+	//ListView channelsLv;
 	ChannelListAdapter myCustomAdapter;
 
 	public List<Station> stationList = new ArrayList<>();
@@ -105,16 +119,28 @@ public class Music extends Fragment {
 	private PhoneStateListener phoneStateListener;
 	private TelephonyManager telephonyManager;
 
+	private WheelView myWheelView;
+	private View mView;
+
+	private int lastSelectionLoaded = 0;
+
+	private Handler customHandler = new Handler();
+	Runnable runnable;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater,
 							 @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
 		View v = inflater.inflate(R.layout.music_fragment, container, false);
+		mView = v;
 		// flipping Layout the RTL to LTR incase needed
 		LinearLayout songBarLL = (LinearLayout) v.findViewById(R.id.songBarLL);
 		EventBus.getDefault().register(this);
 		task.execute("JsonCo.json");
-		if(isRTL()==false) {
+
+		initWheel();
+
+		/*if(isRTL()==false) {
 			ArrayList<View> views = new ArrayList<View>();
 			for (int x = 0; x < songBarLL.getChildCount(); x++) {
 				views.add(songBarLL.getChildAt(x));
@@ -124,23 +150,33 @@ public class Music extends Fragment {
 				songBarLL.addView(views.get(x));
 			}
 		}
+		*/
+
 
 		pauseOnPhoneCalls();
 
-		channelsLv = (ListView) v.findViewById(R.id.channelLv);
+		Typeface custom_font_eng_light = Typeface.createFromAsset(MainActivity.getMyApplicationContext().getAssets(), "fonts/OpenSans-Light.ttf");
+		//Typeface custom_font_heb_black = Typeface.createFromAsset(MainActivity.getMyApplicationContext().getAssets(), "fonts/FBSPOILER-BLACK.otf");
+
+		//channelsLv = (ListView) v.findViewById(R.id.channelLv);
 
 		channelNameTv = (TextView) v.findViewById(R.id.channelNameTv);
-		channelNameTv.setText("No Channel Yet Selected");
+		//channelNameTv.setTypeface(custom_font_heb_black);
+		//channelNameTv.setText("No Channel Yet Selected");
 
 		songNameTv = (TextView) v.findViewById(R.id.songNameTv);
-		artistNameTv = (TextView) v.findViewById(R.id.artistNameTv);
+		songNameTv.setSelected(true);
 
+		songNameTv.setTypeface(custom_font_eng_light);
+		artistNameTv = (TextView) v.findViewById(R.id.artistNameTv);
+		artistNameTv.setTypeface(custom_font_eng_light);
 		progressView = (ProgressBar) v.findViewById(R.id.progress);
 
 		lvProgressView = (ProgressBar) v.findViewById(R.id.lvProgress);
 
 		itunesIb = (ImageButton) v.findViewById(R.id.itunesIb);
 		itunesIb.setVisibility(View.INVISIBLE);
+		itunesIb.setOnClickListener(itunesListener);
 
 		playPauseBtn = (ImageButton) v.findViewById(R.id.play_pause_btn);
 		if(mediaPlayer == null){
@@ -155,9 +191,11 @@ public class Music extends Fragment {
 		}
 
 		if (listCreated == 0 && channelsArray!=null){
-			myCustomAdapter = new ChannelListAdapter(getActivity(), channelsArray);
-			channelsLv.setAdapter(myCustomAdapter);
-			channelsLv.setOnItemClickListener(itemClickListener);
+			myCustomAdapter = new ChannelListAdapter(getActivity(), MainActivity.channelsArray);
+			//channelsLv.setAdapter(myCustomAdapter);
+			Log.e("myloglog", "list 1: " + MainActivity.channelsArray);
+			//channelsLv.setOnItemClickListener(itemClickListener);
+
 		}
 
 		startSongThread();
@@ -165,21 +203,140 @@ public class Music extends Fragment {
 		return v;
 	}
 
+	private void initWheel() {
+
+		myWheelView = (WheelView) mView.findViewById(R.id.wheelview);
+		myWheelView.setVisibility(View.GONE);
+		myWheelView.setWheelAdapter(new MyWheelAdapter(getActivity()));
+		myWheelView.setWheelData(createArrays());
+		//myWheelView.setWheelData(channelsArray);
+		myWheelView.setWheelSize(3);
+		myWheelView.setSkin(WheelView.Skin.None);
+		//myWheelView.setWheelClickable(true);
+		myWheelView.setSelection(2);
+		WheelView.WheelViewStyle style = new WheelView.WheelViewStyle();
+
+
+		style.backgroundColor = Color.TRANSPARENT;
+		style.textColor = Color.TRANSPARENT;
+		style.selectedTextColor = Color.BLUE;
+		style.selectedTextZoom = 62f;
+		style.selectedTextSize = 20;
+		myWheelView.setLoop(true);
+		myWheelView.setStyle(style);
+		/*myWheelView.setOnWheelItemClickListener(new WheelView.OnWheelItemClickListener() {
+			@Override
+			public void onItemClick(int position, Object o) {
+				Toast.makeText(MainActivity.getMyApplicationContext(), "click" + position, Toast.LENGTH_SHORT).show();
+			}
+		});*/
+		myWheelView.setOnWheelItemSelectedListener(new WheelView.OnWheelItemSelectedListener() {
+			@Override
+			public void onItemSelected(final int position, Object o) {
+				if (listCreated ==1) {
+				runnable = new Runnable() {
+					@Override
+					public void run() {
+							if (myWheelView.getCurrentPosition() == position) {
+								//Toast.makeText(MainActivity.getMyApplicationContext(), "scroll" + myWheelView.getCurrentPosition() +" " + position, Toast.LENGTH_SHORT).show();
+								if (lastStationLoading == 0) {
+									lastSelectionLoaded = position;
+									//event = new NotificationBusEvent("play");
+									firstSong = 0;
+									NotificationBusEvent event = null;
+									firstChannel = 1;
+									currentChannel = channelsArray.get(position);
+									if (!Objects.equals(currentChannel.getChannelName(), lastChannel.getChannelName())) {
+										event = new NotificationBusEvent("play");
+										EventBus.getDefault().post(event);
+										//channelNameTv.setText("Current Channel Selected : " + channelsArray.get(position).getChannelName());
+										playPauseBtn.setImageResource(R.drawable.button_pause);
+										lastChannel.setChannelName(currentChannel.getChannelName());
+										lastChannel.setChannelUrl(currentChannel.getChannelUrl());
+										mediaPlayer.reset();
+										new Player().execute(currentChannel.getChannelUrl());
+										isPlaying = 1;
+									}/* ----- if re-chosing the station it pause\play based on last state -----
+									 else {
+										if (isPlaying == 0) {
+											mediaPlayer.start();
+											playPauseBtn.setImageResource(R.drawable.button_pause);
+											event = new NotificationBusEvent("play");
+											isPlaying = 1;
+										} else {
+											event = new NotificationBusEvent("pause");
+											playPauseBtn.setImageResource(R.drawable.button_play);
+											if (mediaPlayer.isPlaying())
+												mediaPlayer.pause();
+											isPlaying = 0;
+										}
+										EventBus.getDefault().post(event);
+									}*/
+								} else {
+									Toast.makeText(MainActivity.getMyApplicationContext(), "please waite while loading last station selected", Toast.LENGTH_LONG).show();
+									myWheelView.setSelection(lastSelectionLoaded);
+								}
+							}
+						}
+					};
+					customHandler.postDelayed(runnable, 1500);
+				}
+			}
+		});
+
+	}
+
+
+	private List<MyObject> createArrays() {
+		List<MyObject> list = new ArrayList<>();
+		for (int i = 0; i < 20; i++) {
+			list.add(new MyObject(null));
+		}
+		return list;
+	}
+
+	private ArrayList<WheelData> createDatas() {
+		ArrayList<WheelData> list = new ArrayList<WheelData>();
+		WheelData item;
+		for (int i = 0; i < 20; i++) {
+			item = new WheelData();
+			item.setId(R.mipmap.ic_launcher);
+			item.setName((i < 10) ? ("0" + i) : ("" + i));
+			list.add(item);
+		}
+		return list;
+	}
+
 	private void setListData(List<Station> stations) {
 		for (int i = 0 ; i<stations.size() ; i++){
 			final Channel newChannel = new Channel(stations.get(i).getStationSlug()
 					, stations.get(i).getStationAudio()
-					, stations.get(i).getSongInfo());
+					, stations.get(i).getSongInfo(), stations.get(i).getStationLogo());
 			channelsArray.add(newChannel);
 		}
 	}
 
 	//Setting Click Listeners
+	View.OnClickListener itunesListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			if(lastSong != null) {
+				Toast.makeText(MainActivity.getMyApplicationContext(), "artist: " + lastSong.getArtist()
+						+ " song: " + lastSong.getSongName(), Toast.LENGTH_LONG).show();
+				Uri uri = Uri.parse("https://itunes.apple.com/search?limit=1&country=IL&term=" + "in the end" + "linkin park"); // missing 'http://' will cause crashed
+				Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+				startActivity(intent);
+			}
+			else {
+				Toast.makeText(MainActivity.getMyApplicationContext() , "null" , Toast.LENGTH_SHORT).show();
+			}
+
+		}
+	};
 
 	View.OnClickListener playPauseListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
-
 
 			// is it on play or pause and act acordingly
 			if (firstChannel == 0) {
@@ -259,6 +416,7 @@ public class Music extends Fragment {
 	AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener(){
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+		//	channelsLv.smoothScrollToPosition(position);
 			if (lastStationLoading == 0) {
 				//event = new NotificationBusEvent("play");
 				firstSong = 0;
@@ -268,7 +426,7 @@ public class Music extends Fragment {
 				if (!Objects.equals(currentChannel.getChannelName(), lastChannel.getChannelName())) {
 					event = new NotificationBusEvent("play");
 					EventBus.getDefault().post(event);
-					channelNameTv.setText("Current Channel Selected : " + channelsArray.get(position).getChannelName());
+					//channelNameTv.setText("Current Channel Selected : " + channelsArray.get(position).getChannelName());
 					playPauseBtn.setImageResource(R.drawable.button_pause);
 					lastChannel.setChannelName(currentChannel.getChannelName());
 					lastChannel.setChannelUrl(currentChannel.getChannelUrl());
@@ -342,6 +500,7 @@ public class Music extends Fragment {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		customHandler.removeCallbacks(runnable);
 		if (mediaPlayer != null) {
 			mediaPlayer.reset();
 			mediaPlayer = null;
@@ -380,10 +539,10 @@ public class Music extends Fragment {
 			itunesIb.setVisibility(View.VISIBLE);
 			try {
 				//making sure till channel selected nothing is showed
-					if (firstChannel == 0) {
+				if (firstChannel == 0) {
 						currentSong = new Song( getString(R.string.notidirsttext) , " " );
 						EventBus.getDefault().post(new NotificationBusEvent("delete"));
-					}
+				}
 				if (firstSong == 0){
 					songNameTv.setText(currentSong.getSongName());
 					artistNameTv.setText(currentSong.getArtist());
@@ -392,7 +551,7 @@ public class Music extends Fragment {
 					EventBus.getDefault().post(new NewSongBusEvent(currentSong.getSongName(), currentSong.getArtist()));
 					//firstSong = 1;
 				}
-					if (firstChannel == 1) {
+				if (firstChannel == 1) {
 						if (!lastSong.getSongName().equals(currentSong.getSongName())) {
 							Log.e("mynewlog", "its here now");
 							songNameTv.setText(currentSong.getSongName());
@@ -402,7 +561,7 @@ public class Music extends Fragment {
 							EventBus.getDefault().post(new NewSongBusEvent(currentSong.getSongName(), currentSong.getArtist()));
 							firstSong = 1;
 						}
-					}
+				}
 			}
 			catch (Exception e) {
 				Log.i("MyLog", "exception postExecute: " + e.getMessage());
@@ -457,7 +616,8 @@ public class Music extends Fragment {
 			//NotificationBusEvent notiEvent = null;
 			if (lastStationLoading == 0) {
 				if (!Objects.equals(currentChannel.getChannelName(), lastChannel.getChannelName())) {
-					channelNameTv.setText("Current Channel Selected : " + channelsArray.get(intEvent.getintBusEvent()).getChannelName());
+					myWheelView.setSelection(intEvent.getintBusEvent());
+				//	channelNameTv.setText("Current Channel Selected : " + channelsArray.get(intEvent.getintBusEvent()).getChannelName());
 					playPauseBtn.setImageResource(R.drawable.button_pause);
 					lastChannel.setChannelName(currentChannel.getChannelName());
 					lastChannel.setChannelUrl(currentChannel.getChannelUrl());
@@ -491,9 +651,10 @@ public class Music extends Fragment {
 	public void onStationEvent(StationBusEvent stationEvent) {
 
 		setListData(stationEvent.getStationBusEvent());
-		myCustomAdapter = new ChannelListAdapter(getActivity(), channelsArray);
-		channelsLv.setAdapter(myCustomAdapter);
-		channelsLv.setOnItemClickListener(itemClickListener);
+		myCustomAdapter = new ChannelListAdapter(getActivity(), MainActivity.channelsArray);
+		//channelsLv.setAdapter(myCustomAdapter);
+
+		//channelsLv.setOnItemClickListener(itemClickListener);
 		listCreated = 1;
 	}
 
@@ -522,13 +683,27 @@ public class Music extends Fragment {
 			// getting a list of Station objects
 			stationList = StationsFromJson(result);
 			setListData(stationList);
-			myCustomAdapter = new ChannelListAdapter(getActivity(), channelsArray);
-			channelsLv.setAdapter(myCustomAdapter);
-			channelsLv.setOnItemClickListener(itemClickListener);
+			myCustomAdapter = new ChannelListAdapter(getActivity(), MainActivity.channelsArray);
+			//channelsLv.setAdapter(myCustomAdapter);
+			Log.e("myloglog", "list 2: " + channelsArray);
+			Log.e("myloglog", "list 4: " + MainActivity.getStations());
+			//channelsLv.setOnItemClickListener(itemClickListener);
 			listCreated = 1;
 			//progressView.setVisibility(View.INVISIBLE);
 			//channelsLv.setBackgroundColor(Color.RED);
 			lvProgressView.setVisibility(View.INVISIBLE);
+			//initWheel();
+			//myWheelView.setWheelAdapter(new MyWheelAdapter(getActivity()));
+			//myWheelView.setWheelData(createArrays());
+			List<MyObject> newMyObjList = new ArrayList<>();
+			for (int i = 0; i < channelsArray.size(); i++) {
+				newMyObjList.add(new MyObject(channelsArray.get(i).getChannelLogo()));
+
+			}
+			myWheelView.setWheelData(newMyObjList);
+			myWheelView.setSelection(0);
+			myWheelView.setVisibility(View.VISIBLE);
+
 		}
 
 	}
@@ -560,4 +735,51 @@ public class Music extends Fragment {
 		return stationList;
 
 	}
+
+	/*class itunesTask extends AsyncTask<String ,Void,String> {
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			if(lastSong != null) {
+				Toast.makeText(MainActivity.getMyApplicationContext(), "artist: " + lastSong.getArtist()
+						+ " song: " + lastSong.getSongName(), Toast.LENGTH_LONG).show();
+				Uri uri = Uri.parse("https://itunes.apple.com/search?limit=1&country=IL&term=" + "in the end" + "linkin park"); // missing 'http://' will cause crashed
+				Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+				startActivity(intent);
+			}
+			else {
+				Toast.makeText(MainActivity.getMyApplicationContext() , "null" , Toast.LENGTH_SHORT).show();
+			}
+			String path=MainActivity.getMyApplicationContext().getFilesDir().getAbsolutePath()+"/JsonCo.json";
+			File file = new File ( path );
+			if ( file.exists() ){
+
+			}else{
+				Toast.makeText(MainActivity.getMyApplicationContext() ,
+						"please download the file to countinue" , Toast.LENGTH_SHORT).show();
+			}
+
+		}
+
+		@Override
+		protected String doInBackground(String... params) {
+			String temp="";
+			try {
+				FileInputStream fin = MainActivity.getMyApplicationContext().openFileInput(params[0]);
+				int c;
+				while( (c = fin.read()) != -1){
+					temp = temp + Character.toString((char)c);
+				}
+				fin.close();
+			} catch (Exception e){
+				Log.e("MyLog" , "read task exception: " + e.getMessage());
+			}
+			return temp;
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			super.onPostExecute(aBoolean);
+		}
+	}*/
 }

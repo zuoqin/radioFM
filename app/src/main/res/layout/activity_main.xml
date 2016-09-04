@@ -66,6 +66,13 @@
                 android:layout_marginRight="20dp"
                 android:layout_marginLeft="20dp" />
 
+            <ProgressBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/progressBarView"
+                android:visibility="visible"
+                android:paddingTop="30dp" />
+
             <ListView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -15,10 +15,11 @@ public class Channel {
 
     }
 
-    public Channel(String channelName, String channelUrl , String songDataUrl) {
+    public Channel(String channelName, String channelUrl , String songDataUrl ,  String channelLogo) {
         this.channelName = channelName;
         this.channelUrl = channelUrl;
         this.songDataUrl = songDataUrl;
+        this.channelLogo = channelLogo;
     }
 
     public String getChannelName() {
@@ -43,5 +44,13 @@ public class Channel {
 
     public void setSongDataUrl(String songDataUrl) {
         this.songDataUrl = songDataUrl;
+    }
+
+    public String getChannelLogo() {
+        return channelLogo;
+    }
+
+    public void setChannelLogo(String channelLogo) {
+        this.channelLogo = channelLogo;
     }
 }

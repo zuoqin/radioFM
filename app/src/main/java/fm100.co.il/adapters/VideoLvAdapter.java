@@ -4,6 +4,7 @@ package fm100.co.il.adapters;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -18,9 +19,14 @@ import com.squareup.picasso.Picasso;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import fm100.co.il.MainActivity;
 import fm100.co.il.R;
 import fm100.co.il.models.Channel;
 import fm100.co.il.models.VideoObj;
@@ -74,6 +80,11 @@ public class VideoLvAdapter  extends BaseAdapter {
             holder.videoPublishedText = (TextView) rowView.findViewById(R.id.vidSubTv);
             holder.videoImageView = (ImageView) rowView.findViewById(R.id.videoItemIv);
 
+            Typeface custom_font_heb_regular = Typeface.createFromAsset(MainActivity.getMyApplicationContext().getAssets(), "fonts/FbSpoilerRegular.ttf");
+
+            holder.videoTitleText.setTypeface(custom_font_heb_regular);
+            holder.videoPublishedText.setTypeface(custom_font_heb_regular);
+
             rowView.setTag(holder);
         }
         else {
@@ -89,7 +100,12 @@ public class VideoLvAdapter  extends BaseAdapter {
             tempVideo = videoList.get(position);
 
             holder.videoTitleText.setText(tempVideo.getTitle());
-            holder.videoPublishedText.setText(tempVideo.getPublished());
+
+            String reDate = tempVideo.getPublished().substring(0 , 10);
+            holder.videoPublishedText.setText(reDate);
+
+
+
            // Log.e("mynewlog", tempVideo.getThumbnail().toString());
 
             Picasso.with(context).load(tempVideo.getThumbnail()).into(holder.videoImageView);

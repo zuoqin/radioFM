@@ -42,6 +42,7 @@
 
     <string name="notidirsttext">    לא נבחרה תחנה</string>
     <string name="highlightListSelected"><![CDATA[> <]]></string>
+    <string name="firstVideoTitle">רדיוס 100FM לייב</string>
 
     <string-array name="channles_urls">
         <item>@string/Hits</item>
@@ -94,6 +95,27 @@
         <item>@string/SongFromSpecial</item>
         <item>@string/SongFromChillout</item>
     </string-array>
+
+    <string-array name="days_list">
+        <item>ראשון</item>
+        <item>שני</item>
+        <item>שלישי</item>
+        <item>רביעי</item>
+        <item>חמישי</item>
+        <item>שישי</item>
+        <item>שבת</item>
+    </string-array>
+
+    <string-array name="days_list_eng">
+        <item>sunday</item>
+        <item>monday</item>
+        <item>tuesday</item>
+        <item>wednesday</item>
+        <item>thursday</item>
+        <item>friday</item>
+        <item>saturday</item>
+    </string-array>
+
 
 
 </resources>

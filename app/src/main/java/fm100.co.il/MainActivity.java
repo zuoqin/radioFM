@@ -507,7 +507,6 @@ public class MainActivity extends ActionBarActivity {
             drawerListProgressBar.setVisibility(View.GONE);
             stationList = stations;
             setListData(stationList);
-            Log.e("myloglog", "list 3: " + channelsArray);
             myCustomAdapter = new StationListAdapter(myApplicationContext, channelsArray);
             lvStations.setAdapter(myCustomAdapter);
             lvStations.setOnItemClickListener(itemClickListener);
@@ -517,7 +516,7 @@ public class MainActivity extends ActionBarActivity {
         for (int i = 0 ; i<stations.size() ; i++){
             final Channel newChannel = new Channel(stations.get(i).getStationSlug()
                     , stations.get(i).getStationAudio()
-                    , stations.get(i).getSongInfo(),stations.get(i).getStationLogo());
+                    , stations.get(i).getSongInfo(),stations.get(i).getStationLogo(),stations.get(i).getStationSlug());
             channelsArray.add(newChannel);
         }
     }

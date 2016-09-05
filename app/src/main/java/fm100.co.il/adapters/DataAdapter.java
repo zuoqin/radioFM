@@ -1,6 +1,7 @@
 package fm100.co.il.adapters;
 
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import fm100.co.il.MainActivity;
 import fm100.co.il.R;
 
 import android.graphics.Color;
@@ -59,6 +61,10 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
             super(view);
             card = (CardView) view.findViewById(R.id.card);
             tv_country = (TextView)view.findViewById(R.id.tv_country);
+
+            Typeface custom_font_eng_light = Typeface.createFromAsset(MainActivity.getMyApplicationContext().getAssets(), "fonts/OpenSans-Light.ttf");
+
+            tv_country.setTypeface(custom_font_eng_light);
         }
     }
 

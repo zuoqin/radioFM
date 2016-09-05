@@ -11,7 +11,7 @@
 
         <WebView
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="186dp"
             android:id="@+id/webView"
             android:background="#00ffffff" />
 
@@ -22,7 +22,18 @@
             android:background="#00ffffff"
             android:src="@drawable/videobg2"
             android:scaleType="centerCrop" />
+
     </FrameLayout>
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleLarge"
+        android:id="@+id/videoLvProgress"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:padding="50dp" />
 
     <ListView
         android:layout_width="match_parent"

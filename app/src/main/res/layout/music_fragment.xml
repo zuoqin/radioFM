@@ -78,6 +78,30 @@
                     android:layout_centerVertical="true"></com.wx.wheelview.widget.WheelView>
 
             </RelativeLayout>
+
+            <ImageButton
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/itemTopIb"
+                android:layout_above="@+id/wheelPickerLeft"
+                android:layout_marginBottom="55dp"
+                android:layout_marginLeft="75dp"
+                android:layout_marginRight="75dp"
+                android:visibility="gone"
+                android:layout_marginTop="30dp"
+                android:background="#00ffffff" />
+
+            <ImageButton
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/itemBotIb"
+                android:layout_below="@+id/wheelPickerLeft"
+                android:layout_marginTop="65dp"
+                android:layout_marginLeft="75dp"
+                android:layout_marginRight="75dp"
+                android:visibility="gone"
+                android:layout_marginBottom="20dp"
+                android:background="#00ffffff" />
         </RelativeLayout>
 
         <LinearLayout

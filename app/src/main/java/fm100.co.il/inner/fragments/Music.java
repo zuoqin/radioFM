@@ -127,6 +127,13 @@ public class Music extends Fragment {
 	private Handler customHandler = new Handler();
 	Runnable runnable;
 
+	private int isLoading = 0;
+
+	private Player myPlayer;
+
+	private ImageButton itemTopIb;
+	private ImageButton itemBotIb;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater,
 							 @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -135,8 +142,9 @@ public class Music extends Fragment {
 		mView = v;
 		// flipping Layout the RTL to LTR incase needed
 		LinearLayout songBarLL = (LinearLayout) v.findViewById(R.id.songBarLL);
-		EventBus.getDefault().register(this);
 		task.execute("JsonCo.json");
+		EventBus.getDefault().register(this);
+
 
 		initWheel();
 
@@ -156,12 +164,12 @@ public class Music extends Fragment {
 		pauseOnPhoneCalls();
 
 		Typeface custom_font_eng_light = Typeface.createFromAsset(MainActivity.getMyApplicationContext().getAssets(), "fonts/OpenSans-Light.ttf");
-		//Typeface custom_font_heb_black = Typeface.createFromAsset(MainActivity.getMyApplicationContext().getAssets(), "fonts/FBSPOILER-BLACK.otf");
+		Typeface custom_font_heb_regular = Typeface.createFromAsset(MainActivity.getMyApplicationContext().getAssets(), "fonts/FbSpoilerRegular.ttf");
 
 		//channelsLv = (ListView) v.findViewById(R.id.channelLv);
 
 		channelNameTv = (TextView) v.findViewById(R.id.channelNameTv);
-		//channelNameTv.setTypeface(custom_font_heb_black);
+		channelNameTv.setTypeface(custom_font_heb_regular);
 		//channelNameTv.setText("No Channel Yet Selected");
 
 		songNameTv = (TextView) v.findViewById(R.id.songNameTv);
@@ -193,10 +201,24 @@ public class Music extends Fragment {
 		if (listCreated == 0 && channelsArray!=null){
 			myCustomAdapter = new ChannelListAdapter(getActivity(), MainActivity.channelsArray);
 			//channelsLv.setAdapter(myCustomAdapter);
-			Log.e("myloglog", "list 1: " + MainActivity.channelsArray);
 			//channelsLv.setOnItemClickListener(itemClickListener);
 
 		}
+
+		itemTopIb = (ImageButton) v.findViewById(R.id.itemTopIb);
+		itemTopIb.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				myWheelView.smoothScrollBy(-315,1000);
+			}
+		});
+		itemBotIb = (ImageButton) v.findViewById(R.id.itemBotIb);
+		itemBotIb.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				myWheelView.smoothScrollBy(315, 1000);
+			}
+		});
 
 		startSongThread();
 
@@ -212,7 +234,7 @@ public class Music extends Fragment {
 		//myWheelView.setWheelData(channelsArray);
 		myWheelView.setWheelSize(3);
 		myWheelView.setSkin(WheelView.Skin.None);
-		//myWheelView.setWheelClickable(true);
+		myWheelView.setWheelClickable(true);
 		myWheelView.setSelection(2);
 		WheelView.WheelViewStyle style = new WheelView.WheelViewStyle();
 
@@ -224,12 +246,15 @@ public class Music extends Fragment {
 		style.selectedTextSize = 20;
 		myWheelView.setLoop(true);
 		myWheelView.setStyle(style);
-		/*myWheelView.setOnWheelItemClickListener(new WheelView.OnWheelItemClickListener() {
+		myWheelView.setOnWheelItemClickListener(new WheelView.OnWheelItemClickListener() {
 			@Override
 			public void onItemClick(int position, Object o) {
-				Toast.makeText(MainActivity.getMyApplicationContext(), "click" + position, Toast.LENGTH_SHORT).show();
+				Toast.makeText(MainActivity.getMyApplicationContext(), "click" + myWheelView.getCurrentPosition() , Toast.LENGTH_SHORT).show();
+				//myWheelView.smoothScrollToPosition(position+1 ,0);
+				//myWheelView.smoothScrollByOffset(5);
+				//myWheelView.smoothScrollBy(300,1000);
 			}
-		});*/
+		});
 		myWheelView.setOnWheelItemSelectedListener(new WheelView.OnWheelItemSelectedListener() {
 			@Override
 			public void onItemSelected(final int position, Object o) {
@@ -254,7 +279,8 @@ public class Music extends Fragment {
 										lastChannel.setChannelName(currentChannel.getChannelName());
 										lastChannel.setChannelUrl(currentChannel.getChannelUrl());
 										mediaPlayer.reset();
-										new Player().execute(currentChannel.getChannelUrl());
+										myPlayer = new Player();
+										myPlayer.execute(currentChannel.getChannelUrl());
 										isPlaying = 1;
 									}/* ----- if re-chosing the station it pause\play based on last state -----
 									 else {
@@ -272,10 +298,19 @@ public class Music extends Fragment {
 										}
 										EventBus.getDefault().post(event);
 									}*/
+
 								} else {
-									Toast.makeText(MainActivity.getMyApplicationContext(), "please waite while loading last station selected", Toast.LENGTH_LONG).show();
-									myWheelView.setSelection(lastSelectionLoaded);
+									if (lastSelectionLoaded == position){
+										isLoading = 0;
+									}
+									if (isLoading == 0) {
+										Toast.makeText(MainActivity.getMyApplicationContext(), "please waite while loading last station selected", Toast.LENGTH_LONG).show();
+										myWheelView.setSelection(lastSelectionLoaded);
+										isLoading = 1;
+									}
+									//myPlayer.cancel(true);
 								}
+
 							}
 						}
 					};
@@ -351,10 +386,12 @@ public class Music extends Fragment {
 							lastChannel.setChannelName(currentChannel.getChannelName());
 							lastChannel.setChannelUrl(currentChannel.getChannelUrl());
 							mediaPlayer.reset();
-							new Player().execute(currentChannel.getChannelUrl());
+							myPlayer = new Player();
+							myPlayer.execute(currentChannel.getChannelUrl());
 
 						} else {
-							new Player().execute(currentChannel.getChannelUrl());
+							myPlayer = new Player();
+							myPlayer.execute(currentChannel.getChannelUrl());
 						}
 					} else {
 						mediaPlayer.start();
@@ -390,7 +427,9 @@ public class Music extends Fragment {
 						if (mediaPlayer != null){
 							if(isPausedInCall){
 								isPausedInCall = false;
-								Log.e("mynewlog" , "call ended");
+								Log.e("mynewlog", "call ended");
+								Log.e("mynewlog", "is playing " + isPlaying);
+								if(isPlaying == 1)
 								playMedia();
 							}
 						}
@@ -431,7 +470,8 @@ public class Music extends Fragment {
 					lastChannel.setChannelName(currentChannel.getChannelName());
 					lastChannel.setChannelUrl(currentChannel.getChannelUrl());
 					mediaPlayer.reset();
-					new Player().execute(currentChannel.getChannelUrl());
+					myPlayer = new Player();
+					myPlayer.execute(currentChannel.getChannelUrl());
 					isPlaying = 1;
 				} else {
 					if (isPlaying == 0) {
@@ -461,11 +501,12 @@ public class Music extends Fragment {
 		@Override
 		protected Boolean doInBackground(String... params) {
 			lastStationLoading = 1;
-			Boolean prepared;
+			Boolean prepared= false;
 			try {
 				mediaPlayer.setDataSource(params[0]);
 				mediaPlayer.prepare();
 				prepared = true;
+
 			} catch (Exception e){
 				Log.d("IllegarArgument", e.getMessage());
 				prepared = false;
@@ -524,9 +565,7 @@ public class Music extends Fragment {
 				String path=MainActivity.getMyApplicationContext().getFilesDir().getAbsolutePath()+"/Song.xml";
 				File file = new File ( path );
 				if ( file.exists() ){
-
 					currentSong = SongXMLParser.getSongFromFile(MainActivity.getMyApplicationContext());
-
 				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -622,7 +661,8 @@ public class Music extends Fragment {
 					lastChannel.setChannelName(currentChannel.getChannelName());
 					lastChannel.setChannelUrl(currentChannel.getChannelUrl());
 					mediaPlayer.reset();
-					new Player().execute(currentChannel.getChannelUrl());
+					myPlayer = new Player();
+					myPlayer.execute(currentChannel.getChannelUrl());
 					isPlaying = 1;
 					/*
 					NotificationBusEvent event = new NotificationBusEvent("play");
@@ -685,8 +725,6 @@ public class Music extends Fragment {
 			setListData(stationList);
 			myCustomAdapter = new ChannelListAdapter(getActivity(), MainActivity.channelsArray);
 			//channelsLv.setAdapter(myCustomAdapter);
-			Log.e("myloglog", "list 2: " + channelsArray);
-			Log.e("myloglog", "list 4: " + MainActivity.getStations());
 			//channelsLv.setOnItemClickListener(itemClickListener);
 			listCreated = 1;
 			//progressView.setVisibility(View.INVISIBLE);
@@ -703,6 +741,8 @@ public class Music extends Fragment {
 			myWheelView.setWheelData(newMyObjList);
 			myWheelView.setSelection(0);
 			myWheelView.setVisibility(View.VISIBLE);
+			itemTopIb.setVisibility(View.VISIBLE);
+			itemBotIb.setVisibility(View.VISIBLE);
 
 		}
 

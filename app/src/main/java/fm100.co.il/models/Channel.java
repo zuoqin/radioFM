@@ -10,6 +10,7 @@ public class Channel {
     private String channelUrl ="";
     private String songDataUrl ="";
     private String channelLogo = "";
+    private String channelSlug = "";
 
     public Channel(){
 
@@ -20,6 +21,22 @@ public class Channel {
         this.channelUrl = channelUrl;
         this.songDataUrl = songDataUrl;
         this.channelLogo = channelLogo;
+    }
+
+    public Channel(String channelName, String channelUrl , String songDataUrl ,  String channelLogo , String channelSlug) {
+        this.channelName = channelName;
+        this.channelUrl = channelUrl;
+        this.songDataUrl = songDataUrl;
+        this.channelLogo = channelLogo;
+        this.channelSlug = channelSlug;
+    }
+
+    public String getChannelSlug() {
+        return channelSlug;
+    }
+
+    public void setChannelSlug(String channelSlug) {
+        this.channelSlug = channelSlug;
     }
 
     public String getChannelName() {

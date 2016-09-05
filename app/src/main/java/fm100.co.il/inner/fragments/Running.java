@@ -175,6 +175,17 @@ public class Running extends Fragment {
 		lastTimeTv = (TextView) v.findViewById(R.id.lastTimeTv);
 		timePastTv = (TextView) v.findViewById(R.id.timePastTv);
 
+		Typeface custom_font_eng_light = Typeface.createFromAsset(MainActivity.getMyApplicationContext().getAssets(), "fonts/OpenSans-Light.ttf");
+		Typeface custom_font_heb_regular = Typeface.createFromAsset(MainActivity.getMyApplicationContext().getAssets(), "fonts/FbSpoilerRegular.ttf");
+
+		distanceTv.setTypeface(custom_font_heb_regular);
+		speedTv.setTypeface(custom_font_heb_regular);
+		lastDistanceTv.setTypeface(custom_font_heb_regular);
+		timerTv.setTypeface(custom_font_heb_regular);
+		lastTimeTv.setTypeface(custom_font_heb_regular);
+		timePastTv.setTypeface(custom_font_heb_regular);
+		startStopBtn.setTypeface(custom_font_heb_regular);
+
 		ll = (LinearLayout) v.findViewById(R.id.drawingArea);
 
 

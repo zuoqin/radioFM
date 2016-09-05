@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -77,6 +78,10 @@ public class Video extends Fragment {
 	ReadFileTask task = new ReadFileTask();
 	videoFromJsonTask vidTask = new videoFromJsonTask();
 
+	private ProgressBar videoLvProgress;
+
+	private VideoObj firstVideoObj;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater,
 							 @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -87,10 +92,10 @@ public class Video extends Fragment {
 		webView = (WebView) v.findViewById(R.id.webView);
 		videoLv = (ListView) v.findViewById(R.id.videoLv);
 		//VideoView vidView = (VideoView)v.findViewById(R.id.videoView);
+		videoLvProgress = (ProgressBar) v.findViewById(R.id.videoLvProgress);
+		task.execute("JsonCo.json");
 
 		webView.setVisibility(View.INVISIBLE);
-
-		task.execute("JsonCo.json");
 
 		startStreamBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -126,6 +131,11 @@ public class Video extends Fragment {
 		*/
 		});
 
+		firstVideoObj = new VideoObj();
+		firstVideoObj.setTitle(MainActivity.getMyApplicationContext().getString(R.string.firstVideoTitle));
+		firstVideoObj.setThumbnail("http://a5.mzstatic.com/us/r30/Purple69/v4/3d/b8/29/3db829f9-7432-1707-7945-cdcfb3cd5cc1/icon175x175.jpeg");
+		firstVideoObj.setPublished("live");
+
 		if (listCreated == 0 && videoList!=null){
 			videoLvAdapter = new VideoLvAdapter(getActivity() , videoList);
 			videoLv.setAdapter(videoLvAdapter);
@@ -155,7 +165,8 @@ public class Video extends Fragment {
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			String videoId =videoList.get(position).getId();
 			String itemURL = mainVideoLink+videoId;
-
+			Toast.makeText(MainActivity.getMyApplicationContext() , "TOAST" , Toast.LENGTH_SHORT).show();
+			//webView.loadUrl(itemURL);
 			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(itemURL)));
 		}
 	};
@@ -225,7 +236,9 @@ public class Video extends Fragment {
 		@Override
 		protected void onPostExecute(List<VideoObj> videoObjs) {
 			super.onPostExecute(videoObjs);
+			videoLvProgress.setVisibility(View.GONE);
 			videoList = videoObjs;
+			//videoList.add(0 , firstVideoObj );
 			videoLvAdapter = new VideoLvAdapter(getActivity() , videoList);
 			videoLv.setAdapter(videoLvAdapter);
 			videoLv.setOnItemClickListener(onVideoClick);

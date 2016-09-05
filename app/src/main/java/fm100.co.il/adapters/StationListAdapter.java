@@ -1,6 +1,7 @@
 package fm100.co.il.adapters;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,7 +49,8 @@ public class StationListAdapter extends BaseAdapter{
     }
 
     static class ViewHolder{
-        public ImageView stationItemImage;
+       // public ImageView stationItemImage;
+        public TextView stationItemText;
     }
 
     @Override
@@ -59,7 +61,12 @@ public class StationListAdapter extends BaseAdapter{
         if (rowView == null){
             rowView = inflater.inflate(R.layout.station_draweritem_layout, parent , false);
             holder = new ViewHolder();
-            holder.stationItemImage = (ImageView) rowView.findViewById(R.id.stationItemIv);
+
+            holder.stationItemText = (TextView) rowView.findViewById(R.id.stationItemTv);
+
+            Typeface custom_font_eng_light = Typeface.createFromAsset(MainActivity.getMyApplicationContext().getAssets(), "fonts/OpenSans-Light.ttf");
+
+            holder.stationItemText.setTypeface(custom_font_eng_light);
 
             rowView.setTag(holder);
         }
@@ -72,8 +79,7 @@ public class StationListAdapter extends BaseAdapter{
         else{
             tempValues = null;
             tempValues = nameObjArray.get(position);
-
-            Picasso.with(context).load(tempValues.getChannelLogo()).into(holder.stationItemImage);
+            holder.stationItemText.setText(tempValues.getChannelName());
         }
 
         return rowView;

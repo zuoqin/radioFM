@@ -24,6 +24,7 @@ import android.widget.TabHost.TabContentFactory;
 
 import fm100.co.il.adapters.MyFragmentPagerAdapter;
 import fm100.co.il.inner.fragments.Music;
+import fm100.co.il.inner.fragments.Schedule;
 import fm100.co.il.inner.fragments.Video;
 import fm100.co.il.inner.fragments.Running;
 import fm100.co.il.R;
@@ -53,7 +54,7 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 		// setting limit so the fragments wont get paused
 		viewPager.setOffscreenPageLimit(4);
 		//setting default tab (opening tab)
-		tabHost.setCurrentTab(1);
+		tabHost.setCurrentTab(2);
 
 		return v;
 	}
@@ -79,6 +80,7 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 			fragmentsList.add(new Video());
 			fragmentsList.add(new Music());
 			fragmentsList.add(new Running());
+			fragmentsList.add(new Schedule());
 
 		this.myViewPagerAdapter = new MyFragmentPagerAdapter(
 				getChildFragmentManager(), fragmentsList);
@@ -95,8 +97,9 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 		Drawable video = getResources().getDrawable(R.drawable.video_off);
 		Drawable music = getResources().getDrawable(R.drawable.radio_off);
 		Drawable running = getResources().getDrawable(R.drawable.run_off);
+		Drawable schedule = getResources().getDrawable(R.drawable.schedule_off);
 
-		Drawable[] drawables = new Drawable[]{video, music, running};
+		Drawable[] drawables = new Drawable[]{video, music, running , schedule};
 
 
 		setTabsIcons(drawables);
@@ -108,7 +111,7 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 
 			//tabsNames = new String[]{"running", "music", "video"};
 
-			tabsNames = new String[]{"video", "music", "running"};
+			tabsNames = new String[]{"video", "music", "running" , "schedule"};
 
 
 		for (int i=drawables.length-1 ; i>=0 ; i--){
@@ -153,46 +156,59 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 	private void highlightCurrentTab(int selectedItem) {
 
 		if(isRTL()==false) {
-			ImageView videoIv = (ImageView) tabHost.getTabWidget().getChildAt(0).findViewById(R.id.tabImage);
+			ImageView videoIv = (ImageView) tabHost.getTabWidget().getChildAt(1).findViewById(R.id.tabImage);
 			videoIv.setImageResource(R.drawable.video_off);
-			ImageView musicIv = (ImageView) tabHost.getTabWidget().getChildAt(1).findViewById(R.id.tabImage);
+			ImageView musicIv = (ImageView) tabHost.getTabWidget().getChildAt(2).findViewById(R.id.tabImage);
 			musicIv.setImageResource(R.drawable.radio_off);
-			ImageView runningIv = (ImageView) tabHost.getTabWidget().getChildAt(2).findViewById(R.id.tabImage);
+			ImageView runningIv = (ImageView) tabHost.getTabWidget().getChildAt(3).findViewById(R.id.tabImage);
 			runningIv.setImageResource(R.drawable.run_off);
+			ImageView ScheduleIv = (ImageView) tabHost.getTabWidget().getChildAt(0).findViewById(R.id.tabImage);
+			ScheduleIv.setImageResource(R.drawable.schedule_off);
 
 			switch (selectedItem){
-				case 0:
-					videoIv = (ImageView) tabHost.getTabWidget().getChildAt(0).findViewById(R.id.tabImage);
+				case 1:
+					videoIv = (ImageView) tabHost.getTabWidget().getChildAt(1).findViewById(R.id.tabImage);
 					videoIv.setImageResource(R.drawable.video_on);
 					break;
-				case 1:
-					musicIv = (ImageView) tabHost.getTabWidget().getChildAt(1).findViewById(R.id.tabImage);
+				case 2:
+					musicIv = (ImageView) tabHost.getTabWidget().getChildAt(2).findViewById(R.id.tabImage);
 					musicIv.setImageResource(R.drawable.radio_on);
 					break;
-				case 2:
-					runningIv = (ImageView) tabHost.getTabWidget().getChildAt(2).findViewById(R.id.tabImage);
+				case 3:
+					runningIv = (ImageView) tabHost.getTabWidget().getChildAt(3).findViewById(R.id.tabImage);
 					runningIv.setImageResource(R.drawable.run_on);
+					break;
+				case 0:
+					ScheduleIv = (ImageView) tabHost.getTabWidget().getChildAt(0).findViewById(R.id.tabImage);
+					ScheduleIv.setImageResource(R.drawable.schedule_on);
 					break;
 			}
 		}else{
-			ImageView videoIv = (ImageView) tabHost.getTabWidget().getChildAt(2).findViewById(R.id.tabImage);
+
+			ImageView videoIv = (ImageView) tabHost.getTabWidget().getChildAt(3).findViewById(R.id.tabImage);
 			videoIv.setImageResource(R.drawable.video_off);
-			ImageView musicIv = (ImageView) tabHost.getTabWidget().getChildAt(1).findViewById(R.id.tabImage);
+			ImageView musicIv = (ImageView) tabHost.getTabWidget().getChildAt(2).findViewById(R.id.tabImage);
 			musicIv.setImageResource(R.drawable.radio_off);
-			ImageView runningIv = (ImageView) tabHost.getTabWidget().getChildAt(0).findViewById(R.id.tabImage);
+			ImageView runningIv = (ImageView) tabHost.getTabWidget().getChildAt(1).findViewById(R.id.tabImage);
 			runningIv.setImageResource(R.drawable.run_off);
+			ImageView ScheduleIv = (ImageView) tabHost.getTabWidget().getChildAt(0).findViewById(R.id.tabImage);
+			ScheduleIv.setImageResource(R.drawable.schedule_off);
 
 			switch (selectedItem){
-				case 2:
-					videoIv = (ImageView) tabHost.getTabWidget().getChildAt(2).findViewById(R.id.tabImage);
+				case 0:
+					ScheduleIv = (ImageView) tabHost.getTabWidget().getChildAt(0).findViewById(R.id.tabImage);
+					ScheduleIv.setImageResource(R.drawable.schedule_on);
+					break;
+				case 3:
+					videoIv = (ImageView) tabHost.getTabWidget().getChildAt(3).findViewById(R.id.tabImage);
 					videoIv.setImageResource(R.drawable.video_on);
 					break;
-				case 1:
-					musicIv = (ImageView) tabHost.getTabWidget().getChildAt(1).findViewById(R.id.tabImage);
+				case 2:
+					musicIv = (ImageView) tabHost.getTabWidget().getChildAt(2).findViewById(R.id.tabImage);
 					musicIv.setImageResource(R.drawable.radio_on);
 					break;
-				case 0:
-					runningIv = (ImageView) tabHost.getTabWidget().getChildAt(0).findViewById(R.id.tabImage);
+				case 1:
+					runningIv = (ImageView) tabHost.getTabWidget().getChildAt(1).findViewById(R.id.tabImage);
 					runningIv.setImageResource(R.drawable.run_on);
 					break;
 			}

@@ -33,6 +33,9 @@ public class Downloader {
 
 			/* Open a connection to that URL. */
             URLConnection ucon = url.openConnection();
+            ucon.setRequestProperty("Content-Type","text/xml");
+            //ucon.setRequestProperty("Expect", "100-continue");
+
 
             // this will be useful so that you can show a tipical 0-100% progress bar
             //int lenghtOfFile = ucon.getContentLength();

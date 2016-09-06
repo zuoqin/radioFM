@@ -101,12 +101,13 @@ public class Video extends Fragment {
 			@Override
 			public void onClick(View v) {
 				String url = "http://100fm.multix.co.il/";
-				webView.setWebChromeClient(new WebChromeClient());
+				webView.setWebViewClient(new WebViewClient());
 				WebSettings webSettings = webView.getSettings();
 				webSettings.setJavaScriptEnabled(true);
 				webSettings.setUseWideViewPort(true);
 				webSettings.setLoadWithOverviewMode(true);
-				webView.loadUrl(url);
+				webView.loadData(url, "text/html", "utf-8");
+				//webView.loadUrl(url);
 			}
 
 

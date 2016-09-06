@@ -262,6 +262,7 @@ public class Music extends Fragment {
 				runnable = new Runnable() {
 					@Override
 					public void run() {
+
 							if (myWheelView.getCurrentPosition() == position) {
 								//Toast.makeText(MainActivity.getMyApplicationContext(), "scroll" + myWheelView.getCurrentPosition() +" " + position, Toast.LENGTH_SHORT).show();
 								if (lastStationLoading == 0) {
@@ -299,14 +300,15 @@ public class Music extends Fragment {
 										EventBus.getDefault().post(event);
 									}*/
 
+
 								} else {
-									if (lastSelectionLoaded == position){
-										isLoading = 0;
-									}
+									//if (lastSelectionLoaded == position){
+									//	isLoading = 0;
+									//}
 									if (isLoading == 0) {
 										Toast.makeText(MainActivity.getMyApplicationContext(), "please waite while loading last station selected", Toast.LENGTH_LONG).show();
 										myWheelView.setSelection(lastSelectionLoaded);
-										isLoading = 1;
+										//isLoading = 1;
 									}
 									//myPlayer.cancel(true);
 								}

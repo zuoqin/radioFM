@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:id="@+id/drawer_layout"
     tools:context="com.demo.slidingmenu_tabhostviewpager.MainActivity"
-    android:background="@drawable/background2">
+    android:background="@drawable/bg">
 
     <!-- Main content (main screen) -->
 
@@ -65,7 +65,7 @@
                     android:layout_weight="1"
                     android:scaleType="fitCenter"
                     android:background="#00ffffff"
-                    android:src="@drawable/facebookicon" />
+                    android:src="@drawable/facebook" />
 
                 <ImageButton
                     android:layout_width="match_parent"
@@ -75,7 +75,7 @@
                     android:layout_weight="1"
                     android:scaleType="fitCenter"
                     android:background="#00ffffff"
-                    android:src="@drawable/instagramicon" />
+                    android:src="@drawable/instagram" />
 
                 <ImageButton
                     android:layout_width="match_parent"
@@ -85,7 +85,7 @@
                     android:layout_weight="1"
                     android:scaleType="fitCenter"
                     android:background="#00ffffff"
-                    android:src="@drawable/websiteicon" />
+                    android:src="@drawable/chrome" />
             </LinearLayout>
 
             <TextView

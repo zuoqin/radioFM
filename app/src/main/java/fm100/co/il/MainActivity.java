@@ -45,7 +45,12 @@ import java.io.BufferedReader;
         import android.widget.TextView;
         import android.widget.Toast;
 
-        import fm100.co.il.adapters.StationListAdapter;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+
+import cz.msebera.android.httpclient.Header;
+import fm100.co.il.adapters.ChannelListAdapter;
+import fm100.co.il.adapters.StationListAdapter;
         import fm100.co.il.busEvents.IntBusEvent;
         import fm100.co.il.busEvents.NewSongBusEvent;
         import fm100.co.il.busEvents.NotificationBusEvent;
@@ -56,7 +61,8 @@ import java.io.BufferedReader;
         import fm100.co.il.fragments.MyHome;
         import fm100.co.il.fragments.MySettings;
         import fm100.co.il.models.Channel;
-        import fm100.co.il.models.NavItem;
+import fm100.co.il.models.MyObject;
+import fm100.co.il.models.NavItem;
         import fm100.co.il.models.Station;
         import fm100.co.il.R;
         import fm100.co.il.models.VideoObj;
@@ -64,7 +70,8 @@ import java.io.BufferedReader;
         import org.greenrobot.eventbus.EventBus;
         import org.greenrobot.eventbus.Subscribe;
         import org.json.JSONArray;
-        import org.json.JSONObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MainActivity extends ActionBarActivity {
 //    private static MainActivity ins;
@@ -95,8 +102,6 @@ public class MainActivity extends ActionBarActivity {
     StationListAdapter myCustomAdapter;
     public List<Station> stationList = new ArrayList<>();
     public List<VideoObj> videoList = new ArrayList<>();
-    ReadFileTask task = new ReadFileTask();
-    StationsFromJsonTask stationTask = new StationsFromJsonTask();
 
 
     // setting irational number so first time never be even
@@ -143,69 +148,68 @@ public class MainActivity extends ActionBarActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // checking if file already exists if it does it doesnt download it again
-        String path=this.getFilesDir().getAbsolutePath()+"/JsonCo.json";
-        File file = new File ( path );
-        if ( file.exists() )
-        {
-            task.execute("JsonCo.json");
-        } else {
-            new JSONTask().execute("http://demo.goufo.co.il/100fm/");
-        }
-        // setting the StationsList
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get("http://demo.goufo.co.il/100fm/", new AsyncHttpResponseHandler() {
 
-        //setting title bar background
-        Drawable titleDrawable = getResources().getDrawable(R.drawable.fmtitlebar);
-        getSupportActionBar().setBackgroundDrawable(titleDrawable);
+            @Override
+            public void onStart() {
+                // called before request is started
+            }
 
-        //setting drawer list items , Fragments and setting an adapter to the view
-        listNavItems = new ArrayList<NavItem>();
-        listNavItems.add(new NavItem("Home", "MyHome page",
-                R.drawable.homeyellow));
-        listNavItems.add(new NavItem("Settings", "Change something",
-                R.drawable.settingsyellow2));
-        listNavItems.add(new NavItem("About", "Author's information",
-                R.drawable.informationyellow));
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    JSONObject obj = new JSONObject(new String(responseBody));
+                    JSONArray parentArray = obj.getJSONArray("stations");
 
-        NavListAdapter navListAdapter = new NavListAdapter(
-                getApplicationContext(), R.layout.item_nav_list, listNavItems);
+                    Station tempStation = null;
 
-        lvNav.setAdapter(navListAdapter);
+                    for (int i = 0; i < parentArray.length(); i++) {
 
-        listFragments = new ArrayList<Fragment>();
-        listFragments.add(new MyHome());
-        listFragments.add(new MySettings());
-        listFragments.add(new MyAbout());
+                        tempStation = new Station();
+                        JSONObject finalObject = parentArray.getJSONObject(i);
+                        tempStation.setStationName(finalObject.getString("name"));
+                        tempStation.setStationAudio(finalObject.getString("audio"));
+                        tempStation.setSongInfo(finalObject.getString("info"));
+                        tempStation.setStationSlug(finalObject.getString("slug"));
+                        tempStation.setStationLogo(finalObject.getString("logo"));
+                        stationList.add(tempStation);
+                    }
 
-        // load MyHome fragment as default:
+                    drawerListProgressBar.setVisibility(View.GONE);
+                    setListData(stationList);
+                    myCustomAdapter = new StationListAdapter(myApplicationContext, channelsArray);
+                    lvStations.setAdapter(myCustomAdapter);
+                    lvStations.setOnItemClickListener(itemClickListener);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Log.d("fm100", "100fm loaded : " + stationList.size()	 );
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+
+            }
+
+            @Override
+            public void onRetry(int retryNo) {
+                // called when request is retried
+            }
+        });
+
+
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.main_content, listFragments.get(0)).commit();
+                .replace(R.id.main_content, new MyHome()).commit();
+
+        Drawable titleDrawable = getResources().getDrawable(R.drawable.header);
+        getSupportActionBar().setBackgroundDrawable(titleDrawable);
+
 
         setTitle("");
 
-        lvNav.setItemChecked(0, true);
         drawerLayout.closeDrawer(drawerPane);
-
-        // set listener for the drawer list items:
-        lvNav.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-
-                // replace the fragment with the selected option fragment:
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                fragmentManager
-                        .beginTransaction()
-                        .replace(R.id.main_content, listFragments.get(position))
-                        .commit();
-
-
-                lvNav.setItemChecked(position, true);
-                drawerLayout.closeDrawer(drawerPane);
-
-            }
-        });
 
         // set listener for drawer layout
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
@@ -369,149 +373,11 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    //Async Tasks to Write and read new Json File on internal storage
-    public class JSONTask extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... params) {
-            List<String> stringList = null;
-            HttpURLConnection connection = null;
-            BufferedReader reader = null;
-
-            try {
-                URL url = new URL(params[0]);
-                connection = (HttpURLConnection) url.openConnection();
-                connection.connect();
-                InputStream stream = connection.getInputStream();
-                reader = new BufferedReader(new InputStreamReader(stream));
-                StringBuffer buffer = new StringBuffer();
-                String line = "";
-                while ((line = reader.readLine()) != null) {
-                    buffer.append(line);
-                }
-                String finalJson = buffer.toString();
-
-                return finalJson;
-
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if (connection != null) {
-                    connection.disconnect();
-                }
-                try {
-                    if (reader != null) {
-                        reader.close();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            FileOutputStream outputStream = null;
-            int created = 0;
-            try{
-                outputStream = openFileOutput("JsonCo.json" , Context.MODE_PRIVATE);
-                outputStream.write(result.getBytes());
-                outputStream.close();
-                created = 1;
-            }catch (Exception e){
-                Log.e("MyLog" , e.getMessage());
-            }
-            if ( created == 1){
-                task.execute("JsonCo.json");
-            }
-        }
-    }
     private boolean isRTL() {
         Locale defLocale = Locale.getDefault();
         return  Character.getDirectionality(defLocale.getDisplayName(defLocale).charAt(0)) == Character.DIRECTIONALITY_RIGHT_TO_LEFT;
     }
 
-    // ------------------------ -----------------------           ----------------------------------------------
-    // JSON RELATED ASYNCTASKS
-    public class ReadFileTask extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-            String temp="";
-            try {
-                FileInputStream fin = myApplicationContext.openFileInput(params[0]);
-                int c;
-                while( (c = fin.read()) != -1){
-                    temp = temp + Character.toString((char)c);
-                }
-                fin.close();
-            } catch (Exception e){
-                Log.e("MyLog" , "read task exception: " + e.getMessage());
-            }
-            return temp;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            // getting a list of Station objects
-           // stationList = StationsFromJson(result);
-            stationTask.execute(result);
-            //videoList = videosFromJson(result);
-           // Log.e("mynewlog" , "its this station: " + stationList.get(0).toString());
-            //Log.e("mynewlog" , "its this video: " + videoList.get(0).toString());
-            //EventBus.getDefault().post(new StationBusEvent(stationList));
-            //EventBus.getDefault().post(new VideoListBusEvent(videoList));
-           // setListData(stationList);
-            //myCustomAdapter = new StationListAdapter(myApplicationContext, channelsArray);
-            //lvStations.setAdapter(myCustomAdapter);
-            //lvStations.setOnItemClickListener(itemClickListener);
-        }
-    }
-
-    public class StationsFromJsonTask extends AsyncTask<String, Void, List<Station>> {
-
-        @Override
-        protected List<Station> doInBackground(String... params) {
-            try {
-                JSONObject parentObject = new JSONObject(params[0]);
-
-                JSONArray parentArray = parentObject.getJSONArray("stations");
-
-                Station tempStation = null;
-
-                for (int i = 0; i < parentArray.length(); i++) {
-
-                    tempStation = new Station();
-                    JSONObject finalObject = parentArray.getJSONObject(i);
-                    tempStation.setStationName(finalObject.getString("name"));
-                    tempStation.setStationAudio(finalObject.getString("audio"));
-                    tempStation.setSongInfo(finalObject.getString("info"));
-                    tempStation.setStationSlug(finalObject.getString("slug"));
-                    tempStation.setStationLogo(finalObject.getString("logo"));
-                    stationList.add(tempStation);
-                }
-            } catch (Exception e) {
-                Log.e("HereLog", "Json Exception" + e.getMessage());
-            }
-
-            return stationList;
-        }
-
-        @Override
-        protected void onPostExecute(List<Station> stations) {
-            super.onPostExecute(stations);
-            drawerListProgressBar.setVisibility(View.GONE);
-            stationList = stations;
-            setListData(stationList);
-            myCustomAdapter = new StationListAdapter(myApplicationContext, channelsArray);
-            lvStations.setAdapter(myCustomAdapter);
-            lvStations.setOnItemClickListener(itemClickListener);
-        }
-    }
     private void setListData(List<Station> stations) {
         for (int i = 0 ; i<stations.size() ; i++){
             final Channel newChannel = new Channel(stations.get(i).getStationSlug()
@@ -520,6 +386,7 @@ public class MainActivity extends ActionBarActivity {
             channelsArray.add(newChannel);
         }
     }
+
     AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener(){
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -541,66 +408,4 @@ public class MainActivity extends ActionBarActivity {
             lastItemClicked = position;
         }
     };
-
-    public List<VideoObj> videosFromJson(String jsonString){
-
-        try {
-            JSONObject parentObject = new JSONObject(jsonString);
-
-            JSONObject parentObject2 = parentObject.getJSONObject("video");
-
-            JSONArray parentArray = parentObject2.getJSONArray("archive");
-
-            VideoObj tempVideo = null;
-
-            for (int i = 0; i < parentArray.length(); i++) {
-
-                tempVideo = new VideoObj();
-                JSONObject finalObject = parentArray.getJSONObject(i);
-                tempVideo.setId((finalObject.getString("id")));
-                tempVideo.setPublished(finalObject.getString("published"));
-                tempVideo.setThumbnail(finalObject.getString("thumbnail"));
-                tempVideo.setTitle(finalObject.getString("title"));
-
-                videoList.add(tempVideo);
-            }
-        } catch (Exception e) {
-            Log.e("HereLog", "Json Exception" + e.getMessage());
-        }
-
-        return videoList;
-
-    }
-    private void flipLayouts() {
-        LinearLayout runningFragLL1 = (LinearLayout) findViewById(R.id.runningFragLL1);
-        LinearLayout runningFragLL2 = (LinearLayout) findViewById(R.id.runningFragLL2);
-        LinearLayout runningFragLL3 = (LinearLayout) findViewById(R.id.runningFragLL3);
-        LinearLayout runningFragLL4 = (LinearLayout) findViewById(R.id.runningFragLL4);
-        LinearLayout runningFragLL5 = (LinearLayout) findViewById(R.id.runningFragLL5);
-
-        List<LinearLayout> llList = new ArrayList<>();
-        llList.add(runningFragLL1);
-        llList.add(runningFragLL2);
-        llList.add(runningFragLL3);
-        llList.add(runningFragLL4);
-        llList.add(runningFragLL5);
-
-        for (int i = 0; i < llList.size(); i++) {
-            if (isRTL() == false) {
-                ArrayList<View> views = new ArrayList<>();
-                for (int x = 0; x < llList.get(i).getChildCount(); x++) {
-                    views.add(llList.get(i).getChildAt(x));
-                }
-                llList.get(i).removeAllViews();
-                for (int x = views.size() - 1; x >= 0; x--) {
-                    llList.get(i).addView(views.get(x));
-                }
-            }
-        }
-    }
-    public static List<Channel> getStations() {
-        List<Channel> stationsArray = channelsArray;
-
-        return stationsArray;
-    }
 }

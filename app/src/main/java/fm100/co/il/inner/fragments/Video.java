@@ -88,36 +88,14 @@ public class Video extends Fragment {
 
 		View v = inflater.inflate(R.layout.video_fragment, container, false);
 		EventBus.getDefault().register(this);
-		ImageButton startStreamBtn = (ImageButton) v.findViewById(R.id.startStreamBtn);
+		//ImageButton startStreamBtn = (ImageButton) v.findViewById(R.id.startStreamBtn);
 		webView = (WebView) v.findViewById(R.id.webView);
 		videoLv = (ListView) v.findViewById(R.id.videoLv);
 		//VideoView vidView = (VideoView)v.findViewById(R.id.videoView);
 		videoLvProgress = (ProgressBar) v.findViewById(R.id.videoLvProgress);
 		task.execute("JsonCo.json");
 
-		webView.setVisibility(View.INVISIBLE);
-
-		startStreamBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				String url = "http://100fm.multix.co.il/";
-				webView.setWebViewClient(new WebViewClient());
-				WebSettings webSettings = webView.getSettings();
-				webSettings.setJavaScriptEnabled(true);
-				webSettings.setUseWideViewPort(true);
-				webSettings.setLoadWithOverviewMode(true);
-				webView.loadData(url, "text/html", "utf-8");
-				//webView.loadUrl(url);
-			}
-
-
-		/*vidView.setVideoURI(vidUri);
-		MediaController vidControl = new MediaController(getActivity());
-		vidControl.setAnchorView(vidView);
-		vidView.setMediaController(vidControl);
-		vidView.requestFocus();
-		vidView.start();
-		*/
+		//webView.setVisibility(View.INVISIBLE);
 
 		/*Intent i = new Intent(android.content.Intent.ACTION_VIEW , vidUri);
 		i.setDataAndType(vidUri , "video/*");
@@ -130,12 +108,11 @@ public class Video extends Fragment {
 		webView.getSettings().setJavaScriptEnabled(true);
 		webView.loadUrl(url);
 		*/
-		});
 
-		firstVideoObj = new VideoObj();
+		/*firstVideoObj = new VideoObj();
 		firstVideoObj.setTitle(MainActivity.getMyApplicationContext().getString(R.string.firstVideoTitle));
 		firstVideoObj.setThumbnail("http://a5.mzstatic.com/us/r30/Purple69/v4/3d/b8/29/3db829f9-7432-1707-7945-cdcfb3cd5cc1/icon175x175.jpeg");
-		firstVideoObj.setPublished("live");
+		firstVideoObj.setPublished("live");*/
 
 		if (listCreated == 0 && videoList!=null){
 			videoLvAdapter = new VideoLvAdapter(getActivity() , videoList);
@@ -144,6 +121,16 @@ public class Video extends Fragment {
 
 
 		return v;
+	}
+
+	public void changeVideoUrl(String url) {
+		webView.setWebViewClient(new WebViewClient());
+		WebSettings webSettings = webView.getSettings();
+		webSettings.setJavaScriptEnabled(true);
+		webSettings.setUseWideViewPort(true);
+		webSettings.setLoadWithOverviewMode(true);
+		//webView.loadData(url, "text/html", "utf-8");
+		webView.loadUrl(url);
 	}
 
 	// catching list of stations from main activity and attaching to list
@@ -166,9 +153,11 @@ public class Video extends Fragment {
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			String videoId =videoList.get(position).getId();
 			String itemURL = mainVideoLink+videoId;
-			Toast.makeText(MainActivity.getMyApplicationContext() , "TOAST" , Toast.LENGTH_SHORT).show();
+			//Toast.makeText(MainActivity.getMyApplicationContext() , "TOAST" , Toast.LENGTH_SHORT).show();
 			//webView.loadUrl(itemURL);
-			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(itemURL)));
+			//startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(itemURL)));
+
+			changeVideoUrl(itemURL);
 		}
 	};
 

@@ -102,6 +102,16 @@
                 android:visibility="gone"
                 android:layout_marginBottom="20dp"
                 android:background="#00ffffff" />
+
+            <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Download this song on iTunes"
+                android:id="@+id/itunesIb"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true" />
+
         </RelativeLayout>
 
         <LinearLayout
@@ -135,8 +145,8 @@
                 android:scrollHorizontally="true"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:id="@+id/songNameTv"
-                android:text="בחר תחנה "
-                android:textSize="22sp"
+                android:text="רדיוס 100FM"
+                android:textSize="30sp"
                 android:layout_alignParentTop="true"
                 android:layout_toRightOf="@+id/songImage"
                 android:layout_toEndOf="@+id/songImage"
@@ -154,7 +164,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textSize="12sp"
+                android:textSize="15sp"
                 android:id="@+id/artistNameTv"
                 android:layout_below="@+id/songNameTv"
                 android:layout_toRightOf="@+id/songImage"
@@ -165,22 +175,8 @@
                 android:textColor="#b5ffffff"
                 android:textAlignment="textStart"
                 android:ellipsize="end"
-                android:maxLines="1"/>
-
-                <ImageButton
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:id="@+id/itunesIb"
-                    android:layout_gravity="center_horizontal"
-                    android:src="@drawable/itunesicon2"
-                    android:background="#00ffffff"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginRight="5dp"
-                    android:paddingBottom="10dp"
-                    android:scaleType="fitCenter"
-                    android:paddingRight="5dp"
-                    android:paddingLeft="5dp" />
+                android:maxLines="1"
+                android:text="מוזיקה זה הכלל" />
 
             </LinearLayout>
 

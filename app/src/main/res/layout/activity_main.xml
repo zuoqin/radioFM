@@ -22,7 +22,7 @@
         android:layout_width="220dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="@drawable/mainoutlinesemitrans">
+        android:background="@drawable/bg">
 
         <!-- Profile box ; currently not displaying anything can display current channel or something-->
 
@@ -92,7 +92,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="תחנות"
+                android:text="ערוצים דיגיטליים"
                 android:id="@+id/textView4"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"

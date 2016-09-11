@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceActivity;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.telephony.PhoneStateListener;
@@ -21,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -33,6 +35,7 @@ import com.wx.wheelview.common.WheelData;
 import com.wx.wheelview.util.WheelUtils;
 import com.wx.wheelview.widget.WheelView;
 
+import cz.msebera.android.httpclient.Header;
 import fm100.co.il.adapters.MyWheelAdapter;
 import fm100.co.il.adapters.StationListAdapter;
 import fm100.co.il.busEvents.IntBusEvent;
@@ -65,6 +68,8 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
+import org.json.*;
+import com.loopj.android.http.*;
 
 /************************************************
  * the activity of the music fragment
@@ -76,7 +81,7 @@ public class Music extends Fragment {
 	private boolean playPause;
 	private static MediaPlayer mediaPlayer = new MediaPlayer();
 	private TextView channelNameTv;
-	private ImageButton itunesIb;
+	private Button itunesIb;
 
 	private TextView songNameTv;
 	private TextView artistNameTv;
@@ -113,7 +118,7 @@ public class Music extends Fragment {
 
 	private int listCreated = 0;
 
-	ReadFileTask task = new ReadFileTask();
+	//ReadFileTask task = new ReadFileTask();
 
 	private Boolean isPausedInCall = false;
 	private PhoneStateListener phoneStateListener;
@@ -142,8 +147,73 @@ public class Music extends Fragment {
 		mView = v;
 		// flipping Layout the RTL to LTR incase needed
 		LinearLayout songBarLL = (LinearLayout) v.findViewById(R.id.songBarLL);
-		task.execute("JsonCo.json");
+		//task.execute("JsonCo.json");
 		EventBus.getDefault().register(this);
+
+		AsyncHttpClient client = new AsyncHttpClient();
+		client.get("http://demo.goufo.co.il/100fm/", new AsyncHttpResponseHandler() {
+
+			@Override
+			public void onStart() {
+				// called before request is started
+			}
+
+			@Override
+			public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+				try {
+					JSONObject obj = new JSONObject(new String(responseBody));
+					JSONArray parentArray = obj.getJSONArray("stations");
+
+					Station tempStation = null;
+
+					for (int i = 0; i < parentArray.length(); i++) {
+
+						tempStation = new Station();
+						JSONObject finalObject = parentArray.getJSONObject(i);
+						tempStation.setStationName(finalObject.getString("name"));
+						tempStation.setStationAudio(finalObject.getString("audio"));
+						tempStation.setSongInfo(finalObject.getString("info"));
+						tempStation.setStationSlug(finalObject.getString("slug"));
+						tempStation.setStationLogo(finalObject.getString("logo"));
+						stationList.add(tempStation);
+					}
+
+					setListData(stationList);
+					myCustomAdapter = new ChannelListAdapter(getActivity(), MainActivity.channelsArray);
+					//channelsLv.setAdapter(myCustomAdapter);
+					//channelsLv.setOnItemClickListener(itemClickListener);
+					listCreated = 1;
+					//progressView.setVisibility(View.INVISIBLE);
+					//channelsLv.setBackgroundColor(Color.RED);
+					lvProgressView.setVisibility(View.INVISIBLE);
+					//initWheel();
+					//myWheelView.setWheelAdapter(new MyWheelAdapter(getActivity()));
+					//myWheelView.setWheelData(createArrays());
+					List<MyObject> newMyObjList = new ArrayList<>();
+					for (int i = 0; i < channelsArray.size(); i++) {
+						newMyObjList.add(new MyObject(channelsArray.get(i).getChannelLogo()));
+					}
+					myWheelView.setWheelData(newMyObjList);
+					myWheelView.setSelection(0);
+					myWheelView.setVisibility(View.VISIBLE);
+					itemTopIb.setVisibility(View.VISIBLE);
+					itemBotIb.setVisibility(View.VISIBLE);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				Log.d("fm100", "100fm loaded : " + stationList.size()	 );
+			}
+
+			@Override
+			public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+
+			}
+
+			@Override
+			public void onRetry(int retryNo) {
+				// called when request is retried
+			}
+		});
 
 
 		initWheel();
@@ -182,7 +252,7 @@ public class Music extends Fragment {
 
 		lvProgressView = (ProgressBar) v.findViewById(R.id.lvProgress);
 
-		itunesIb = (ImageButton) v.findViewById(R.id.itunesIb);
+		itunesIb = (Button) v.findViewById(R.id.itunesIb);
 		itunesIb.setVisibility(View.INVISIBLE);
 		itunesIb.setOnClickListener(itunesListener);
 
@@ -701,7 +771,7 @@ public class Music extends Fragment {
 	}
 
 	// JSON RELATED ASYNCTASKS
-	public class ReadFileTask extends AsyncTask<String, Void, String> {
+	/*public class ReadFileTask extends AsyncTask<String, Void, String> {
 
 		@Override
 		protected String doInBackground(String... params) {
@@ -738,7 +808,6 @@ public class Music extends Fragment {
 			List<MyObject> newMyObjList = new ArrayList<>();
 			for (int i = 0; i < channelsArray.size(); i++) {
 				newMyObjList.add(new MyObject(channelsArray.get(i).getChannelLogo()));
-
 			}
 			myWheelView.setWheelData(newMyObjList);
 			myWheelView.setSelection(0);
@@ -776,7 +845,7 @@ public class Music extends Fragment {
 
 		return stationList;
 
-	}
+	}*/
 
 	/*class itunesTask extends AsyncTask<String ,Void,String> {
 		@Override

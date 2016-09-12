@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:layout_width="match_parent" android:layout_height="fill_parent"
     >
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:minHeight="150dp"
+            android:layout_below="@+id/channelNameTv"
+            android:layout_above="@+id/songBarLL">
 
         <TextView
             android:layout_width="wrap_content"
@@ -23,14 +22,10 @@
             android:layout_marginTop="5dp"
             android:paddingBottom="5dp"
             android:textColor="#deffffff"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center_horizontal"
+            android:gravity="top" />
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="2">
-
-            <FrameLayout
+        <FrameLayout
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:background="@drawable/trianglepickerright"
@@ -54,10 +49,10 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="55dp"
-                android:layout_marginRight="55dp"
-                android:gravity="center">
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="false"
+                android:layout_alignParentBottom="false"
+                android:layout_alignParentTop="false">
 
                 <ProgressBar
                     style="?android:attr/progressBarStyleLarge"
@@ -73,35 +68,15 @@
                     android:id="@+id/wheelview"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
                     android:layout_weight="1"
-                    android:layout_centerVertical="true"></com.wx.wheelview.widget.WheelView>
+                    android:background="@color/colorAccent"
+                    android:scrollingCache="true"
+                    android:smoothScrollbar="true"
+                    android:stackFromBottom="true"
+                    android:layout_centerInParent="true"
+                    android:layout_alignWithParentIfMissing="false"></com.wx.wheelview.widget.WheelView>
 
             </RelativeLayout>
-
-            <ImageButton
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/itemTopIb"
-                android:layout_above="@+id/wheelPickerLeft"
-                android:layout_marginBottom="55dp"
-                android:layout_marginLeft="75dp"
-                android:layout_marginRight="75dp"
-                android:visibility="gone"
-                android:layout_marginTop="30dp"
-                android:background="#00ffffff" />
-
-            <ImageButton
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/itemBotIb"
-                android:layout_below="@+id/wheelPickerLeft"
-                android:layout_marginTop="65dp"
-                android:layout_marginLeft="75dp"
-                android:layout_marginRight="75dp"
-                android:visibility="gone"
-                android:layout_marginBottom="20dp"
-                android:background="#00ffffff" />
 
             <Button
                 style="?android:attr/buttonStyleSmall"
@@ -110,11 +85,13 @@
                 android:text="Download this song on iTunes"
                 android:id="@+id/itunesIb"
                 android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true" />
+                android:layout_centerHorizontal="true"
+                android:textColor="@android:color/white"
+                android:background="@android:color/holo_red_light"
+                android:clickable="false"
+                android:visibility="gone" />
 
-        </RelativeLayout>
-
-        <LinearLayout
+        <RelativeLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="0.5dp"
@@ -122,74 +99,35 @@
             android:id="@+id/whiteLine"
             android:layout_marginRight="5dp"
             android:layout_marginLeft="5dp"
-            android:layout_marginTop="10dp"></LinearLayout>
+            android:padding="10dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"></RelativeLayout>
 
-        <LinearLayout
+    </RelativeLayout>
+
+    <RelativeLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="5"
+            android:layout_height="wrap_content"
             android:id="@+id/songBarLL"
-            android:minHeight="200dp">
+            android:minHeight="80dp"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentBottom="true"
+        android:padding="5dp">
 
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scrollHorizontally="true"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:id="@+id/songNameTv"
-                android:text="רדיוס 100FM"
-                android:textSize="30sp"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/songImage"
-                android:layout_toEndOf="@+id/songImage"
-                android:layout_marginLeft="5dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginRight="5dp"
-                android:textColor="#b5ffffff"
-                android:textAlignment="textStart"
-                android:ellipsize="marquee"
-                android:singleLine="true"
-                android:marqueeRepeatLimit="marquee_forever"
-                />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textSize="15sp"
-                android:id="@+id/artistNameTv"
-                android:layout_below="@+id/songNameTv"
-                android:layout_toRightOf="@+id/songImage"
-                android:layout_toEndOf="@+id/songImage"
-                android:layout_marginTop="5dp"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:textColor="#b5ffffff"
-                android:textAlignment="textStart"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="מוזיקה זה הכלל" />
-
-            </LinearLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
+        <RelativeLayout
+                android:layout_width="80dp"
+                android:layout_height="80dp"
                 android:layout_alignTop="@+id/songImage"
-                android:layout_toEndOf="@+id/artistNameTv">
+                android:layout_toEndOf="@+id/artistNameTv"
+                android:layout_alignParentEnd="false"
+                android:layout_alignParentStart="true"
+                android:id="@+id/playHolder"
+            android:layout_centerHorizontal="true">
 
                 <ImageButton
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:id="@+id/play_pause_btn"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentBottom="false"
@@ -211,16 +149,62 @@
                     android:id="@+id/progress"
                     style="?android:attr/progressBarStyleLarge"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
-                    android:visibility="invisible"/>
+                    android:visibility="invisible" />
 
 
 
             </RelativeLayout>
 
-        </LinearLayout>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:layout_weight="1"
+                android:id="@+id/songInfo"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentStart="false"
+                android:layout_toEndOf="@id/playHolder"
+                android:layout_alignParentTop="false"
+                android:layout_alignParentBottom="false">
 
-    </LinearLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollHorizontally="false"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:id="@+id/songNameTv"
+                android:text="רדיוס 100FM"
+                android:textSize="30sp"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/songImage"
+                android:layout_toEndOf="@+id/songImage"
+                android:textColor="#FFFFFFFF"
+                android:textAlignment="textStart"
+                android:layout_weight="1" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="15sp"
+                android:id="@+id/artistNameTv"
+                android:layout_below="@+id/songNameTv"
+                android:layout_toRightOf="@+id/songImage"
+                android:layout_toEndOf="@+id/songImage"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:textColor="#ffffff"
+                android:textAlignment="textStart"
+                android:text="מוזיקה זה הכלל"
+                android:layout_weight="1" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
 
 </RelativeLayout>

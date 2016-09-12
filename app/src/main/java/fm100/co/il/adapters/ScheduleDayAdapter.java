@@ -1,6 +1,7 @@
 package fm100.co.il.adapters;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,6 +48,8 @@ public class ScheduleDayAdapter extends BaseAdapter {
 
     static class ViewHolder{
         public TextView scheduleTv;
+        public TextView scheduleAuthor;
+        public TextView scheduleTime;
     }
 
     @Override
@@ -54,10 +57,12 @@ public class ScheduleDayAdapter extends BaseAdapter {
         View rowView = convertView;
         ViewHolder holder;
         if (rowView == null){
-            rowView = inflater.inflate(R.layout.schedule_list_item , parent , false);
+            rowView = inflater.inflate(R.layout.schedule_item , parent , false);
 
             holder = new ViewHolder();
-            holder.scheduleTv = (TextView) rowView.findViewById(R.id.dayTv);
+            holder.scheduleTv = (TextView) rowView.findViewById(R.id.programName);
+            holder.scheduleAuthor = (TextView) rowView.findViewById(R.id.programAuthor);
+            holder.scheduleTime = (TextView) rowView.findViewById(R.id.programTime);
 
             rowView.setTag(holder);
         }
@@ -67,8 +72,20 @@ public class ScheduleDayAdapter extends BaseAdapter {
         tempItem = null;
         tempItem = scheduleList.get(position);
 
-        holder.scheduleTv.setText(daysList[position]);
+        Typeface custom_font_heb_regular = Typeface.createFromAsset(MainActivity.getMyApplicationContext().getAssets(), "fonts/FbSpoilerRegular.ttf");
 
+        holder.scheduleTv.setText(tempItem.getProgramName());
+        holder.scheduleTime.setText(tempItem.getProgramStartHoure());
+
+        holder.scheduleTv.setTypeface(custom_font_heb_regular);
+        holder.scheduleTime.setTypeface(custom_font_heb_regular);
+
+        if( !tempItem.getProgramAutor().equals("") ) {
+            holder.scheduleAuthor.setText(tempItem.getProgramAutor());
+            holder.scheduleAuthor.setTypeface(custom_font_heb_regular);
+        } else {
+            holder.scheduleAuthor.setVisibility(View.GONE);
+        }
         return rowView;
     }
 }

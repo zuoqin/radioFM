@@ -101,8 +101,12 @@ public class VideoLvAdapter  extends BaseAdapter {
 
             holder.videoTitleText.setText(tempVideo.getTitle());
 
-            String reDate = tempVideo.getPublished().substring(0 , 10);
-            holder.videoPublishedText.setText(reDate);
+            if( !tempVideo.getPublished().isEmpty() ) {
+                String reDate = tempVideo.getPublished().substring(0 , 10);
+                holder.videoPublishedText.setText(reDate);
+            } else {
+                holder.videoPublishedText.setText("");
+            }
 
 
 

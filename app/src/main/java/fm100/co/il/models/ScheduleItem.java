@@ -5,6 +5,7 @@ public class ScheduleItem {
     private String program = "" ;
     private String ProgramName = "" ;
     private String ProgramDesc = "" ;
+    private String ProgramAutor = "" ;
     private String ProgramDay = "" ;
     private String ProgramStartHoure = "" ;
 
@@ -41,6 +42,14 @@ public class ScheduleItem {
 
     public void setProgramName(String programName) {
         ProgramName = programName;
+    }
+
+    public String getProgramAutor() {
+        return ProgramAutor;
+    }
+
+    public void setProgramAutor(String ProgramAuto) {
+        ProgramAutor = ProgramAuto;
     }
 
     public String getProgramStartHoure() {

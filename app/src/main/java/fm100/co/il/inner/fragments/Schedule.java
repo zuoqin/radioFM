@@ -12,16 +12,28 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+
 import org.greenrobot.eventbus.EventBus;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.msebera.android.httpclient.Header;
 import fm100.co.il.MainActivity;
 import fm100.co.il.R;
 import fm100.co.il.adapters.ScheduleListAdapter;
+import fm100.co.il.adapters.StationListAdapter;
 import fm100.co.il.busEvents.NewSongBusEvent;
 import fm100.co.il.busEvents.NotificationBusEvent;
 import fm100.co.il.helpers.Downloader;
@@ -29,6 +41,7 @@ import fm100.co.il.helpers.ScheduleXMLParser;
 import fm100.co.il.helpers.SongXMLParser;
 import fm100.co.il.models.ScheduleItem;
 import fm100.co.il.models.Song;
+import fm100.co.il.models.Station;
 
 public class Schedule extends Fragment {
 
@@ -44,9 +57,8 @@ public class Schedule extends Fragment {
 
         scheduleList = (ListView) v.findViewById(R.id.scheduleList);
 
-
-       ScheduleDownloadTask download = new ScheduleDownloadTask();
-       download.execute();
+        ScheduleDownloadTask download = new ScheduleDownloadTask();
+        download.execute();
 
         return v;
     }
@@ -75,10 +87,10 @@ public class Schedule extends Fragment {
         protected void onPostExecute(List<ScheduleItem> scheduleItems) {
             super.onPostExecute(scheduleItems);
 
-           // myScheduleListAdapter = new ScheduleListAdapter(MainActivity.getMyApplicationContext(),scheduleItems);
-           // scheduleList.setAdapter(myScheduleListAdapter);
-            Log.e("myloglog", "happening" + scheduleItemList);
-            Log.e("myloglog", "OR HERE: " + scheduleItems);
+            myScheduleListAdapter = new ScheduleListAdapter(MainActivity.getMyApplicationContext(),scheduleItems);
+            scheduleList.setAdapter(myScheduleListAdapter);
+            //Log.i("100fm", "happening" + scheduleItemList);
+            //Log.i("100fm", "OR HERE: " + scheduleItems);
         }
     }
 }

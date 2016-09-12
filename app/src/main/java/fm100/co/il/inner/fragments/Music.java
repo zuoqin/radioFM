@@ -27,6 +27,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -136,9 +137,6 @@ public class Music extends Fragment {
 
 	private Player myPlayer;
 
-	private ImageButton itemTopIb;
-	private ImageButton itemBotIb;
-
 	@Override
 	public View onCreateView(LayoutInflater inflater,
 							 @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -146,90 +144,11 @@ public class Music extends Fragment {
 		View v = inflater.inflate(R.layout.music_fragment, container, false);
 		mView = v;
 		// flipping Layout the RTL to LTR incase needed
-		LinearLayout songBarLL = (LinearLayout) v.findViewById(R.id.songBarLL);
+		RelativeLayout songBarLL = (RelativeLayout) v.findViewById(R.id.songBarLL);
 		//task.execute("JsonCo.json");
 		EventBus.getDefault().register(this);
 
-		AsyncHttpClient client = new AsyncHttpClient();
-		client.get("http://demo.goufo.co.il/100fm/", new AsyncHttpResponseHandler() {
-
-			@Override
-			public void onStart() {
-				// called before request is started
-			}
-
-			@Override
-			public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-				try {
-					JSONObject obj = new JSONObject(new String(responseBody));
-					JSONArray parentArray = obj.getJSONArray("stations");
-
-					Station tempStation = null;
-
-					for (int i = 0; i < parentArray.length(); i++) {
-
-						tempStation = new Station();
-						JSONObject finalObject = parentArray.getJSONObject(i);
-						tempStation.setStationName(finalObject.getString("name"));
-						tempStation.setStationAudio(finalObject.getString("audio"));
-						tempStation.setSongInfo(finalObject.getString("info"));
-						tempStation.setStationSlug(finalObject.getString("slug"));
-						tempStation.setStationLogo(finalObject.getString("logo"));
-						stationList.add(tempStation);
-					}
-
-					setListData(stationList);
-					myCustomAdapter = new ChannelListAdapter(getActivity(), MainActivity.channelsArray);
-					//channelsLv.setAdapter(myCustomAdapter);
-					//channelsLv.setOnItemClickListener(itemClickListener);
-					listCreated = 1;
-					//progressView.setVisibility(View.INVISIBLE);
-					//channelsLv.setBackgroundColor(Color.RED);
-					lvProgressView.setVisibility(View.INVISIBLE);
-					//initWheel();
-					//myWheelView.setWheelAdapter(new MyWheelAdapter(getActivity()));
-					//myWheelView.setWheelData(createArrays());
-					List<MyObject> newMyObjList = new ArrayList<>();
-					for (int i = 0; i < channelsArray.size(); i++) {
-						newMyObjList.add(new MyObject(channelsArray.get(i).getChannelLogo()));
-					}
-					myWheelView.setWheelData(newMyObjList);
-					myWheelView.setSelection(0);
-					myWheelView.setVisibility(View.VISIBLE);
-					itemTopIb.setVisibility(View.VISIBLE);
-					itemBotIb.setVisibility(View.VISIBLE);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-				Log.d("fm100", "100fm loaded : " + stationList.size()	 );
-			}
-
-			@Override
-			public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-
-			}
-
-			@Override
-			public void onRetry(int retryNo) {
-				// called when request is retried
-			}
-		});
-
-
 		initWheel();
-
-		/*if(isRTL()==false) {
-			ArrayList<View> views = new ArrayList<View>();
-			for (int x = 0; x < songBarLL.getChildCount(); x++) {
-				views.add(songBarLL.getChildAt(x));
-			}
-			songBarLL.removeAllViews();
-			for (int x = views.size() - 1; x >= 0; x--) {
-				songBarLL.addView(views.get(x));
-			}
-		}
-		*/
-
 
 		pauseOnPhoneCalls();
 
@@ -252,9 +171,15 @@ public class Music extends Fragment {
 
 		lvProgressView = (ProgressBar) v.findViewById(R.id.lvProgress);
 
-		itunesIb = (Button) v.findViewById(R.id.itunesIb);
+
+		if (progressView != null) {
+			progressView.setIndeterminate(true);
+			progressView.getIndeterminateDrawable().setColorFilter(0xFFFFFFFF, android.graphics.PorterDuff.Mode.MULTIPLY);
+		}
+
+		/*itunesIb = (Button) v.findViewById(R.id.itunesIb);
 		itunesIb.setVisibility(View.INVISIBLE);
-		itunesIb.setOnClickListener(itunesListener);
+		itunesIb.setOnClickListener(itunesListener);*/
 
 		playPauseBtn = (ImageButton) v.findViewById(R.id.play_pause_btn);
 		if(mediaPlayer == null){
@@ -275,7 +200,7 @@ public class Music extends Fragment {
 
 		}
 
-		itemTopIb = (ImageButton) v.findViewById(R.id.itemTopIb);
+		/*itemTopIb = (ImageButton) v.findViewById(R.id.itemTopIb);
 		itemTopIb.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -288,22 +213,51 @@ public class Music extends Fragment {
 			public void onClick(View v) {
 				myWheelView.smoothScrollBy(315, 1000);
 			}
-		});
+		});*/
 
 		startSongThread();
 
 		return v;
 	}
 
-	private void initWheel() {
+	public void setStationData(JSONObject obj) throws JSONException {
+		JSONArray parentArray = obj.getJSONArray("stations");
 
+		Station tempStation = null;
+
+		for (int i = 0; i < parentArray.length(); i++) {
+
+			tempStation = new Station();
+			JSONObject finalObject = parentArray.getJSONObject(i);
+			tempStation.setStationName(finalObject.getString("name"));
+			tempStation.setStationAudio(finalObject.getString("audio"));
+			tempStation.setSongInfo(finalObject.getString("info"));
+			tempStation.setStationSlug(finalObject.getString("slug"));
+			tempStation.setStationLogo(finalObject.getString("logo"));
+			stationList.add(tempStation);
+		}
+
+		setListData(stationList);
+		myCustomAdapter = new ChannelListAdapter(getActivity(), MainActivity.channelsArray);
+		listCreated = 1;
+		lvProgressView.setVisibility(View.INVISIBLE);
+		List<MyObject> newMyObjList = new ArrayList<>();
+		for (int i = 0; i < channelsArray.size(); i++) {
+			newMyObjList.add(new MyObject(channelsArray.get(i).getChannelLogo()));
+		}
+		myWheelView.setWheelData(newMyObjList);
+		myWheelView.setSelection(0);
+		myWheelView.setVisibility(View.VISIBLE);
+	}
+
+	private void initWheel() {
 		myWheelView = (WheelView) mView.findViewById(R.id.wheelview);
-		myWheelView.setVisibility(View.GONE);
+		//myWheelView.setVisibility(View.GONE);
 		myWheelView.setWheelAdapter(new MyWheelAdapter(getActivity()));
 		myWheelView.setWheelData(createArrays());
 		//myWheelView.setWheelData(channelsArray);
 		myWheelView.setWheelSize(3);
-		myWheelView.setSkin(WheelView.Skin.None);
+		//myWheelView.setSkin(WheelView.Skin.None);
 		myWheelView.setWheelClickable(true);
 		myWheelView.setSelection(2);
 		WheelView.WheelViewStyle style = new WheelView.WheelViewStyle();
@@ -311,7 +265,7 @@ public class Music extends Fragment {
 
 		style.backgroundColor = Color.TRANSPARENT;
 		style.textColor = Color.TRANSPARENT;
-		style.selectedTextColor = Color.BLUE;
+		style.selectedTextColor = Color.YELLOW;
 		style.selectedTextZoom = 62f;
 		style.selectedTextSize = 20;
 		myWheelView.setLoop(true);
@@ -353,34 +307,14 @@ public class Music extends Fragment {
 										myPlayer = new Player();
 										myPlayer.execute(currentChannel.getChannelUrl());
 										isPlaying = 1;
-									}/* ----- if re-chosing the station it pause\play based on last state -----
-									 else {
-										if (isPlaying == 0) {
-											mediaPlayer.start();
-											playPauseBtn.setImageResource(R.drawable.button_pause);
-											event = new NotificationBusEvent("play");
-											isPlaying = 1;
-										} else {
-											event = new NotificationBusEvent("pause");
-											playPauseBtn.setImageResource(R.drawable.button_play);
-											if (mediaPlayer.isPlaying())
-												mediaPlayer.pause();
-											isPlaying = 0;
-										}
-										EventBus.getDefault().post(event);
-									}*/
-
+									}
 
 								} else {
-									//if (lastSelectionLoaded == position){
-									//	isLoading = 0;
-									//}
 									if (isLoading == 0) {
 										Toast.makeText(MainActivity.getMyApplicationContext(), "please waite while loading last station selected", Toast.LENGTH_LONG).show();
 										myWheelView.setSelection(lastSelectionLoaded);
 										//isLoading = 1;
 									}
-									//myPlayer.cancel(true);
 								}
 
 							}
@@ -390,7 +324,6 @@ public class Music extends Fragment {
 				}
 			}
 		});
-
 	}
 
 
@@ -647,7 +580,7 @@ public class Music extends Fragment {
 
 		@Override
 		protected void onPostExecute(Void result) {
-			itunesIb.setVisibility(View.VISIBLE);
+			//itunesIb.setVisibility(View.VISIBLE);
 			try {
 				//making sure till channel selected nothing is showed
 				if (firstChannel == 0) {

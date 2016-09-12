@@ -42,25 +42,17 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:background="#ff192127"></LinearLayout>
+            android:background="#ff192127">
 
-        <HorizontalScrollView
-            android:id="@+id/hScrollView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fillViewport="true"
-            android:scrollbars="none"
-            android:layout_weight="2"
-            android:background="#ff213442"
-            android:layout_gravity="center_vertical">
+        </LinearLayout>
 
-            <TabWidget
-                android:id="@android:id/tabs"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/footer">
-            </TabWidget>
-        </HorizontalScrollView>
+        <TabWidget
+            android:id="@android:id/tabs"
+            android:layout_width="fill_parent"
+            android:layout_height="55dp"
+            android:background="@drawable/footer">
+        </TabWidget>
+
     </LinearLayout>
     </TabHost>
 

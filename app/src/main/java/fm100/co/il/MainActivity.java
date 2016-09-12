@@ -83,6 +83,7 @@ public class MainActivity extends ActionBarActivity {
     Bundle myBundle;
     List<NavItem> listNavItems;
     List<Fragment> listFragments;
+    MyHome home;
     //private LinearLayout inDrawLayout;
 
     private EventBus bus = EventBus.getDefault();
@@ -118,7 +119,7 @@ public class MainActivity extends ActionBarActivity {
         if(isRTL()==false) {
             getWindow().getDecorView().setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
         }
-             setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main);
         myApplicationContext = this;
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerListProgressBar = (ProgressBar) findViewById(R.id.progressBarView);
@@ -160,6 +161,9 @@ public class MainActivity extends ActionBarActivity {
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 try {
                     JSONObject obj = new JSONObject(new String(responseBody));
+
+                    home.setStationData(obj);
+
                     JSONArray parentArray = obj.getJSONArray("stations");
 
                     Station tempStation = null;
@@ -198,16 +202,17 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
+        home = new MyHome();
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.main_content, new MyHome()).commit();
+                .replace(R.id.main_content, home).commit();
 
         Drawable titleDrawable = getResources().getDrawable(R.drawable.header);
         getSupportActionBar().setBackgroundDrawable(titleDrawable);
 
-
-        setTitle("");
+        //setTitle("");
+        //getActionBar().setIcon(R.drawable.fm100);
 
         drawerLayout.closeDrawer(drawerPane);
 
@@ -327,7 +332,7 @@ public class MainActivity extends ActionBarActivity {
 
         @SuppressWarnings("deprecation")
 
-        Notification notification = new Notification(R.drawable.purpleheart, null, System.currentTimeMillis());
+        Notification notification = new Notification(R.drawable.fm100, null, System.currentTimeMillis());
 
         RemoteViews notificationView = new RemoteViews(getPackageName(), R.layout.custom_notifications);
         notificationView.setImageViewResource(R.id.playPauseIb , playPauseImage);

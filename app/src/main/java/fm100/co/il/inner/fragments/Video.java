@@ -27,6 +27,7 @@ import android.widget.VideoView;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.FileInputStream;
@@ -75,9 +76,6 @@ public class Video extends Fragment {
 	public static final int USER_MOBILE = 0;
 	public static final int USER_DESKTOP = 1;
 
-	ReadFileTask task = new ReadFileTask();
-	videoFromJsonTask vidTask = new videoFromJsonTask();
-
 	private ProgressBar videoLvProgress;
 
 	private VideoObj firstVideoObj;
@@ -93,7 +91,7 @@ public class Video extends Fragment {
 		videoLv = (ListView) v.findViewById(R.id.videoLv);
 		//VideoView vidView = (VideoView)v.findViewById(R.id.videoView);
 		videoLvProgress = (ProgressBar) v.findViewById(R.id.videoLvProgress);
-		task.execute("JsonCo.json");
+		//task.execute("JsonCo.json");
 
 		//webView.setVisibility(View.INVISIBLE);
 
@@ -119,8 +117,42 @@ public class Video extends Fragment {
 			videoLv.setAdapter(videoLvAdapter);
 		}
 
+		changeVideoUrl("http://100fm.multix.co.il/");
+
 
 		return v;
+	}
+
+	public void setStationData(JSONObject obj) throws JSONException {
+		JSONObject parentObject2 = obj.getJSONObject("video");
+
+		JSONArray parentArray = parentObject2.getJSONArray("archive");
+
+		VideoObj tempVideo = null;
+
+		tempVideo = new VideoObj();
+		tempVideo.setId("live");
+		tempVideo.setPublished("");
+		tempVideo.setThumbnail("http://assets-jpcust.jwpsrv.com/thumbs/teD8sDdM-720.jpg");
+		tempVideo.setTitle("רדיוס 100FM לייב");
+		videoList.add(tempVideo);
+
+		for (int i = 0; i < parentArray.length(); i++) {
+
+			tempVideo = new VideoObj();
+			JSONObject finalObject = parentArray.getJSONObject(i);
+			tempVideo.setId((finalObject.getString("id")));
+			tempVideo.setPublished(finalObject.getString("published"));
+			tempVideo.setThumbnail(finalObject.getString("thumbnail"));
+			tempVideo.setTitle(finalObject.getString("title"));
+
+			videoList.add(tempVideo);
+		}
+
+		videoLvProgress.setVisibility(View.GONE);
+		videoLvAdapter = new VideoLvAdapter(getActivity() , videoList);
+		videoLv.setAdapter(videoLvAdapter);
+		videoLv.setOnItemClickListener(onVideoClick);
 	}
 
 	public void changeVideoUrl(String url) {
@@ -153,86 +185,13 @@ public class Video extends Fragment {
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			String videoId =videoList.get(position).getId();
 			String itemURL = mainVideoLink+videoId;
-			//Toast.makeText(MainActivity.getMyApplicationContext() , "TOAST" , Toast.LENGTH_SHORT).show();
-			//webView.loadUrl(itemURL);
-			//startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(itemURL)));
+
+			if( videoId.equals("live") ) {
+				itemURL = "http://100fm.multix.co.il/";
+			}
 
 			changeVideoUrl(itemURL);
 		}
 	};
-
-	// JSON RELATED ASYNCTASKS
-	public class ReadFileTask extends AsyncTask<String, Void, String> {
-
-		@Override
-		protected String doInBackground(String... params) {
-			String temp="";
-			try {
-				FileInputStream fin = MainActivity.getMyApplicationContext().openFileInput(params[0]);
-				int c;
-				while( (c = fin.read()) != -1){
-					temp = temp + Character.toString((char)c);
-				}
-				fin.close();
-			} catch (Exception e){
-				Log.e("MyLog" , "read task exception: " + e.getMessage());
-			}
-			return temp;
-		}
-
-		@Override
-		protected void onPostExecute(String result) {
-			super.onPostExecute(result);
-			//videoList = videosFromJson(result);
-			vidTask.execute(result);
-			//videoLvAdapter = new VideoLvAdapter(getActivity() , videoList);
-			//videoLv.setAdapter(videoLvAdapter);
-			//videoLv.setOnItemClickListener(onVideoClick);
-			listCreated =1;
-		}
-	}
-
-	public class videoFromJsonTask extends AsyncTask<String, Void, List<VideoObj>> {
-
-		@Override
-		protected List<VideoObj> doInBackground(String... params) {
-			try {
-				JSONObject parentObject = new JSONObject(params[0]);
-
-				JSONObject parentObject2 = parentObject.getJSONObject("video");
-
-				JSONArray parentArray = parentObject2.getJSONArray("archive");
-
-				VideoObj tempVideo = null;
-
-				for (int i = 0; i < parentArray.length(); i++) {
-
-					tempVideo = new VideoObj();
-					JSONObject finalObject = parentArray.getJSONObject(i);
-					tempVideo.setId((finalObject.getString("id")));
-					tempVideo.setPublished(finalObject.getString("published"));
-					tempVideo.setThumbnail(finalObject.getString("thumbnail"));
-					tempVideo.setTitle(finalObject.getString("title"));
-
-					videoList.add(tempVideo);
-				}
-			} catch (Exception e) {
-				Log.e("HereLog", "Json Exception" + e.getMessage());
-			}
-
-			return videoList;
-		}
-
-		@Override
-		protected void onPostExecute(List<VideoObj> videoObjs) {
-			super.onPostExecute(videoObjs);
-			videoLvProgress.setVisibility(View.GONE);
-			videoList = videoObjs;
-			//videoList.add(0 , firstVideoObj );
-			videoLvAdapter = new VideoLvAdapter(getActivity() , videoList);
-			videoLv.setAdapter(videoLvAdapter);
-			videoLv.setOnItemClickListener(onVideoClick);
-		}
-	}
 }
 

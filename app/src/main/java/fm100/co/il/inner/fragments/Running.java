@@ -189,7 +189,7 @@ public class Running extends Fragment {
 		ll = (LinearLayout) v.findViewById(R.id.drawingArea);
 
 
-		hsView = (HorizontalScrollView) v.findViewById(R.id.hScrollView);
+		//hsView = (HorizontalScrollView) v.findViewById(R.id.hScrollView);
 
 		//setting canvas and canvas needed variables
 		DisplayMetrics displaymetrics = new DisplayMetrics();

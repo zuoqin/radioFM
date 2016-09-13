@@ -28,7 +28,8 @@ public class ScheduleXMLParser {
         static final String KEY_DESC = "ProgramDes";
         static final String KEY_DAY = "ProgramDay";
         static final String KEY_AUTHOR = "ProgramAutor";
-        static final String KEY_HOUR = "ProgramStartHoure";
+    static final String KEY_HOUR = "ProgramStartHoure";
+    static final String KEY_IMAGE = "ProgramImg";
 
 
 
@@ -87,9 +88,11 @@ public class ScheduleXMLParser {
                                  scheduleItem.setProgramStartHoure(curText);
                              }   else if (tagname.equalsIgnoreCase(KEY_AUTHOR)) {
                                  scheduleItem.setProgramAutor(curText.trim());
+                             }   else if (tagname.equalsIgnoreCase(KEY_IMAGE)) {
+                                 scheduleItem.setProgramImage(curText);
                              }   else if (tagname.equalsIgnoreCase(KEY_PROGRAM)) {
-                                scheduleItemList.add(scheduleItem);
-                            }   else break;
+                                 scheduleItemList.add(scheduleItem);
+                             }   else break;
 
                             break;
 

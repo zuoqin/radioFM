@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
+import android.media.Image;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -21,9 +22,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -38,21 +43,26 @@ import com.wx.wheelview.widget.WheelView;
 
 import cz.msebera.android.httpclient.Header;
 import fm100.co.il.adapters.MyWheelAdapter;
+import fm100.co.il.adapters.ScheduleListAdapter;
 import fm100.co.il.adapters.StationListAdapter;
 import fm100.co.il.busEvents.IntBusEvent;
 import fm100.co.il.busEvents.StationBusEvent;
 import fm100.co.il.busEvents.VideoListBusEvent;
+import fm100.co.il.helpers.DownloadImageTask;
 import fm100.co.il.helpers.Downloader;
 import fm100.co.il.MainActivity;
 import fm100.co.il.busEvents.NewSongBusEvent;
 import fm100.co.il.busEvents.NotificationBusEvent;
 import fm100.co.il.R;
+import fm100.co.il.helpers.ScheduleXMLParser;
 import fm100.co.il.helpers.SongXMLParser;
 import fm100.co.il.adapters.ChannelListAdapter;
 import fm100.co.il.models.Channel;
 import fm100.co.il.models.MyObject;
+import fm100.co.il.models.ScheduleItem;
 import fm100.co.il.models.Song;
 import fm100.co.il.models.Station;
+import jp.wasabeef.blurry.Blurry;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -63,7 +73,13 @@ import org.w3c.dom.Text;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -90,6 +106,10 @@ public class Music extends Fragment {
 	private ProgressBar progressView;
 
 	private ProgressBar lvProgressView;
+
+	private ImageView imgRound;
+	private ImageView imgCover;
+	private ImageView imgDarken;
 
 	//default channel url
 	Channel currentChannel = new Channel();//("100fm" , "http://audio.100fm.co.il/100fmAudio" , "http://digital.100fm.co.il/label/Ch0-100fm.xml" , "http://demo.goufo.co.il/100fm/images/100fmlive.png" );
@@ -137,6 +157,10 @@ public class Music extends Fragment {
 
 	private Player myPlayer;
 
+	LinearLayout rLayout;
+
+	private List<ScheduleItem> scheduleItemList = new ArrayList<>();
+
 	@Override
 	public View onCreateView(LayoutInflater inflater,
 							 @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -171,6 +195,11 @@ public class Music extends Fragment {
 
 		lvProgressView = (ProgressBar) v.findViewById(R.id.lvProgress);
 
+		imgCover = (ImageView) v.findViewById(R.id.imgCover);
+		imgDarken = (ImageView) v.findViewById(R.id.imgDarken);
+		imgRound = (ImageView) v.findViewById(R.id.imgRound);
+
+		rLayout = (LinearLayout) v.findViewById(R.id.playRotate);
 
 		if (progressView != null) {
 			progressView.setIndeterminate(true);
@@ -184,13 +213,22 @@ public class Music extends Fragment {
 		playPauseBtn = (ImageButton) v.findViewById(R.id.play_pause_btn);
 		if(mediaPlayer == null){
 			mediaPlayer = new MediaPlayer();
+			mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener(){
+				@Override
+				public void onPrepared(MediaPlayer mp){
+					mediaPlayer.start();
+					progressView.setVisibility(View.INVISIBLE);
+					playPauseBtn.setVisibility(View.VISIBLE);
+					imgRound.setVisibility(View.VISIBLE);
+				}
+			});
 		}
 		mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 		playPauseBtn.setOnClickListener(playPauseListener);
 		if (isPlaying == 1) {
-			playPauseBtn.setImageResource(R.drawable.button_pause);
+			playPauseBtn.setImageResource(R.drawable.stop);
 		} else {
-			playPauseBtn.setImageResource(R.drawable.button_play);
+			playPauseBtn.setImageResource(R.drawable.play);
 		}
 
 		if (listCreated == 0 && channelsArray!=null){
@@ -257,7 +295,7 @@ public class Music extends Fragment {
 		myWheelView.setWheelData(createArrays());
 		//myWheelView.setWheelData(channelsArray);
 		myWheelView.setWheelSize(3);
-		//myWheelView.setSkin(WheelView.Skin.None);
+		myWheelView.setSkin(WheelView.Skin.None);
 		myWheelView.setWheelClickable(true);
 		myWheelView.setSelection(2);
 		WheelView.WheelViewStyle style = new WheelView.WheelViewStyle();
@@ -270,7 +308,25 @@ public class Music extends Fragment {
 		style.selectedTextSize = 20;
 		myWheelView.setLoop(true);
 		myWheelView.setStyle(style);
+
 		myWheelView.setOnWheelItemClickListener(new WheelView.OnWheelItemClickListener() {
+			@Override
+			public void onItemClick(int position, Object o) {
+				Log.i("100fm", "onItemClick " + position + " last " + lastSelectionLoaded);
+				myWheelView.smoothScrollToPosition(position);
+				//myWheelView.smoothScrollBy( position < lastSelectionLoaded ? -350 : 350,0);
+				//myWheelView.smoothScrollToPosition(position);
+			}
+		});
+		myWheelView.setOnWheelItemSelectedListener(new WheelView.OnWheelItemSelectedListener() {
+			@Override
+			public void onItemSelected(int position, Object o) {
+				Log.i("100fm", "onItemSelected " + position);
+				playStation(position);
+			}
+		});
+
+		/*myWheelView.setOnWheelItemClickListener(new WheelView.OnWheelItemClickListener() {
 			@Override
 			public void onItemClick(int position, Object o) {
 				Toast.makeText(MainActivity.getMyApplicationContext(), "click" + myWheelView.getCurrentPosition() , Toast.LENGTH_SHORT).show();
@@ -323,9 +379,73 @@ public class Music extends Fragment {
 					customHandler.postDelayed(runnable, 1500);
 				}
 			}
-		});
+		});*/
 	}
 
+	private void playStation(int position) {
+		if( channelsArray.size() == 0 ) {
+			return;
+		}
+		//if (lastStationLoading == 0) {
+			lastSelectionLoaded = position;
+			//firstSong = 0;
+			NotificationBusEvent event = null;
+			//firstChannel = 1;
+			currentChannel = channelsArray.get(position);
+			//if (!Objects.equals(currentChannel.getChannelName(), lastChannel.getChannelName())) {
+				event = new NotificationBusEvent("play");
+				EventBus.getDefault().post(event);
+				//channelNameTv.setText("Current Channel Selected : " + channelsArray.get(position).getChannelName());
+				playPauseBtn.setImageResource(R.drawable.stop);
+				lastChannel.setChannelName(currentChannel.getChannelName());
+				lastChannel.setChannelUrl(currentChannel.getChannelUrl());
+				mediaPlayer.reset();
+				myPlayer = new Player();
+				myPlayer.execute(currentChannel.getChannelUrl());
+				isPlaying = 1;
+
+				Animation an = new RotateAnimation(0.0f, 360.0f, rLayout.getWidth()/2, rLayout.getHeight()/2);
+
+				an.setDuration(2000);
+				an.setRepeatCount(-1);
+				an.setFillAfter(false);              // DO NOT keep rotation after animation
+				an.setFillEnabled(true);             // Make smooth ending of Animation
+				an.setInterpolator(new LinearInterpolator());
+				an.setAnimationListener(new Animation.AnimationListener() {
+					@Override
+					public void onAnimationStart(Animation animation) {}
+
+					@Override
+					public void onAnimationRepeat(Animation animation) {}
+
+					@Override
+					public void onAnimationEnd(Animation animation) {
+						rLayout.setRotation(0.0f);      // Make instant rotation when Animation is finished
+					}
+				});
+
+				// Aply animation to image view
+				//rLayout.setAnimation(an);
+				rLayout.startAnimation(an);
+			//}
+			reloadSongName();
+		/*} else {
+			if (isLoading == 0) {
+				//Toast.makeText(MainActivity.getMyApplicationContext(), "please waite while loading last station selected", Toast.LENGTH_LONG).show();
+				//myWheelView.setSelection(lastSelectionLoaded);
+				//isLoading = 1;
+			}
+		}*/
+	}
+	private void stopStation() {
+		NotificationBusEvent event = new NotificationBusEvent("pause");
+		playPauseBtn.setImageResource(R.drawable.play);
+		if (mediaPlayer.isPlaying())
+			mediaPlayer.stop();
+		isPlaying = 0;
+		EventBus.getDefault().post(event);
+		rLayout.clearAnimation();
+	}
 
 	private List<MyObject> createArrays() {
 		List<MyObject> list = new ArrayList<>();
@@ -377,9 +497,14 @@ public class Music extends Fragment {
 	View.OnClickListener playPauseListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
-
+			Log.i("100fm", "playPauseListener " + isPlaying + " " + lastSelectionLoaded);
+			if (isPlaying == 0) {
+				playStation(lastSelectionLoaded);
+			} else {
+				stopStation();
+			}
 			// is it on play or pause and act acordingly
-			if (firstChannel == 0) {
+			/*if (firstChannel == 0) {
 				Toast.makeText(getActivity(), "No Channel Selected" , Toast.LENGTH_SHORT).show();
 			} else {
 				NotificationBusEvent event = null;
@@ -410,7 +535,7 @@ public class Music extends Fragment {
 					isPlaying = 0;
 				}
 				EventBus.getDefault().post(event);
-			}
+			}*/
 		}
 	};
 
@@ -432,8 +557,6 @@ public class Music extends Fragment {
 						if (mediaPlayer != null){
 							if(isPausedInCall){
 								isPausedInCall = false;
-								Log.e("mynewlog", "call ended");
-								Log.e("mynewlog", "is playing " + isPlaying);
 								if(isPlaying == 1)
 								playMedia();
 							}
@@ -453,15 +576,15 @@ public class Music extends Fragment {
 
 	private void pauseMedia() {
 		if(mediaPlayer.isPlaying()){
-			mediaPlayer.pause();
+			mediaPlayer.stop();
 		}
 	}
 
-	AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener(){
+	/*AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener(){
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		//	channelsLv.smoothScrollToPosition(position);
-			if (lastStationLoading == 0) {
+			//if (lastStationLoading == 0) {
 				//event = new NotificationBusEvent("play");
 				firstSong = 0;
 				NotificationBusEvent event = null;
@@ -493,11 +616,11 @@ public class Music extends Fragment {
 					}
 					EventBus.getDefault().post(event);
 				}
-			} else {
+			/*} else {
 				Toast.makeText(MainActivity.getMyApplicationContext(), "please waite while loading last station selected", Toast.LENGTH_LONG).show();
 			}
 		}
-	};
+	};*/
 
 
 	// preparing mediaplayer will take sometime to buffer the content so prepare it inside the background thread and starting it on UI thread.
@@ -513,7 +636,7 @@ public class Music extends Fragment {
 				prepared = true;
 
 			} catch (Exception e){
-				Log.d("IllegarArgument", e.getMessage());
+				//Log.d("IllegarArgument", e.getMessage());
 				prepared = false;
 				e.printStackTrace();
 			}
@@ -532,6 +655,7 @@ public class Music extends Fragment {
 
 				progressView.setVisibility(View.INVISIBLE);
 				playPauseBtn.setVisibility(View.VISIBLE);
+				imgRound.setVisibility(View.VISIBLE);
 			}
 		}
 
@@ -540,9 +664,10 @@ public class Music extends Fragment {
 			super.onPreExecute();
 			progressView.setVisibility(View.VISIBLE);
 			playPauseBtn.setVisibility(View.INVISIBLE);
-
+			imgRound.setVisibility(View.INVISIBLE);
 		}
 	}
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
@@ -556,6 +681,80 @@ public class Music extends Fragment {
 			telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
 		}
 
+	}
+
+	private void reloadSongName() {
+		if( lastSelectionLoaded == 0 ) {
+			//if( scheduleItemList.size() == 0 ) {
+				ScheduleDownloadTask download = new ScheduleDownloadTask();
+				download.execute();
+			/*} else {
+				reload100fmName();
+			}*/
+		} else {
+			SongDownloadTask download = new SongDownloadTask();
+			download.execute();
+		}
+	}
+
+	private void reload100fmName() {
+		Calendar calendar = Calendar.getInstance();
+		Date date = calendar.getTime();
+		String day = new SimpleDateFormat("EEEE", Locale.ENGLISH).format(date.getTime());
+		int hours = date.getHours() * 100;
+
+		for (int i=0 ; i<scheduleItemList.size() ; i++) {
+			ScheduleItem item = scheduleItemList.get(i);
+			if( day.equals(item.getProgramDay()) ) {
+				int h = Integer.parseInt( item.getProgramStartHoure().replace(":","") );
+				if( hours <= h ) {
+					//Log.i("100fm", "reload100fmName | " + item.getProgramName() + " | " + item.getProgramAutor() );
+					currentSong = new Song( item.getProgramName(), item.getProgramAutor() );
+					songNameTv.setText(currentSong.getSongName());
+					artistNameTv.setText(currentSong.getArtist());
+
+					if( !item.getProgramImage().isEmpty() ) {
+						new DownloadImageTask(imgCover, getContext()).execute(item.getProgramImage());
+						imgCover.setVisibility(View.VISIBLE);
+						imgDarken.setVisibility(View.VISIBLE);
+					} else {
+						imgCover.setVisibility(View.INVISIBLE);
+						imgDarken.setVisibility(View.INVISIBLE);
+					}
+
+					lastSong.setSongName(item.getProgram());
+					lastSong.setArtist(item.getProgramAutor());
+					EventBus.getDefault().post(new NewSongBusEvent(item.getProgram(), item.getProgramAutor()));
+					return;
+				}
+			}
+		}
+	}
+	// getting the xml for the song data and checking for it every second if changed
+	private class ScheduleDownloadTask extends AsyncTask<Void, Void, List<ScheduleItem>> {
+
+
+		@Override
+		protected List<ScheduleItem> doInBackground(Void... arg0) {
+			//Download the file
+			try {
+				Downloader.DownloadFromUrl("http://www.100fm.co.il/smartphoneXML/programs.aspx", MainActivity.getMyApplicationContext().openFileOutput("Schedule.xml", Context.MODE_PRIVATE));
+				String path = MainActivity.getMyApplicationContext().getFilesDir().getAbsolutePath() + "/Schedule.xml";
+				File file = new File(path);
+				if (file.exists()) {
+					scheduleItemList = ScheduleXMLParser.getScheduleListFromFile(MainActivity.getMyApplicationContext());
+				}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+			return scheduleItemList;
+		}
+
+		@Override
+		protected void onPostExecute(List<ScheduleItem> scheduleItems) {
+			super.onPostExecute(scheduleItems);
+			reload100fmName();
+		}
 	}
 
 	// getting the xml for the song data and checking for it every second if changed
@@ -583,18 +782,55 @@ public class Music extends Fragment {
 			//itunesIb.setVisibility(View.VISIBLE);
 			try {
 				//making sure till channel selected nothing is showed
-				if (firstChannel == 0) {
+				/*if (firstChannel == 0) {
 						currentSong = new Song( getString(R.string.notidirsttext) , " " );
 						EventBus.getDefault().post(new NotificationBusEvent("delete"));
 				}
-				if (firstSong == 0){
-					songNameTv.setText(currentSong.getSongName());
-					artistNameTv.setText(currentSong.getArtist());
-					lastSong.setSongName(currentSong.getSongName());
-					lastSong.setArtist(currentSong.getArtist());
-					EventBus.getDefault().post(new NewSongBusEvent(currentSong.getSongName(), currentSong.getArtist()));
+				if (firstSong == 0){*/
+					if( !currentSong.getArtist().isEmpty() && !currentSong.getArtist().equals(" ") && !lastSong.getSongName().equals( currentSong.getSongName() ) ) {
+						songNameTv.setText(currentSong.getSongName());
+						artistNameTv.setText(currentSong.getArtist());
+						lastSong.setSongName(currentSong.getSongName());
+						lastSong.setArtist(currentSong.getArtist());
+						EventBus.getDefault().post(new NewSongBusEvent(currentSong.getSongName(), currentSong.getArtist()));
+
+						String key = currentSong.getSongName() + " " + currentSong.getArtist();
+
+						AsyncHttpClient client = new AsyncHttpClient();
+						client.get("https://itunes.apple.com/search?limit=1&country=IL&term=" + URLEncoder.encode(key, "utf-8"), new AsyncHttpResponseHandler() {
+
+
+							@Override
+							public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+								try {
+									JSONObject obj = new JSONObject(new String(responseBody));
+
+									if( obj.getInt("resultCount") > 0 ) {
+										JSONObject song = (JSONObject) obj.getJSONArray("results").get(0);
+
+										Log.d("fm100", "artworkUrl100 : " + song.getString("artworkUrl100").replace("100x100bb", "400x400bb") );
+										new DownloadImageTask(imgCover, getContext()).execute(song.getString("artworkUrl100").replace("100x100bb", "400x400bb"));
+
+										imgCover.setVisibility(View.VISIBLE);
+										imgDarken.setVisibility(View.VISIBLE);
+									} else {
+										imgCover.setVisibility(View.INVISIBLE);
+										imgDarken.setVisibility(View.INVISIBLE);
+									}
+
+								} catch (JSONException e) {
+									e.printStackTrace();
+								}
+							}
+
+							@Override
+							public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+
+							}
+						});
+					}
 					//firstSong = 1;
-				}
+				/*}
 				if (firstChannel == 1) {
 						if (!lastSong.getSongName().equals(currentSong.getSongName())) {
 							Log.e("mynewlog", "its here now");
@@ -605,7 +841,7 @@ public class Music extends Fragment {
 							EventBus.getDefault().post(new NewSongBusEvent(currentSong.getSongName(), currentSong.getArtist()));
 							firstSong = 1;
 						}
-				}
+				}*/
 			}
 			catch (Exception e) {
 				Log.i("MyLog", "exception postExecute: " + e.getMessage());
@@ -616,32 +852,25 @@ public class Music extends Fragment {
 	public void startSongThread(){
 		Timer timer = new Timer();
 		timer.schedule(new TimerTask() {
-
 			@Override
 			public void run() {
-					try {
-						SongDownloadTask download = new SongDownloadTask();
-						download.execute();
-					} catch (Exception e) {
-						Log.i("MyLog", e.getMessage());
-					}
-				}
-
-		}, 0, 3000);
+				reloadSongName();
+			}
+		}, 0, 15000);
 	}
 
 	@Subscribe
 	public void onEvent(NotificationBusEvent event) {
 		// set a "pause" notification
 		if (event.getNotificationBusMsg().equals("pause")) {
-			playPauseBtn.setImageResource(R.drawable.button_play);
+			playPauseBtn.setImageResource(R.drawable.play);
 			if (mediaPlayer.isPlaying())
-				mediaPlayer.pause();
+				mediaPlayer.stop();
 			isPlaying = 0;
 		}
 		// set a "play" notification
 		else if (event.getNotificationBusMsg().equals("play")) {
-			playPauseBtn.setImageResource(R.drawable.button_pause);
+			playPauseBtn.setImageResource(R.drawable.stop);
 				mediaPlayer.start();
 				isPlaying = 1;
 		}
@@ -662,12 +891,19 @@ public class Music extends Fragment {
 				if (!Objects.equals(currentChannel.getChannelName(), lastChannel.getChannelName())) {
 					myWheelView.setSelection(intEvent.getintBusEvent());
 				//	channelNameTv.setText("Current Channel Selected : " + channelsArray.get(intEvent.getintBusEvent()).getChannelName());
-					playPauseBtn.setImageResource(R.drawable.button_pause);
+					playPauseBtn.setImageResource(R.drawable.stop);
 					lastChannel.setChannelName(currentChannel.getChannelName());
 					lastChannel.setChannelUrl(currentChannel.getChannelUrl());
 					mediaPlayer.reset();
-					myPlayer = new Player();
-					myPlayer.execute(currentChannel.getChannelUrl());
+					//myPlayer = new Player();
+					//myPlayer.execute(currentChannel.getChannelUrl());
+					try {
+						mediaPlayer.setDataSource(currentChannel.getChannelUrl());
+						mediaPlayer.prepare();
+						mediaPlayer.start();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 					isPlaying = 1;
 					/*
 					NotificationBusEvent event = new NotificationBusEvent("play");

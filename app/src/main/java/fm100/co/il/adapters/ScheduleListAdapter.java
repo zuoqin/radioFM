@@ -26,7 +26,7 @@ public class ScheduleListAdapter extends BaseAdapter {
     private String[] daysList = MainActivity.getMyApplicationContext().getResources().getStringArray(R.array.days_list);
     private String[] daysListEng = MainActivity.getMyApplicationContext().getResources().getStringArray(R.array.days_list_eng);
         LayoutInflater inflater = null;
-    List<ScheduleItem> tempScheduleList = new ArrayList<>();
+    //List<ScheduleItem> tempScheduleList = new ArrayList<>();
     private ScheduleDayAdapter myScheduleDayAdapter;
 
     public ScheduleListAdapter(Context context , List<ScheduleItem> scheduleList) {
@@ -38,7 +38,7 @@ public class ScheduleListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return daysList.length;
+        return scheduleList.size();
     }
 
     @Override
@@ -54,47 +54,52 @@ public class ScheduleListAdapter extends BaseAdapter {
     static class ViewHolder{
         public TextView dayTv;
         public ListView scheduleListView;
+
+        public TextView scheduleTv;
+        public TextView scheduleAuthor;
+        public TextView scheduleTime;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View rowView = convertView;
         ViewHolder holder;
-        if (rowView == null){
-            rowView = inflater.inflate(R.layout.schedule_list_item , parent , false);
+        ScheduleItem item = scheduleList.get(position);
+
+            rowView = inflater.inflate( item.getTitle().isEmpty() ? R.layout.schedule_item : R.layout.schedule_list_item , parent , false);
 
             holder = new ViewHolder();
-            holder.dayTv = (TextView) rowView.findViewById(R.id.dayTv);
-            holder.scheduleListView = (ListView) rowView.findViewById(R.id.scheduleItemLv);
             Typeface custom_font_heb_regular = Typeface.createFromAsset(MainActivity.getMyApplicationContext().getAssets(), "fonts/FbSpoilerRegular.ttf");
 
-            holder.dayTv.setTypeface(custom_font_heb_regular);
+            if( item.getTitle().isEmpty() ) {
+                holder.scheduleTv = (TextView) rowView.findViewById(R.id.programName);
+                holder.scheduleAuthor = (TextView) rowView.findViewById(R.id.programAuthor);
+                holder.scheduleTime = (TextView) rowView.findViewById(R.id.programTime);
+
+                holder.scheduleTv.setTypeface(custom_font_heb_regular);
+                holder.scheduleTime.setTypeface(custom_font_heb_regular);
+                holder.scheduleAuthor.setTypeface(custom_font_heb_regular);
+            } else {
+                holder.dayTv = (TextView) rowView.findViewById(R.id.dayTv);
+                holder.scheduleListView = (ListView) rowView.findViewById(R.id.scheduleItemLv);
+
+                holder.dayTv.setTypeface(custom_font_heb_regular);
+            }
 
             rowView.setTag(holder);
-        }
-        else {
-            holder = (ViewHolder) rowView.getTag();
-        }
-        tempScheduleList.clear();
-        int h = 0;
-        for (int i=0 ; i<scheduleList.size() ; i++){
-            if(scheduleList.get(i).getProgramDay().toLowerCase().equals(daysListEng[position].toLowerCase())){
-                tempScheduleList.add(scheduleList.get(i));
 
-                h += scheduleList.get(i).getProgramAutor().isEmpty() ? 88 : 182;
+        if( item.getTitle().isEmpty() ) {
+            holder.scheduleTv.setText(item.getProgramName());
+            holder.scheduleTime.setText(item.getProgramStartHoure());
+
+            if( !item.getProgramAutor().equals("") ) {
+                holder.scheduleAuthor.setText(item.getProgramAutor());
+            } else {
+                holder.scheduleAuthor.setVisibility(View.GONE);
             }
+        } else {
+            holder.dayTv.setText(item.getTitle());
         }
-        holder.dayTv.setText(daysList[position]);
-
-        Log.i("100fm", daysList[position] + " - " + tempScheduleList.size());
-
-        myScheduleDayAdapter = new ScheduleDayAdapter(MainActivity.getMyApplicationContext() , tempScheduleList);
-        holder.scheduleListView.setAdapter(myScheduleDayAdapter);
-
-        ViewGroup.LayoutParams lp = (ViewGroup.LayoutParams) holder.scheduleListView.getLayoutParams();
-        lp.height = h;
-        holder.scheduleListView.setLayoutParams(lp);
-        //holder.scheduleListView.setAdapter();
 
         return rowView;
     }

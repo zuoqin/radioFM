@@ -26,8 +26,12 @@ import org.xmlpull.v1.XmlPullParserFactory;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.StringReader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import cz.msebera.android.httpclient.Header;
 import fm100.co.il.MainActivity;
@@ -49,6 +53,8 @@ public class Schedule extends Fragment {
     private ListView scheduleList;
     private ScheduleListAdapter myScheduleListAdapter;
     private List<ScheduleItem> scheduleItemList = new ArrayList<>();
+    private String[] daysList = MainActivity.getMyApplicationContext().getResources().getStringArray(R.array.days_list);
+    int currentRow = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -75,7 +81,34 @@ public class Schedule extends Fragment {
                 path = MainActivity.getMyApplicationContext().getFilesDir().getAbsolutePath() + "/Schedule.xml";
                 File file = new File(path);
                 if (file.exists()) {
-                    scheduleItemList = ScheduleXMLParser.getScheduleListFromFile(MainActivity.getMyApplicationContext());
+                    List<ScheduleItem> tempScheduleList = ScheduleXMLParser.getScheduleListFromFile(MainActivity.getMyApplicationContext());
+
+                    scheduleItemList.clear();
+                    int dd = -1;
+                    String slug = "";
+
+                    Calendar calendar = Calendar.getInstance();
+                    Date date = calendar.getTime();
+                    String days = new SimpleDateFormat("EEEE", Locale.ENGLISH).format(date.getTime());
+                    int hours = date.getHours() * 100;
+                    currentRow = -1;
+
+                    for (int i=0 ; i<tempScheduleList.size() ; i++){
+                        ScheduleItem item = new ScheduleItem();
+                        if( !slug.equals( tempScheduleList.get(i).getProgramDay() )) {
+                            slug = tempScheduleList.get(i).getProgramDay();
+                            item.setTitle( daysList[++dd] );
+                            scheduleItemList.add(item);
+                        }
+                        scheduleItemList.add(tempScheduleList.get(i));
+
+                        if( days.equals(tempScheduleList.get(i).getProgramDay()) ) {
+                            int h = Integer.parseInt( tempScheduleList.get(i).getProgramStartHoure().replace(":","") );
+                                if( hours <= h && currentRow == -1) {
+                                    currentRow = i;
+                                }
+                            }
+                        }
                 }
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -89,8 +122,7 @@ public class Schedule extends Fragment {
 
             myScheduleListAdapter = new ScheduleListAdapter(MainActivity.getMyApplicationContext(),scheduleItems);
             scheduleList.setAdapter(myScheduleListAdapter);
-            //Log.i("100fm", "happening" + scheduleItemList);
-            //Log.i("100fm", "OR HERE: " + scheduleItems);
+            scheduleList.setSelection(currentRow);
         }
     }
 }

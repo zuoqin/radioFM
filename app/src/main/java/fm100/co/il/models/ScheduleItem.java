@@ -2,12 +2,14 @@ package fm100.co.il.models;
 
 
 public class ScheduleItem {
+    private String title = "" ;
     private String program = "" ;
     private String ProgramName = "" ;
     private String ProgramDesc = "" ;
     private String ProgramAutor = "" ;
     private String ProgramDay = "" ;
     private String ProgramStartHoure = "" ;
+    private String ProgramImage = "" ;
 
     public ScheduleItem() {
     }
@@ -55,6 +57,20 @@ public class ScheduleItem {
     public String getProgramStartHoure() {
         return ProgramStartHoure;
     }
+
+    public void setTitle(String str ) {
+        title = str;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getProgramImage() {
+        return ProgramImage;
+    }
+
+    public void setProgramImage(String img) { ProgramImage = img.trim(); }
 
     public void setProgramStartHoure(String programStartHoure) {
         ProgramStartHoure = programStartHoure;

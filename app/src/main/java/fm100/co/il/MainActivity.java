@@ -211,7 +211,7 @@ public class MainActivity extends ActionBarActivity {
         Drawable titleDrawable = getResources().getDrawable(R.drawable.header);
         getSupportActionBar().setBackgroundDrawable(titleDrawable);
 
-        //setTitle("");
+        setTitle("");
         //getActionBar().setIcon(R.drawable.fm100);
 
         drawerLayout.closeDrawer(drawerPane);
@@ -387,7 +387,7 @@ public class MainActivity extends ActionBarActivity {
         for (int i = 0 ; i<stations.size() ; i++){
             final Channel newChannel = new Channel(stations.get(i).getStationSlug()
                     , stations.get(i).getStationAudio()
-                    , stations.get(i).getSongInfo(),stations.get(i).getStationLogo(),stations.get(i).getStationSlug());
+                    , stations.get(i).getSongInfo(),stations.get(i).getStationLogo(),stations.get(i).getStationName());
             channelsArray.add(newChannel);
         }
     }

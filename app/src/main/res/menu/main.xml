@@ -7,7 +7,7 @@
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="share"
-        android:icon="@drawable/transperanheart"
+        android:icon="@drawable/like"
         app:showAsAction="always"/>
 
 </menu>

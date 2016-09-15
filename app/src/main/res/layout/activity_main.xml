@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:id="@+id/drawer_layout"
     tools:context="com.demo.slidingmenu_tabhostviewpager.MainActivity"
-    android:background="@drawable/background2">
+    android:background="@drawable/bg">
 
     <!-- Main content (main screen) -->
 
@@ -22,7 +22,7 @@
         android:layout_width="220dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="@drawable/mainoutlinesemitrans">
+        android:background="@drawable/bg">
 
         <!-- Profile box ; currently not displaying anything can display current channel or something-->
 
@@ -65,7 +65,7 @@
                     android:layout_weight="1"
                     android:scaleType="fitCenter"
                     android:background="#00ffffff"
-                    android:src="@drawable/facebookicon" />
+                    android:src="@drawable/facebook" />
 
                 <ImageButton
                     android:layout_width="match_parent"
@@ -75,7 +75,7 @@
                     android:layout_weight="1"
                     android:scaleType="fitCenter"
                     android:background="#00ffffff"
-                    android:src="@drawable/instagramicon" />
+                    android:src="@drawable/instagram" />
 
                 <ImageButton
                     android:layout_width="match_parent"
@@ -85,14 +85,14 @@
                     android:layout_weight="1"
                     android:scaleType="fitCenter"
                     android:background="#00ffffff"
-                    android:src="@drawable/websiteicon" />
+                    android:src="@drawable/chrome" />
             </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="תחנות"
+                android:text="ערוצים דיגיטליים"
                 android:id="@+id/textView4"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"

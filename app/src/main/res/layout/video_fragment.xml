@@ -11,17 +11,9 @@
 
         <WebView
             android:layout_width="match_parent"
-            android:layout_height="186dp"
+            android:layout_height="fill_parent"
             android:id="@+id/webView"
             android:background="#00ffffff" />
-
-        <ImageButton
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/startStreamBtn"
-            android:background="#00ffffff"
-            android:src="@drawable/videobg2"
-            android:scaleType="centerCrop" />
 
     </FrameLayout>
 

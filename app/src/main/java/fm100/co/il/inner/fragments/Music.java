@@ -2,8 +2,10 @@ package fm100.co.il.inner.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.Image;
@@ -22,10 +24,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
+import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -84,6 +89,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import org.json.*;
@@ -111,6 +117,8 @@ public class Music extends Fragment {
 	private ImageView imgRound;
 	private ImageView imgCover;
 	private ImageView imgDarken;
+
+	String lastCoverImage = "";
 
 	//default channel url
 	Channel currentChannel = new Channel();//("100fm" , "http://audio.100fm.co.il/100fmAudio" , "http://digital.100fm.co.il/label/Ch0-100fm.xml" , "http://demo.goufo.co.il/100fm/images/100fmlive.png" );
@@ -162,6 +170,11 @@ public class Music extends Fragment {
 
 	private List<ScheduleItem> scheduleItemList = new ArrayList<>();
 
+	RelativeLayout flying;
+	public ArrayList<View> monkeys = new ArrayList<>();
+	int flyingColor = 0xFFF8F301;
+	Timer timer_flying = null;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater,
 							 @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -201,6 +214,8 @@ public class Music extends Fragment {
 		imgRound = (ImageView) v.findViewById(R.id.imgRound);
 
 		rLayout = (LinearLayout) v.findViewById(R.id.playRotate);
+
+		flying = (RelativeLayout) v.findViewById(R.id.flyingMonkeys);
 
 		if (progressView != null) {
 			progressView.setIndeterminate(true);
@@ -324,68 +339,12 @@ public class Music extends Fragment {
 				playStation(position);
 			}
 		});
-
-		/*myWheelView.setOnWheelItemClickListener(new WheelView.OnWheelItemClickListener() {
-			@Override
-			public void onItemClick(int position, Object o) {
-				Toast.makeText(MainActivity.getMyApplicationContext(), "click" + myWheelView.getCurrentPosition() , Toast.LENGTH_SHORT).show();
-				//myWheelView.smoothScrollToPosition(position+1 ,0);
-				//myWheelView.smoothScrollByOffset(5);
-				//myWheelView.smoothScrollBy(300,1000);
-			}
-		});
-		myWheelView.setOnWheelItemSelectedListener(new WheelView.OnWheelItemSelectedListener() {
-			@Override
-			public void onItemSelected(final int position, Object o) {
-				if (listCreated ==1) {
-				runnable = new Runnable() {
-					@Override
-					public void run() {
-
-							if (myWheelView.getCurrentPosition() == position) {
-								//Toast.makeText(MainActivity.getMyApplicationContext(), "scroll" + myWheelView.getCurrentPosition() +" " + position, Toast.LENGTH_SHORT).show();
-								if (lastStationLoading == 0) {
-									lastSelectionLoaded = position;
-									//event = new NotificationBusEvent("play");
-									firstSong = 0;
-									NotificationBusEvent event = null;
-									firstChannel = 1;
-									currentChannel = channelsArray.get(position);
-									if (!Objects.equals(currentChannel.getChannelName(), lastChannel.getChannelName())) {
-										event = new NotificationBusEvent("play");
-										EventBus.getDefault().post(event);
-										//channelNameTv.setText("Current Channel Selected : " + channelsArray.get(position).getChannelName());
-										playPauseBtn.setImageResource(R.drawable.button_pause);
-										lastChannel.setChannelName(currentChannel.getChannelName());
-										lastChannel.setChannelUrl(currentChannel.getChannelUrl());
-										mediaPlayer.reset();
-										myPlayer = new Player();
-										myPlayer.execute(currentChannel.getChannelUrl());
-										isPlaying = 1;
-									}
-
-								} else {
-									if (isLoading == 0) {
-										Toast.makeText(MainActivity.getMyApplicationContext(), "please waite while loading last station selected", Toast.LENGTH_LONG).show();
-										myWheelView.setSelection(lastSelectionLoaded);
-										//isLoading = 1;
-									}
-								}
-
-							}
-						}
-					};
-					customHandler.postDelayed(runnable, 1500);
-				}
-			}
-		});*/
 	}
 
 	private void playStation(int position) {
 		if( channelsArray.size() == 0 ) {
 			return;
 		}
-		//if (lastStationLoading == 0) {
 			lastSelectionLoaded = position;
 			//firstSong = 0;
 			NotificationBusEvent event = null;
@@ -428,13 +387,7 @@ public class Music extends Fragment {
 				rLayout.startAnimation(an);
 			//}
 			reloadSongName();
-		/*} else {
-			if (isLoading == 0) {
-				//Toast.makeText(MainActivity.getMyApplicationContext(), "please waite while loading last station selected", Toast.LENGTH_LONG).show();
-				//myWheelView.setSelection(lastSelectionLoaded);
-				//isLoading = 1;
-			}
-		}*/
+			startFlyingMonkeys();
 	}
 	private void stopStation() {
 		NotificationBusEvent event = new NotificationBusEvent("pause");
@@ -444,6 +397,10 @@ public class Music extends Fragment {
 		isPlaying = 0;
 		EventBus.getDefault().post(event);
 		rLayout.clearAnimation();
+		if( timer_flying != null ) {
+			timer_flying.cancel();
+			timer_flying = null;
+		}
 	}
 
 	private List<MyObject> createArrays() {
@@ -502,39 +459,6 @@ public class Music extends Fragment {
 			} else {
 				stopStation();
 			}
-			// is it on play or pause and act acordingly
-			/*if (firstChannel == 0) {
-				Toast.makeText(getActivity(), "No Channel Selected" , Toast.LENGTH_SHORT).show();
-			} else {
-				NotificationBusEvent event = null;
-				if (isPlaying == 0) {
-					event = new NotificationBusEvent("play");
-					playPauseBtn.setImageResource(R.drawable.button_pause);
-					if (!Objects.equals(currentChannel.getChannelName(), lastChannel.getChannelName())) {
-						if (currentChannel != null) {
-							lastChannel.setChannelName(currentChannel.getChannelName());
-							lastChannel.setChannelUrl(currentChannel.getChannelUrl());
-							mediaPlayer.reset();
-							myPlayer = new Player();
-							myPlayer.execute(currentChannel.getChannelUrl());
-
-						} else {
-							myPlayer = new Player();
-							myPlayer.execute(currentChannel.getChannelUrl());
-						}
-					} else {
-						mediaPlayer.start();
-					}
-					isPlaying =1;
-				} else {
-					event = new NotificationBusEvent("pause");
-					playPauseBtn.setImageResource(R.drawable.button_play);
-					if (mediaPlayer.isPlaying())
-						mediaPlayer.pause();
-					isPlaying = 0;
-				}
-				EventBus.getDefault().post(event);
-			}*/
 		}
 	};
 
@@ -578,49 +502,6 @@ public class Music extends Fragment {
 			mediaPlayer.stop();
 		}
 	}
-
-	/*AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener(){
-		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		//	channelsLv.smoothScrollToPosition(position);
-			//if (lastStationLoading == 0) {
-				//event = new NotificationBusEvent("play");
-				firstSong = 0;
-				NotificationBusEvent event = null;
-				firstChannel = 1;
-				currentChannel = channelsArray.get(position);
-				if (!Objects.equals(currentChannel.getChannelName(), lastChannel.getChannelName())) {
-					event = new NotificationBusEvent("play");
-					EventBus.getDefault().post(event);
-					//channelNameTv.setText("Current Channel Selected : " + channelsArray.get(position).getChannelName());
-					playPauseBtn.setImageResource(R.drawable.button_pause);
-					lastChannel.setChannelName(currentChannel.getChannelName());
-					lastChannel.setChannelUrl(currentChannel.getChannelUrl());
-					mediaPlayer.reset();
-					myPlayer = new Player();
-					myPlayer.execute(currentChannel.getChannelUrl());
-					isPlaying = 1;
-				} else {
-					if (isPlaying == 0) {
-						mediaPlayer.start();
-						playPauseBtn.setImageResource(R.drawable.button_pause);
-						event = new NotificationBusEvent("play");
-						isPlaying = 1;
-					} else {
-						event = new NotificationBusEvent("pause");
-						playPauseBtn.setImageResource(R.drawable.button_play);
-						if (mediaPlayer.isPlaying())
-							mediaPlayer.pause();
-						isPlaying = 0;
-					}
-					EventBus.getDefault().post(event);
-				}
-			/*} else {
-				Toast.makeText(MainActivity.getMyApplicationContext(), "please waite while loading last station selected", Toast.LENGTH_LONG).show();
-			}
-		}
-	};*/
-
 
 	// preparing mediaplayer will take sometime to buffer the content so prepare it inside the background thread and starting it on UI thread.
 	class Player extends AsyncTask<String ,Void,Boolean> {
@@ -736,7 +617,11 @@ public class Music extends Fragment {
 	}
 
 	private void showCover(String img) {
+		if( lastCoverImage.equals(img) ) {
+			return;
+		}
 		Log.i("100fm", "showCover : " + img );
+		lastCoverImage = img;
 
 		if( imgDarken.getVisibility() != View.VISIBLE ) {
 			Animation a = new AlphaAnimation(0.00f, 1.00f);
@@ -779,7 +664,7 @@ public class Music extends Fragment {
 	}
 
 	private void hideCover() {
-		Log.i("100fm", "hideCover" );
+		flyingColor = 0xFFF8F301;
 		if( imgDarken.getVisibility() != View.INVISIBLE ) {
 			Animation a = new AlphaAnimation(1.00f, 0.00f);
 
@@ -904,35 +789,11 @@ public class Music extends Fragment {
 							}
 						});
 					}
-					//firstSong = 1;
-				/*}
-				if (firstChannel == 1) {
-						if (!lastSong.getSongName().equals(currentSong.getSongName())) {
-							Log.e("mynewlog", "its here now");
-							songNameTv.setText(currentSong.getSongName());
-							artistNameTv.setText(currentSong.getArtist());
-							lastSong.setSongName(currentSong.getSongName());
-							lastSong.setArtist(currentSong.getArtist());
-							EventBus.getDefault().post(new NewSongBusEvent(currentSong.getSongName(), currentSong.getArtist()));
-							firstSong = 1;
-						}
-				}*/
 			}
 			catch (Exception e) {
 				Log.i("MyLog", "exception postExecute: " + e.getMessage());
 			}
 		}
-	}
-
-	private void drawShape() {
-		LinearLayout myLayout = findViewById(R.id.main);
-
-		Button myButton = new Button(this);
-		myButton.setLayoutParams(new LinearLayout.LayoutParams(
-				LinearLayout.LayoutParams.FILL_PARENT,
-				LinearLayout.LayoutParams.FILL_PARENT));
-
-		myLayout.addView(myButton);
 	}
 
 	// checking for new song every 1 second
@@ -944,6 +805,82 @@ public class Music extends Fragment {
 				reloadSongName();
 			}
 		}, 0, 15000);
+	}
+
+	public void startFlyingMonkeys() {
+		if (timer_flying != null) {
+			timer_flying.cancel();
+		}
+		timer_flying = new Timer();
+		timer_flying.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				if( getActivity() != null ) {
+					getActivity().runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							Random r = new Random();
+
+							if( imgCover.getDrawable() != null && imgCover.getVisibility() == View.VISIBLE ) {
+								Bitmap bitmap = ((BitmapDrawable)imgCover.getDrawable()).getBitmap();
+								flyingColor = bitmap.getPixel(0,0);
+							}
+
+							if( getContext() != null ) {
+								View myButton = new View(getContext());
+								int s = r.nextInt(60) + 40;
+								RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(s, s);
+								params.rightMargin = r.nextInt(flying.getWidth());
+								params.topMargin = 0;
+								myButton.setLayoutParams(params);
+								myButton.setBackgroundColor(flyingColor);
+								myButton.setAlpha(.5f);
+								flying.addView(myButton);
+
+								monkeys.add(myButton);
+
+								AnimationSet snowMov1 = new AnimationSet(true);
+
+								RotateAnimation rotate1 = new RotateAnimation(-90, r.nextInt(180), s/2, s/2);
+								rotate1.setStartOffset(50);
+								rotate1.setDuration(3000);
+								rotate1.setRepeatCount(1);
+								rotate1.setInterpolator(new AccelerateInterpolator());
+								snowMov1.addAnimation(rotate1);
+
+								TranslateAnimation trans1 = new TranslateAnimation(0, 0, flying.getHeight(), -100);
+								trans1.setDuration(3000);
+								snowMov1.addAnimation(trans1);
+
+								trans1.setAnimationListener(new Animation.AnimationListener() {
+									@Override
+									public void onAnimationStart(Animation animation) {
+
+									}
+
+									@Override
+									public void onAnimationEnd(Animation animation) {
+										if( monkeys.size() > 0 ) {
+											View v = monkeys.get(0);
+											flying.removeView(v);
+											monkeys.remove(0);
+										}
+									}
+
+									@Override
+									public void onAnimationRepeat(Animation animation) {
+									}
+								});
+
+								//myButton.startAnimation(snowMov1);
+								myButton.startAnimation(trans1);
+								//myButton.setVisibility(View.VISIBLE);
+							}
+						}
+					});
+				}
+			}
+		}, 0, 400);
 	}
 
 	@Subscribe
@@ -958,8 +895,8 @@ public class Music extends Fragment {
 		// set a "play" notification
 		else if (event.getNotificationBusMsg().equals("play")) {
 			playPauseBtn.setImageResource(R.drawable.stop);
-				mediaPlayer.start();
-				isPlaying = 1;
+			mediaPlayer.start();
+			isPlaying = 1;
 		}
 	}
 
@@ -991,16 +928,6 @@ public class Music extends Fragment {
 					*/
 				} else {
 					Toast.makeText(MainActivity.getMyApplicationContext() , "channel already selected" , Toast.LENGTH_SHORT ).show();
-					/*if (isPlaying == 0) {
-						mediaPlayer.start();
-						playPauseBtn.setImageResource(R.drawable.button_pause);
-						isPlaying = 1;
-					} else {
-						playPauseBtn.setImageResource(R.drawable.button_play);
-						if (mediaPlayer.isPlaying())
-							mediaPlayer.pause();
-						isPlaying = 0;
-					}*/
 				}
 			} else {
 				Toast.makeText(MainActivity.getMyApplicationContext(), "please waite while loading last station selected", Toast.LENGTH_LONG).show();
@@ -1018,128 +945,4 @@ public class Music extends Fragment {
 		//channelsLv.setOnItemClickListener(itemClickListener);
 		listCreated = 1;
 	}
-
-	// JSON RELATED ASYNCTASKS
-	/*public class ReadFileTask extends AsyncTask<String, Void, String> {
-
-		@Override
-		protected String doInBackground(String... params) {
-			String temp="";
-			try {
-				FileInputStream fin = MainActivity.getMyApplicationContext().openFileInput(params[0]);
-				int c;
-				while( (c = fin.read()) != -1){
-					temp = temp + Character.toString((char)c);
-				}
-				fin.close();
-			} catch (Exception e){
-				Log.e("MyLog" , "read task exception: " + e.getMessage());
-			}
-			return temp;
-		}
-
-		@Override
-		protected void onPostExecute(String result) {
-			super.onPostExecute(result);
-			// getting a list of Station objects
-			stationList = StationsFromJson(result);
-			setListData(stationList);
-			myCustomAdapter = new ChannelListAdapter(getActivity(), MainActivity.channelsArray);
-			//channelsLv.setAdapter(myCustomAdapter);
-			//channelsLv.setOnItemClickListener(itemClickListener);
-			listCreated = 1;
-			//progressView.setVisibility(View.INVISIBLE);
-			//channelsLv.setBackgroundColor(Color.RED);
-			lvProgressView.setVisibility(View.INVISIBLE);
-			//initWheel();
-			//myWheelView.setWheelAdapter(new MyWheelAdapter(getActivity()));
-			//myWheelView.setWheelData(createArrays());
-			List<MyObject> newMyObjList = new ArrayList<>();
-			for (int i = 0; i < channelsArray.size(); i++) {
-				newMyObjList.add(new MyObject(channelsArray.get(i).getChannelLogo()));
-			}
-			myWheelView.setWheelData(newMyObjList);
-			myWheelView.setSelection(0);
-			myWheelView.setVisibility(View.VISIBLE);
-			itemTopIb.setVisibility(View.VISIBLE);
-			itemBotIb.setVisibility(View.VISIBLE);
-
-		}
-
-	}
-
-	public List<Station> StationsFromJson(String jsonString){
-
-		try {
-			JSONObject parentObject = new JSONObject(jsonString);
-
-			JSONArray parentArray = parentObject.getJSONArray("stations");
-
-			Station tempStation = null;
-
-			for (int i = 0; i < parentArray.length(); i++) {
-
-				tempStation = new Station();
-				JSONObject finalObject = parentArray.getJSONObject(i);
-				tempStation.setStationName(finalObject.getString("name"));
-				tempStation.setStationAudio(finalObject.getString("audio"));
-				tempStation.setSongInfo(finalObject.getString("info"));
-				tempStation.setStationSlug(finalObject.getString("slug"));
-				tempStation.setStationLogo(finalObject.getString("logo"));
-				stationList.add(tempStation);
-			}
-		} catch (Exception e) {
-			Log.e("HereLog", "Json Exception" + e.getMessage());
-		}
-
-		return stationList;
-
-	}*/
-
-	/*class itunesTask extends AsyncTask<String ,Void,String> {
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-			if(lastSong != null) {
-				Toast.makeText(MainActivity.getMyApplicationContext(), "artist: " + lastSong.getArtist()
-						+ " song: " + lastSong.getSongName(), Toast.LENGTH_LONG).show();
-				Uri uri = Uri.parse("https://itunes.apple.com/search?limit=1&country=IL&term=" + "in the end" + "linkin park"); // missing 'http://' will cause crashed
-				Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-				startActivity(intent);
-			}
-			else {
-				Toast.makeText(MainActivity.getMyApplicationContext() , "null" , Toast.LENGTH_SHORT).show();
-			}
-			String path=MainActivity.getMyApplicationContext().getFilesDir().getAbsolutePath()+"/JsonCo.json";
-			File file = new File ( path );
-			if ( file.exists() ){
-
-			}else{
-				Toast.makeText(MainActivity.getMyApplicationContext() ,
-						"please download the file to countinue" , Toast.LENGTH_SHORT).show();
-			}
-
-		}
-
-		@Override
-		protected String doInBackground(String... params) {
-			String temp="";
-			try {
-				FileInputStream fin = MainActivity.getMyApplicationContext().openFileInput(params[0]);
-				int c;
-				while( (c = fin.read()) != -1){
-					temp = temp + Character.toString((char)c);
-				}
-				fin.close();
-			} catch (Exception e){
-				Log.e("MyLog" , "read task exception: " + e.getMessage());
-			}
-			return temp;
-		}
-
-		@Override
-		protected void onPostExecute(String result) {
-			super.onPostExecute(aBoolean);
-		}
-	}*/
 }

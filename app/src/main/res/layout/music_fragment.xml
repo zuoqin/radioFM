@@ -18,6 +18,11 @@
         android:visibility="invisible" />
 
     <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/flyingMonkeys"></RelativeLayout>
+
+    <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="fill_parent"
             android:minHeight="150dp"

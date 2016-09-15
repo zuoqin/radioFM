@@ -84,7 +84,7 @@ public class ScheduleListAdapter extends BaseAdapter {
                 holder.dayTv = (TextView) rowView.findViewById(R.id.dayTv);
                 holder.scheduleListView = (ListView) rowView.findViewById(R.id.scheduleItemLv);
 
-                holder.dayTv.setTypeface(custom_font_heb_regular);
+                holder.dayTv.setTypeface(custom_font_heb_regular2);
             }
 
             rowView.setTag(holder);

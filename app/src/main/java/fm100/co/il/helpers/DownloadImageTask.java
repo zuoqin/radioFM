@@ -25,12 +25,13 @@ import java.net.URL;
 
 /**
  * Created by leonidangarov on 30/11/15.
- */public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+ */
+public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
     private static final float BITMAP_SCALE = 0.4f;
     private static final float BLUR_RADIUS = 3.5f;
 
     ImageView bmImage;
-
+    int color;
     Context ctx;
 
     public DownloadImageTask(ImageView bmImage, Context c) {
@@ -52,6 +53,9 @@ import java.net.URL;
     }
 
     public static Bitmap blur(Context context, Bitmap image) {
+        if( context == null ) {
+            return null;
+        }
         int width = Math.round(image.getWidth() * BITMAP_SCALE);
         int height = Math.round(image.getHeight() * BITMAP_SCALE);
 

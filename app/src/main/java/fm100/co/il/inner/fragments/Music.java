@@ -880,7 +880,7 @@ public class Music extends Fragment {
 					});
 				}
 			}
-		}, 0, 400);
+		}, 0, 500);
 	}
 
 	@Subscribe

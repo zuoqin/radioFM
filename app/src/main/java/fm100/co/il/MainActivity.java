@@ -238,6 +238,9 @@ public class MainActivity extends ActionBarActivity {
         };
 
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
+
+        Intent intent = new Intent(MainActivity.this, Loading.class);
+        startActivity(intent);
     }
 
     @Override
@@ -385,7 +388,7 @@ public class MainActivity extends ActionBarActivity {
 
     private void setListData(List<Station> stations) {
         for (int i = 0 ; i<stations.size() ; i++){
-            final Channel newChannel = new Channel(stations.get(i).getStationSlug()
+            final Channel newChannel = new Channel(stations.get(i).getStationName()
                     , stations.get(i).getStationAudio()
                     , stations.get(i).getSongInfo(),stations.get(i).getStationLogo(),stations.get(i).getStationName());
             channelsArray.add(newChannel);

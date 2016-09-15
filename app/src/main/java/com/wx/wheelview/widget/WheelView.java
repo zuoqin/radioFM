@@ -26,6 +26,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
@@ -33,8 +34,10 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.wx.wheelview.adapter.ArrayWheelAdapter;
@@ -47,6 +50,9 @@ import com.wx.wheelview.util.WheelUtils;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+
+import fm100.co.il.R;
 
 /**
  * 滚轮控件
@@ -66,6 +72,7 @@ public class WheelView<T> extends ListView implements IWheelView<T> {
     private int mExtraMargin;   // 附加文本外边距
     private int mSelection = 0; // 选中位置
     private boolean mClickable = CLICKABLE; // 是否可点击
+
 
     private Paint mTextPaint;   // 附加文本画笔
 
@@ -145,10 +152,35 @@ public class WheelView<T> extends ListView implements IWheelView<T> {
         }
 
         @Override
-        public void onScroll(AbsListView view, int firstVisibleItem, int
-                visibleItemCount, int totalItemCount) {
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+            //Log.i("100fm", "onScroll ");
             if (visibleItemCount != 0) {
                 refreshCurrentPosition(false);
+            }
+            if (WheelUtils.isEmpty(mList)) {
+                return;
+            }
+            //Log.i("100fm", "mCurrentPositon " + mCurrentPositon + " getRealPosition " + getRealPosition(mCurrentPositon) + " firstVisibleItem : " + firstVisibleItem + ", totalItemCount : " + totalItemCount );
+            int mid = (getRealPosition(mCurrentPositon) - firstVisibleItem) % mList.size();
+            //Log.i("100fm", "getRealPosition : " + getRealPosition(mCurrentPositon) + ", firstVisibleItem : " + firstVisibleItem );
+            for (int i = 0; i < visibleItemCount; i++) {
+                View itemView = getChildAt(i);
+                if (itemView != null) {
+                    ImageView imageView = (ImageView) itemView.findViewById(R.id.item_image);
+
+                    int alpha = (int) (250 * Math.cos ((2 + mid - i) * Math.PI / visibleItemCount)) - 70;
+                    if( alpha < 20 ) alpha = 20;
+                    if( 2 + mid - i == 0 ) alpha = 255;
+                    imageView.setImageAlpha(alpha);
+
+                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) imageView.getLayoutParams();
+                    params.height = 50 + 70 * alpha / 255;
+                    imageView.setLayoutParams(params);
+                    //imageView.setScaleY(alpha / 250);
+                    //imageView.setScaleX(alpha / 250);
+
+                    //Log.i("100fm", "mid : " + mid + ", i : " + i + ", alpha : " + alpha + ", mCurrentPositon : " + mCurrentPositon + ", mItemH : " + mItemH );
+                }
             }
         }
     };
@@ -392,8 +424,9 @@ public class WheelView<T> extends ListView implements IWheelView<T> {
     }
 
     public void smoothScrollToPosition(final int selection) {
-        mSelection = selection;
-        WheelView.super.smoothScrollToPosition(getRealPosition(selection));
+        Log.i("100fm", "selection : " + getRealPosition(selection));
+        //mSelection = selection;
+        //WheelView.super.smoothScrollToPosition(getRealPosition(selection));
         //refreshCurrentPosition(false);
     }
 

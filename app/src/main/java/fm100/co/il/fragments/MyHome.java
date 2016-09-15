@@ -124,17 +124,10 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 	private void setTabsIcons(Drawable[] drawables) {
 		String[] tabsNames = null;
 
-			//tabsNames = new String[]{"running", "music", "video"};
+		//tabsNames = new String[]{"running", "music", "video"};
 
 		tabsNames = new String[]{"music", "video", /*"running" ,*/ "schedule"};
 
-
-		/*for (int i=drawables.length-1 ; i>=0 ; i--){
-			TabHost.TabSpec myTabSpec = tabHost.newTabSpec(tabsNames[i]);
-			myTabSpec.setIndicator(getTabIndicator(tabHost.getContext(), drawables[i] )); //getTabIndicator: new function to inject own tab layout
-			myTabSpec.setContent(new FakeContent(getActivity()));
-			tabHost.addTab(myTabSpec);
-		}*/
 		for (int i=0 ; i < drawables.length ; i++){
 			TabHost.TabSpec myTabSpec = tabHost.newTabSpec(tabsNames[i]);
 			myTabSpec.setIndicator(getTabIndicator(tabHost.getContext(), drawables[i] )); //getTabIndicator: new function to inject own tab layout
@@ -152,7 +145,7 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 
 	@Override
 	public void onTabChanged(String tabId) {
-		Log.e("MyLog", "does it fall here onTabChange???");
+		Log.e("MyLog", "does it	 fall here onTabChange???");
 		if(null != getActivity() ) {
 			int pos = this.tabHost.getCurrentTab();
 			if(isRTL()==true){

@@ -22,6 +22,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
@@ -290,14 +291,12 @@ public class Music extends Fragment {
 
 	private void initWheel() {
 		myWheelView = (WheelView) mView.findViewById(R.id.wheelview);
-		//myWheelView.setVisibility(View.GONE);
 		myWheelView.setWheelAdapter(new MyWheelAdapter(getActivity()));
 		myWheelView.setWheelData(createArrays());
-		//myWheelView.setWheelData(channelsArray);
-		myWheelView.setWheelSize(3);
+		myWheelView.setWheelSize(5);
 		myWheelView.setSkin(WheelView.Skin.None);
 		myWheelView.setWheelClickable(true);
-		myWheelView.setSelection(2);
+		myWheelView.setSelection(3);
 		WheelView.WheelViewStyle style = new WheelView.WheelViewStyle();
 
 
@@ -703,31 +702,105 @@ public class Music extends Fragment {
 		String day = new SimpleDateFormat("EEEE", Locale.ENGLISH).format(date.getTime());
 		int hours = date.getHours() * 100;
 
+		ScheduleItem itemCurrent = null;
 		for (int i=0 ; i<scheduleItemList.size() ; i++) {
 			ScheduleItem item = scheduleItemList.get(i);
 			if( day.equals(item.getProgramDay()) ) {
 				int h = Integer.parseInt( item.getProgramStartHoure().replace(":","") );
-				if( hours <= h ) {
+				if( hours > h ) {
+					itemCurrent = item;
 					//Log.i("100fm", "reload100fmName | " + item.getProgramName() + " | " + item.getProgramAutor() );
-					currentSong = new Song( item.getProgramName(), item.getProgramAutor() );
-					songNameTv.setText(currentSong.getSongName());
-					artistNameTv.setText(currentSong.getArtist());
-
-					if( !item.getProgramImage().isEmpty() ) {
-						new DownloadImageTask(imgCover, getContext()).execute(item.getProgramImage());
-						imgCover.setVisibility(View.VISIBLE);
-						imgDarken.setVisibility(View.VISIBLE);
-					} else {
-						imgCover.setVisibility(View.INVISIBLE);
-						imgDarken.setVisibility(View.INVISIBLE);
-					}
-
-					lastSong.setSongName(item.getProgram());
-					lastSong.setArtist(item.getProgramAutor());
-					EventBus.getDefault().post(new NewSongBusEvent(item.getProgram(), item.getProgramAutor()));
-					return;
 				}
 			}
+		}
+		if( itemCurrent != null ) {
+			currentSong = new Song( itemCurrent.getProgramName(), itemCurrent.getProgramAutor() );
+			songNameTv.setText(currentSong.getSongName());
+			artistNameTv.setText(currentSong.getArtist());
+
+			if( !itemCurrent.getProgramImage().isEmpty() ) {
+				showCover(itemCurrent.getProgramImage());
+				//new DownloadImageTask(imgCover, getContext()).execute(item.getProgramImage());
+						/*imgCover.setVisibility(View.VISIBLE);
+						imgDarken.setVisibility(View.VISIBLE);*/
+			} else {
+				hideCover();
+						/*imgCover.setVisibility(View.INVISIBLE);
+						imgDarken.setVisibility(View.INVISIBLE);*/
+			}
+
+			lastSong.setSongName(itemCurrent.getProgramName());
+			lastSong.setArtist(itemCurrent.getProgramAutor());
+			EventBus.getDefault().post(new NewSongBusEvent(itemCurrent.getProgramName(), itemCurrent.getProgramAutor()));
+		}
+	}
+
+	private void showCover(String img) {
+		Log.i("100fm", "showCover : " + img );
+
+		if( imgDarken.getVisibility() != View.VISIBLE ) {
+			Animation a = new AlphaAnimation(0.00f, 1.00f);
+
+			a.setDuration(500);
+			a.setAnimationListener(new Animation.AnimationListener() {
+
+				public void onAnimationStart(Animation animation) {
+				}
+
+				public void onAnimationRepeat(Animation animation) {
+				}
+
+				public void onAnimationEnd(Animation animation) {
+					imgDarken.setVisibility(View.VISIBLE);
+				}
+			});
+
+			imgDarken.startAnimation(a);
+
+			Animation b = new AlphaAnimation(1.00f, 0.00f);
+
+			b.setDuration(200);
+			b.setAnimationListener(new Animation.AnimationListener() {
+
+				public void onAnimationStart(Animation animation) {
+				}
+
+				public void onAnimationRepeat(Animation animation) {
+				}
+
+				public void onAnimationEnd(Animation animation) {
+					imgCover.setVisibility(View.INVISIBLE);
+				}
+			});
+
+			imgCover.startAnimation(b);
+		}
+		new DownloadImageTask(imgCover, getContext()).execute(img);
+	}
+
+	private void hideCover() {
+		Log.i("100fm", "hideCover" );
+		if( imgDarken.getVisibility() != View.INVISIBLE ) {
+			Animation a = new AlphaAnimation(1.00f, 0.00f);
+
+			a.setDuration(500);
+			a.setAnimationListener(new Animation.AnimationListener() {
+
+				public void onAnimationStart(Animation animation) {
+				}
+
+				public void onAnimationRepeat(Animation animation) {
+				}
+
+				public void onAnimationEnd(Animation animation) {
+					imgCover.setVisibility(View.INVISIBLE);
+					imgCover.setImageResource(android.R.color.transparent);
+					imgDarken.setVisibility(View.INVISIBLE);
+				}
+			});
+
+			imgCover.startAnimation(a);
+			imgDarken.startAnimation(a);
 		}
 	}
 	// getting the xml for the song data and checking for it every second if changed
@@ -809,13 +882,15 @@ public class Music extends Fragment {
 										JSONObject song = (JSONObject) obj.getJSONArray("results").get(0);
 
 										Log.d("fm100", "artworkUrl100 : " + song.getString("artworkUrl100").replace("100x100bb", "400x400bb") );
-										new DownloadImageTask(imgCover, getContext()).execute(song.getString("artworkUrl100").replace("100x100bb", "400x400bb"));
+										//new DownloadImageTask(imgCover, getContext()).execute(song.getString("artworkUrl100").replace("100x100bb", "400x400bb"));
 
-										imgCover.setVisibility(View.VISIBLE);
-										imgDarken.setVisibility(View.VISIBLE);
+										//imgCover.setVisibility(View.VISIBLE);
+										//imgDarken.setVisibility(View.VISIBLE);
+										showCover(song.getString("artworkUrl100").replace("100x100bb", "400x400bb"));
 									} else {
-										imgCover.setVisibility(View.INVISIBLE);
-										imgDarken.setVisibility(View.INVISIBLE);
+										//imgCover.setVisibility(View.INVISIBLE);
+										//imgDarken.setVisibility(View.INVISIBLE);
+										hideCover();
 									}
 
 								} catch (JSONException e) {
@@ -848,6 +923,18 @@ public class Music extends Fragment {
 			}
 		}
 	}
+
+	private void drawShape() {
+		LinearLayout myLayout = findViewById(R.id.main);
+
+		Button myButton = new Button(this);
+		myButton.setLayoutParams(new LinearLayout.LayoutParams(
+				LinearLayout.LayoutParams.FILL_PARENT,
+				LinearLayout.LayoutParams.FILL_PARENT));
+
+		myLayout.addView(myButton);
+	}
+
 	// checking for new song every 1 second
 	public void startSongThread(){
 		Timer timer = new Timer();
@@ -895,15 +982,8 @@ public class Music extends Fragment {
 					lastChannel.setChannelName(currentChannel.getChannelName());
 					lastChannel.setChannelUrl(currentChannel.getChannelUrl());
 					mediaPlayer.reset();
-					//myPlayer = new Player();
-					//myPlayer.execute(currentChannel.getChannelUrl());
-					try {
-						mediaPlayer.setDataSource(currentChannel.getChannelUrl());
-						mediaPlayer.prepare();
-						mediaPlayer.start();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+					myPlayer = new Player();
+					myPlayer.execute(currentChannel.getChannelUrl());
 					isPlaying = 1;
 					/*
 					NotificationBusEvent event = new NotificationBusEvent("play");

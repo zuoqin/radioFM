@@ -15,6 +15,9 @@ import android.renderscript.Element;
 import android.renderscript.RenderScript;
 import android.renderscript.ScriptIntrinsicBlur;
 import android.util.Log;
+import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.ImageView;
 
 import java.io.InputStream;
@@ -23,6 +26,9 @@ import java.net.URL;
 /**
  * Created by leonidangarov on 30/11/15.
  */public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+    private static final float BITMAP_SCALE = 0.4f;
+    private static final float BLUR_RADIUS = 3.5f;
+
     ImageView bmImage;
 
     Context ctx;
@@ -34,15 +40,6 @@ import java.net.URL;
 
     protected Bitmap doInBackground(String... urls) {
         String urldisplay = urls[0];
-        /*String filename = urldisplay.substring(urldisplay.lastIndexOf("/") + 1);
-        String path = urldisplay.substring(0, urldisplay.lastIndexOf("/") + 1);
-        try {
-            filename = URLEncoder.encode(filename, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        urldisplay = path + filename;*/
-        //Log.i("ufo", urldisplay);
         Bitmap mIcon11 = null;
         try {
             InputStream in = new URL(urldisplay).openStream();
@@ -53,17 +50,21 @@ import java.net.URL;
         }
         return mIcon11;
     }
-    public Bitmap blur(Bitmap image) {
-        if (null == image || this.ctx == null) return null;
 
-        Bitmap outputBitmap = Bitmap.createBitmap(image);
-        final RenderScript renderScript = RenderScript.create(this.ctx);
-        Allocation tmpIn = Allocation.createFromBitmap(renderScript, image);
-        Allocation tmpOut = Allocation.createFromBitmap(renderScript, outputBitmap);
+    public static Bitmap blur(Context context, Bitmap image) {
+        int width = Math.round(image.getWidth() * BITMAP_SCALE);
+        int height = Math.round(image.getHeight() * BITMAP_SCALE);
 
-        //Intrinsic Gausian blur filter
-        ScriptIntrinsicBlur theIntrinsic = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript));
-        theIntrinsic.setRadius(15);
+        Bitmap inputBitmap = Bitmap.createScaledBitmap(image, width, height,
+                false);
+        Bitmap outputBitmap = Bitmap.createBitmap(inputBitmap);
+
+        RenderScript rs = RenderScript.create(context);
+        ScriptIntrinsicBlur theIntrinsic = ScriptIntrinsicBlur.create(rs,
+                Element.U8_4(rs));
+        Allocation tmpIn = Allocation.createFromBitmap(rs, inputBitmap);
+        Allocation tmpOut = Allocation.createFromBitmap(rs, outputBitmap);
+        theIntrinsic.setRadius(BLUR_RADIUS);
         theIntrinsic.setInput(tmpIn);
         theIntrinsic.forEach(tmpOut);
         tmpOut.copyTo(outputBitmap);
@@ -72,6 +73,24 @@ import java.net.URL;
     }
 
     protected void onPostExecute(Bitmap result) {
-        bmImage.setImageBitmap(blur(result));
+        Animation a = new AlphaAnimation(0.00f, 1.00f);
+
+        a.setDuration(300);
+        a.setAnimationListener(new Animation.AnimationListener() {
+
+            public void onAnimationStart(Animation animation) {
+            }
+
+            public void onAnimationRepeat(Animation animation) {
+            }
+
+            public void onAnimationEnd(Animation animation) {
+                bmImage.setVisibility(View.VISIBLE);
+            }
+        });
+
+        bmImage.setImageBitmap(blur(ctx, result));
+        bmImage.clearAnimation();
+        bmImage.startAnimation(a);
     }
 }

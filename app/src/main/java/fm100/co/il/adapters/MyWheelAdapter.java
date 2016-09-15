@@ -34,7 +34,7 @@ public class MyWheelAdapter extends BaseWheelAdapter<MyObject> {
         if (convertView == null) {
             viewHolder = new ViewHolder();
             convertView = LayoutInflater.from(mContext).inflate(R.layout.item_list, null);
-            viewHolder.textView = (TextView) convertView.findViewById(R.id.item_name);
+            //viewHolder.textView = (TextView) convertView.findViewById(R.id.item_name);
             viewHolder.imageView = (ImageView) convertView.findViewById(R.id.item_image);
             convertView.setTag(viewHolder);
         } else {

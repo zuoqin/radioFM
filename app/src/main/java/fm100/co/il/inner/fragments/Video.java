@@ -62,8 +62,7 @@ public class Video extends Fragment {
 	private VideoLvAdapter videoLvAdapter;
 
 	VideoView videoView;
-
-	String vidAddress = "http://100fm.multix.co.il/";
+	String vidAddress = "http://hlscdn.streamgates.net/radios100fm/abr/playlist.m3u8";//"http://100fm.multix.co.il/";
 	//String vidAddress = "rtmp:\\/\\/37.49.225.94:1935\\/radios100fm";
 	// another adress = "http://100fm.multix.co.il/"
 	// another testing adress = "https://archive.org/download/ksnn_compilation_master_the_internet/ksnn_compilation_master_the_internet_512kb.mp4"
@@ -117,8 +116,10 @@ public class Video extends Fragment {
 			videoLv.setAdapter(videoLvAdapter);
 		}
 
-		changeVideoUrl("http://100fm.multix.co.il/");
+		//changeVideoUrl(vidAddress);
 
+
+		webView.loadData("<html><body style=\"margin: 0;\"><video width=\"100%\" height=\"100%\" preload=\"none\" poster=\"http://assets-jpcust.jwpsrv.com/thumbs/teD8sDdM-720.jpg\"><source type=\"application/x-mpegURL\" src=\"http://hlscdn.streamgates.net/radios100fm/abr/playlist.m3u8\" /></video></body></html>", "text/html; charset=UTF-8", null);
 
 		return v;
 	}
@@ -187,10 +188,13 @@ public class Video extends Fragment {
 			String itemURL = mainVideoLink+videoId;
 
 			if( videoId.equals("live") ) {
-				itemURL = "http://100fm.multix.co.il/";
+				webView.loadUrl("");
+				webView.loadData("<html><body style=\"margin: 0;\"><video width=\"100%\" height=\"100%\" preload=\"none\" poster=\"http://assets-jpcust.jwpsrv.com/thumbs/teD8sDdM-720.jpg\"><source type=\"application/x-mpegURL\" src=\"http://hlscdn.streamgates.net/radios100fm/abr/playlist.m3u8\" /></video></body></html>", "text/html; charset=UTF-8", null);
+				webView.reload();
+			} else {
+				webView.loadData("", "text/html; charset=UTF-8", null);
+				changeVideoUrl(itemURL);
 			}
-
-			changeVideoUrl(itemURL);
 		}
 	};
 }

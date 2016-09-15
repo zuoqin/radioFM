@@ -70,13 +70,14 @@ public class ScheduleListAdapter extends BaseAdapter {
 
             holder = new ViewHolder();
             Typeface custom_font_heb_regular = Typeface.createFromAsset(MainActivity.getMyApplicationContext().getAssets(), "fonts/FbSpoilerRegular.ttf");
+            Typeface custom_font_heb_regular2 = Typeface.createFromAsset(MainActivity.getMyApplicationContext().getAssets(), "fonts/FbSpoilerBlack.ttf");
 
             if( item.getTitle().isEmpty() ) {
                 holder.scheduleTv = (TextView) rowView.findViewById(R.id.programName);
                 holder.scheduleAuthor = (TextView) rowView.findViewById(R.id.programAuthor);
                 holder.scheduleTime = (TextView) rowView.findViewById(R.id.programTime);
 
-                holder.scheduleTv.setTypeface(custom_font_heb_regular);
+                holder.scheduleTv.setTypeface(custom_font_heb_regular2);
                 holder.scheduleTime.setTypeface(custom_font_heb_regular);
                 holder.scheduleAuthor.setTypeface(custom_font_heb_regular);
             } else {

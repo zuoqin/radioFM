@@ -25,6 +25,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:label="@string/app_name" android:name=".Loading"/>
         <receiver android:name=".NotificationBroadcast" >
             <intent-filter>
                 <action android:name="com.example.hpuser.rad100fm.ACTION_PAUSE" />

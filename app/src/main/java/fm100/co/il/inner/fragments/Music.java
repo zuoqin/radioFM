@@ -387,7 +387,7 @@ public class Music extends Fragment {
 				rLayout.startAnimation(an);
 			//}
 			reloadSongName();
-			startFlyingMonkeys();
+			//startFlyingMonkeys();
 	}
 	private void stopStation() {
 		NotificationBusEvent event = new NotificationBusEvent("pause");

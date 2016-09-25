@@ -3,7 +3,6 @@ package fm100.co.il.inner.fragments;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
@@ -14,23 +13,17 @@ import android.graphics.PorterDuff;
 import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -39,35 +32,41 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import fm100.co.il.adapters.DataAdapter;
-import fm100.co.il.busEvents.DistanceBusEvent;
-import fm100.co.il.MainActivity;
-import fm100.co.il.R;
-import fm100.co.il.helpers.DistanceService;
-import fm100.co.il.helpers.GPSTracker;
-import fm100.co.il.models.RunShape;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.AxisValueFormatter;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
 
-import org.greenrobot.eventbus.EventBus;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
+
+import fm100.co.il.MainActivity;
+import fm100.co.il.R;
+import fm100.co.il.helpers.GPSTracker;
+import fm100.co.il.models.RunShape;
+import lecho.lib.hellocharts.util.ChartUtils;
 
 /************************************************
  * The Running Fragment Class , allow the user to see the distance and speed in which he ran and display it in line graph
  ************************************************/
+
 
 public class Running extends Fragment {
 
 	//private final static Intent myIntent = new Intent(MainActivity.getMyApplicationContext(), DistanceService.class);
 	private TextView distanceTv;
 	private TextView speedTv;
-	private TextView lastDistanceTv;
+	//private TextView lastDistanceTv;
 	private TextView timerTv;
-	private TextView lastTimeTv;
+	//private TextView lastTimeTv;
 
 	private String currentDistance = "0";
 	private String currentSpeed = "0";
@@ -89,7 +88,7 @@ public class Running extends Fragment {
 	private int firstWidth;
 	private int firstCanvas = 0;
 
-	private LinearLayout ll;
+	//private LinearLayout ll;
 
 	//private int curSpeed=34;
 	//private int lastSpeed =23;
@@ -114,7 +113,7 @@ public class Running extends Fragment {
 
 	private View v;
 
-	private TextView timePastTv;
+	//private TextView timePastTv;
 
 	String timeStamp = "   ";
 	String timerText = "";
@@ -128,7 +127,7 @@ public class Running extends Fragment {
 
 	private int firstLocation = 0;
 
-	private HorizontalScrollView hsView;
+	//private HorizontalScrollView hsView;
 
 	private int minWidh = 500;
 
@@ -140,15 +139,11 @@ public class Running extends Fragment {
 
 	private Button startStopBtn;
 
-	private ArrayList<String> countries = new ArrayList<>();
-	private RecyclerView recyclerView;
+	private LineChart lineGraph;
 
-	private int simpleCount = 0;
+	private float distance = 0;
 
-	private ArrayList<Integer> backgroundColors = new ArrayList<>();
-	private ArrayList<Drawable> backgrounds = new ArrayList<>();
-
-	private int newLastSpeed = 0;
+	private float lastDistance =0;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater,
@@ -159,9 +154,6 @@ public class Running extends Fragment {
 		v = inflater.inflate(R.layout.running_fragment, container, false);
 		// flipping Layout the RTL to LTR incase needed
 		flipLayouts();
-		recyclerView = (RecyclerView)v.findViewById(R.id.card_recycler_view);
-
-		initViews();
 
 		manager = (LocationManager) getActivity().getSystemService(MainActivity.getMyApplicationContext().LOCATION_SERVICE);
 
@@ -170,26 +162,15 @@ public class Running extends Fragment {
 		startStopBtn = (Button) v.findViewById(R.id.startStopBtn);
 		distanceTv = (TextView) v.findViewById(R.id.distanceTv);
 		speedTv = (TextView) v.findViewById(R.id.speedTv);
-		lastDistanceTv = (TextView) v.findViewById(R.id.lastDistanceTv);
+		//lastDistanceTv = (TextView) v.findViewById(R.id.lastDistanceTv);
 		timerTv = (TextView) v.findViewById(R.id.timerTv);
-		lastTimeTv = (TextView) v.findViewById(R.id.lastTimeTv);
-		timePastTv = (TextView) v.findViewById(R.id.timePastTv);
+		//lastTimeTv = (TextView) v.findViewById(R.id.lastTimeTv);
+		//timePastTv = (TextView) v.findViewById(R.id.timePastTv);
 
-		Typeface custom_font_eng_light = Typeface.createFromAsset(MainActivity.getMyApplicationContext().getAssets(), "fonts/OpenSans-Light.ttf");
-		Typeface custom_font_heb_regular = Typeface.createFromAsset(MainActivity.getMyApplicationContext().getAssets(), "fonts/FbSpoilerRegular.ttf");
-
-		distanceTv.setTypeface(custom_font_heb_regular);
-		speedTv.setTypeface(custom_font_heb_regular);
-		lastDistanceTv.setTypeface(custom_font_heb_regular);
-		timerTv.setTypeface(custom_font_heb_regular);
-		lastTimeTv.setTypeface(custom_font_heb_regular);
-		timePastTv.setTypeface(custom_font_heb_regular);
-		startStopBtn.setTypeface(custom_font_heb_regular);
-
-		ll = (LinearLayout) v.findViewById(R.id.drawingArea);
-
+		//ll = (LinearLayout) v.findViewById(R.id.drawingArea);
 
 		//hsView = (HorizontalScrollView) v.findViewById(R.id.hScrollView);
+		lineGraph = (LineChart) v.findViewById(R.id.lineGraph);
 
 		//setting canvas and canvas needed variables
 		DisplayMetrics displaymetrics = new DisplayMetrics();
@@ -197,7 +178,151 @@ public class Running extends Fragment {
 		height = (displaymetrics.heightPixels) / 5;
 		width = displaymetrics.widthPixels;
 		//int intWidth = (int) llWidth;
+// -----------------------------------------
 
+
+
+		//setting the xAxis values (72 hours by 5 secs)
+		int hours = 0;
+		int mins = 0;
+		int secs = 0;
+		String[] values = new String[51840];
+		int timeValuesCounter = 0;
+
+		for (int i = 0; i<72 ; i++){
+			hours = i;
+			for(int j = 0 ; j<60 ; j++){
+				mins = j;
+				for (int k=0 ; k<12; k++){
+					secs = 5*k;
+					String timeValues = "" + String.format("%02d", hours) + ":"
+							+ String.format("%02d", mins) + ":"
+							+ String.format("%02d", secs);
+					values[timeValuesCounter] = timeValues;
+					timeValuesCounter++;
+
+				}
+			}
+		}
+
+		// setting 1st entry
+		final List<Entry> entries = new ArrayList<Entry>();
+		entries.add(new Entry(0, 0));
+
+
+		LineDataSet dataSet = new LineDataSet(entries, null); // add entries to dataset
+		dataSet.setHighlightEnabled(false);
+		dataSet.setColor(Color.RED);
+		dataSet.setValueTextColor(Color.BLUE);
+		dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+		dataSet.setColor(ColorTemplate.getHoloBlue());
+		dataSet.setCircleColor(Color.WHITE);
+		dataSet.setLineWidth(2f);
+		dataSet.setCircleRadius(1f);
+		dataSet.setFillAlpha(65);
+		dataSet.setFillColor(ColorTemplate.getHoloBlue());
+		dataSet.setHighLightColor(Color.rgb(244, 117, 117));
+		dataSet.setValueTextColor(Color.WHITE);
+		dataSet.setValueTextSize(8f);
+		dataSet.setDrawValues(false);
+		dataSet.setAxisDependency(YAxis.AxisDependency.RIGHT);
+
+
+		final LineData lineData = new LineData(dataSet);
+		lineGraph.setData(lineData);
+
+
+		/*
+		lineGraph.canScrollHorizontally(1);
+		// enable touch gestures
+		lineGraph.setTouchEnabled(true);
+		// enable scaling and dragging
+		lineGraph.setDragEnabled(true);
+		//lineGraph.setScaleEnabled(true);
+		lineGraph.setDrawGridBackground(false);
+
+		XAxis xl = lineGraph.getXAxis();
+		xl.setTextColor(Color.WHITE);
+		xl.setDrawGridLines(false);
+		xl.setAvoidFirstLastClipping(true);
+		xl.setEnabled(true);
+
+		YAxis leftAxis = lineGraph.getAxisLeft();
+		leftAxis.setTextColor(Color.WHITE);
+		leftAxis.setAxisMaxValue(10f);
+		leftAxis.setAxisMinValue(0f);
+		leftAxis.setDrawGridLines(true);
+		YAxis rightAxis = lineGraph.getAxisRight();
+		rightAxis.setEnabled(false);
+		*/
+
+		lineGraph.setDrawGridBackground(false);
+		lineGraph.setDrawBorders(false);
+
+		lineGraph.getAxisLeft().setEnabled(false);
+		lineGraph.getAxisRight().setEnabled(true);
+		lineGraph.setDescription("");
+		/*.setDrawAxisLine(false);
+		lineGraph.getAxisRight().setDrawGridLines(false);
+		*/
+		lineGraph.getXAxis().setEnabled(true);
+		lineGraph.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+		lineGraph.getXAxis().setDrawAxisLine(false);
+		lineGraph.getXAxis().setDrawGridLines(false);
+		//lineGraph.getXAxis().setAxisMaxValue(51840);
+		//lineGraph.getXAxis().setAxisMinValue(0);
+		//lineGraph.getXAxis().setGranularity(1f);
+		//lineGraph.getXAxis().setAxisMinValue(0f);
+		//lineGraph.getXAxis().setAxisMaxValue(10f);
+		//lineGraph.getXAxis().setDrawLabels(false);
+				/*.setDrawAxisLine(false);
+		lineGraph.getXAxis().setDrawGridLines(false);
+
+*/
+
+		lineGraph.getXAxis().setAxisLineWidth(1.0f);
+
+		// enable touch gestures
+		lineGraph.setTouchEnabled(true);
+
+		// enable scaling and dragging
+		lineGraph.setDragEnabled(true);
+		lineGraph.setScaleEnabled(false);
+
+		// if disabled, scaling can be done on x- and y-axis separately
+		lineGraph.setPinchZoom(false);
+
+		lineGraph.setVisibleXRangeMaximum(6f);
+		//lineGraph.setVisibleXRangeMinimum(6f);
+
+		///////////////////////////////////
+
+		XAxis xAxis = lineGraph.getXAxis();
+		xAxis.setTextColor(Color.WHITE);
+		//xAxis.setTextSize(8f);
+		Legend lx = lineGraph.getLegend();
+		lx.setEnabled(false);
+		//xAxis.setAvoidFirstLastClipping(true);
+		xAxis.setAxisLineWidth(1f);
+		xAxis.setValueFormatter(new MyXAxisValueFormatter(values));
+		//xAxis.setLabelCount(7, true);
+		//xAxis.setGranularity(1f);
+
+		YAxis yAxis = lineGraph.getAxisRight();
+		yAxis.setTextColor(Color.WHITE);
+		//yAxis.setDrawAxisLine(false);
+		yAxis.setDrawGridLines(false);
+		yAxis.setAxisMinValue(0.0f);
+		yAxis.setAxisMaxValue(50);
+		yAxis.setAxisLineColor(Color.YELLOW);
+		yAxis.setAxisLineWidth(1f);
+
+		///////////////////////////////////
+
+
+		lineGraph.invalidate();
+
+		// ------------------------------------------------
 
 
 		startStopBtn.setOnClickListener(new View.OnClickListener() {
@@ -221,6 +346,37 @@ public class Running extends Fragment {
 						customHandler.postDelayed(updateTimerThread, 0);
 						customHandler.postDelayed(timeStampRunnable, 0);
 						customHandler.post(timeSegmentsRunnable);
+
+						while(lineData.getEntryCount()!=0)
+							lineData.removeEntry(0,0);
+
+						lineData.removeDataSet(0);
+						/*
+						final List<Entry> entries2 = new ArrayList<Entry>();
+						entries.add(new Entry(0, 0));
+						*/
+						LineDataSet dataSet = new LineDataSet(null, null); // add entries to dataset
+						dataSet.setHighlightEnabled(false);
+						dataSet.setColor(Color.RED);
+						dataSet.setValueTextColor(Color.BLUE);
+						dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+						dataSet.setColor(ColorTemplate.getHoloBlue());
+						dataSet.setCircleColor(Color.WHITE);
+						dataSet.setLineWidth(2f);
+						dataSet.setCircleRadius(1f);
+						dataSet.setFillAlpha(65);
+						dataSet.setFillColor(ColorTemplate.getHoloBlue());
+						dataSet.setHighLightColor(Color.rgb(244, 117, 117));
+						dataSet.setValueTextColor(Color.WHITE);
+						dataSet.setValueTextSize(9f);
+						dataSet.setDrawValues(false);
+						dataSet.setAxisDependency(YAxis.AxisDependency.RIGHT);
+
+
+						final LineData lineData = new LineData(dataSet);
+						lineGraph.setData(lineData);
+
+
 						startStop = 1;
 
 						//Toast.makeText(MainActivity.getMyApplicationContext() , " GPS STOPPED!" , Toast.LENGTH_LONG).show();
@@ -247,12 +403,12 @@ public class Running extends Fragment {
 		//firstTime = 1;
 		startStopBtn.setText("התחל ריצה");
 		//getActivity().stopService(myIntent);
-		lastDistanceTv.setText(currentDistance);
+		//lastDistanceTv.setText(currentDistance);
 		currentDistance = "0";
 		currentSpeed = "0";
 		distanceTv.setText(currentDistance);
 		speedTv.setText(currentSpeed);
-		lastTimeTv.setText(timerTv.getText());
+		//lastTimeTv.setText(timerTv.getText());
 		timerTv.setText("00:00:00");
 		//firstTime = 0;
 		timeSwapBuff += timeInMilliseconds;
@@ -270,123 +426,6 @@ public class Running extends Fragment {
 		tentime = "00:00:00";
 		timetenList = new ArrayList<>();
 		//timetenList.add(tentime);
-
-	}
-
-	private void addPath(int newSpeed) {
-		float llWidth = ll.getWidth();
-		Log.e("mynewlog" , "llWidthh: " +llWidth);
-		bg = Bitmap.createBitmap((int) llWidth, height, Bitmap.Config.ARGB_8888);
-		canvas = new Canvas(bg);
-
-
-		int bitHeight = height-20;
-		//minWidh = 500 + minWidh;
-		//ll.setMinimumWidth(300000);
-
-		//int widthRatio = (500/minWidh);
-		// until here change
-		//float llWidth = ll.getWidth();
-		//float horiWidth = width;
-		float widthRatio = (width/llWidth);
-		drawHeightUnit = bitHeight / 45;
-		//Log.e("mynewlog", "width: " + width + " llwidth: " + llWidth + " ratio: " + (width/llWidth));
-		//if (llWidth < width) {
-		unitWidth = 110;
-		//width / 10;
-		//}
-		//else {
-		//unitWidth = (width/20)/(llWidth/width);
-		//	}
-		int startingPoint = 30;
-		// setting the colors
-		canvas.drawColor(0, PorterDuff.Mode.CLEAR);
-		Paint circlePaint = new Paint();
-		circlePaint.setColor(Color.parseColor("#fdff37"));
-		Paint polygonPaint = new Paint();
-		polygonPaint.setColor(Color.parseColor("#88ecfb"));
-		polygonPaint.setStrokeWidth(1);
-		polygonPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-		Paint newSpeedLinePaint = new Paint();
-		newSpeedLinePaint.setColor(Color.parseColor("#ffffd4"));
-		newSpeedLinePaint.setStrokeWidth(3);
-		newSpeedLinePaint.setStyle(Paint.Style.FILL_AND_STROKE);
-		newSpeedLinePaint.setAntiAlias(true);
-		newSpeedLinePaint.setShader(new LinearGradient(0, 0, 0, bitHeight - 180, Color.WHITE, Color.rgb(142, 192, 202), Shader.TileMode.CLAMP));
-		polygonPaint.setAntiAlias(true);
-		polygonPaint.setShader(new LinearGradient(0, 0, 0, bitHeight - 100, Color.WHITE, Color.WHITE, Shader.TileMode.CLAMP));
-		Paint textPaint = new Paint();
-		textPaint.setColor(Color.parseColor("#ffffff"));
-		textPaint.setTextSize(28.0f);
-		textPaint.setTypeface(Typeface.DEFAULT_BOLD);
-		Paint speedMarkPaint = new Paint();
-		speedMarkPaint.setColor(Color.parseColor("#204060"));
-
-		// drawing the polygon from the last speed to the current speed
-
-		for (int i = 0; i < runSegments.size(); i++) {
-			// currently not used because i wanted to try with floats
-			Point a = new Point(Math.round(startingPoint + (unitWidth * (runSegments.size() - (i + 1)))), bitHeight - 20 - 10);
-			Point b = new Point(Math.round(startingPoint + (unitWidth * (runSegments.size() - (i + 1)))), (bitHeight - 10 - (drawHeightUnit * runSegments.get(i).getCurrentSpeed())) - 20);
-			Point c = new Point(Math.round(startingPoint + (unitWidth * (runSegments.size() - i))), (bitHeight - 10 - (drawHeightUnit * runSegments.get(i).getPreviousSpeed())) - 20);
-			Point d = new Point(Math.round(startingPoint + (unitWidth * (runSegments.size() - i))), bitHeight - 20 - 10);
-
-			path = new Path();
-			path.setFillType(Path.FillType.EVEN_ODD);
-			path.moveTo((startingPoint + (unitWidth * (runSegments.size() - (i + 1)))), bitHeight - 20 - 10);
-			path.lineTo(startingPoint + (unitWidth * (runSegments.size() - (i + 1))), (bitHeight - 10 - (drawHeightUnit * runSegments.get(i).getCurrentSpeed())) - 20);
-			path.lineTo(startingPoint + (unitWidth * (runSegments.size() - i)), (bitHeight - 10 - (drawHeightUnit * runSegments.get(i).getPreviousSpeed())) - 20);
-			path.lineTo(startingPoint + (unitWidth * (runSegments.size() - i)), bitHeight - 20 - 10);
-			path.lineTo((startingPoint + (unitWidth * (runSegments.size() - (i + 1)))), bitHeight - 20 - 10);
-			path.close();
-
-			canvas.drawPath(path, polygonPaint);
-
-		}
-
-			for (int i = 0; i < timetenList.size(); i++) {
-				//Log.e("mynewlog", "tentime: " + timetenList.get(i));
-				if (timetenList != null) {
-					canvas.drawText(timetenList.get(i), (startingPoint + (unitWidth * ((runSegments.size()) - ((i*3) + 1)))) + 5, height, textPaint);
-				}
-			}
-		// creating the speed mark path
-		speedMarkpath = new Path();
-		speedMarkpath.setFillType(Path.FillType.EVEN_ODD);
-		speedMarkpath.moveTo(startingPoint + unitWidth / 4, bitHeight - (drawHeightUnit * newSpeed) - 28 - 10);
-		speedMarkpath.lineTo(startingPoint + unitWidth / 2, bitHeight - (drawHeightUnit * newSpeed) - 48 - 10);
-		speedMarkpath.lineTo(startingPoint + unitWidth * 1.7f, bitHeight - (drawHeightUnit * newSpeed) - 48 - 10);
-		speedMarkpath.lineTo(startingPoint + unitWidth * 1.7f, bitHeight - (drawHeightUnit * newSpeed) - 8 - 10);
-		speedMarkpath.lineTo(startingPoint + unitWidth / 2, bitHeight - (drawHeightUnit * newSpeed) - 8 - 10);
-		speedMarkpath.lineTo(startingPoint + unitWidth / 4, bitHeight - (drawHeightUnit * newSpeed) - 28 - 10);
-		speedMarkpath.close();
-
-		//drawing the path circle and speed mark
-		canvas.drawPath(speedMarkpath, speedMarkPaint);
-		canvas.drawText(newSpeed + " קמ''ש ", 10 + startingPoint + unitWidth / 2, bitHeight - (drawHeightUnit * newSpeed) - 20 - 10, textPaint);
-		canvas.drawLine(startingPoint, bitHeight - 20 - 10, startingPoint, bitHeight - (drawHeightUnit * newSpeed) - 20 - 10, newSpeedLinePaint);
-		canvas.drawCircle(startingPoint, bitHeight - (drawHeightUnit * newSpeed) - 28 - 10, 8, circlePaint);
-
-
-		/*int circleWidth = 300;
-		float resizedWidth = 300*widthRatio;
-		int resizedWidthInt = (int) resizedWidth;
-		Bitmap bg2 = Bitmap.createBitmap(resizedWidthInt, height, Bitmap.Config.ARGB_8888);
-		//Log.e("mynewlog" , "resized width: " + resizedWidth + " widthRatio: " + widthRatio);
-		//Bitmap resizedBitmap = Bitmap.createScaledBitmap(bg2, resizedWidthInt, height, false);
-		Canvas canvas2 = new Canvas(bg2);
-		for (int i = 0; i < runSegments.size(); i++) {
-			canvas2.drawCircle((circleWidth/3) * (i + 1), 50, 50, textPaint);
-		}
-
-		Paint bitPaint = new Paint();
-		bitPaint.setAntiAlias(true);
-		bitPaint.setFilterBitmap(true);
-		bitPaint.setDither(true);
-		canvas.drawBitmap(bg2, 0, 0, bitPaint);
-		*/
-
-		ll.setBackgroundDrawable(new BitmapDrawable(bg));
 
 	}
 
@@ -416,9 +455,10 @@ public class Running extends Fragment {
 					+ String.format("%02d", secs);
 
 			timerTv.setText(timerText);
-			if(secs %10 ==0){
+			if(secs %5 ==0){
 				tentime = timerText;
 				timetenList.add(tentime);
+				addEntry();
 
 			}
 			//if needed milisecs + String.format("%03d", milliseconds));
@@ -437,15 +477,15 @@ public class Running extends Fragment {
 		LinearLayout runningFragLL1 = (LinearLayout) v.findViewById(R.id.runningFragLL1);
 		LinearLayout runningFragLL2 = (LinearLayout) v.findViewById(R.id.runningFragLL2);
 		LinearLayout runningFragLL3 = (LinearLayout) v.findViewById(R.id.runningFragLL3);
-		LinearLayout runningFragLL4 = (LinearLayout) v.findViewById(R.id.runningFragLL4);
-		LinearLayout runningFragLL5 = (LinearLayout) v.findViewById(R.id.runningFragLL5);
+		//LinearLayout runningFragLL4 = (LinearLayout) v.findViewById(R.id.runningFragLL4);
+		//LinearLayout runningFragLL5 = (LinearLayout) v.findViewById(R.id.runningFragLL5);
 
 		List<LinearLayout> llList = new ArrayList<>();
 		llList.add(runningFragLL1);
 		llList.add(runningFragLL2);
 		llList.add(runningFragLL3);
-		llList.add(runningFragLL4);
-		llList.add(runningFragLL5);
+		//llList.add(runningFragLL4);
+		//llList.add(runningFragLL5);
 
 		for (int i = 0; i < llList.size(); i++) {
 			if (isRTL() == false) {
@@ -479,15 +519,19 @@ public class Running extends Fragment {
 			}
 			Location newLocation = gps.getLocation();
 			// just now //Toast.makeText(MainActivity.getMyApplicationContext(), "Your new Location is " + newLocation + " Your last Location is " + lastLocation, Toast.LENGTH_LONG).show();
-			float distance;
-			distance = lastLocation.distanceTo(newLocation);
-
+			float thisDistance;
+			thisDistance = lastLocation.distanceTo(newLocation);
+			float thisSpeed;
 			// just now //Toast.makeText(MainActivity.getMyApplicationContext(), "distance: " + distance, Toast.LENGTH_SHORT).show();
-			speed = (distance / 10) * 18 / 5;
+			thisSpeed = (distance / 10) * 18 / 5;
+			if (thisSpeed > 50){
+				thisSpeed =0;
+			}
+			Location thisLastLocation;
 			// just now //Toast.makeText(MainActivity.getMyApplicationContext(), "speed: " + speed, Toast.LENGTH_SHORT).show();
-			lastLocation = gps.getLocation();
+			thisLastLocation = gps.getLocation();
 
-			customHandler.postDelayed(this, 10000);
+			customHandler.postDelayed(this, 5000);
 		}
 	};
 
@@ -515,92 +559,35 @@ public class Running extends Fragment {
 			if(manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 				Location newLocation = gps.getLocation();
 				//Toast.makeText(MainActivity.getMyApplicationContext(), "Your new Location is " + newLocation + " Your last Location is " + lastLocation, Toast.LENGTH_LONG).show();
-				float distance;
-				distance = lastLocation.distanceTo(newLocation);
 
+
+				lastDistance = lastLocation.distanceTo(newLocation);
+				if (lastDistance>60){
+					lastDistance =0;
+				}
+				distance += lastDistance;
 				//Toast.makeText(MainActivity.getMyApplicationContext(), "distance: " + distance, Toast.LENGTH_SHORT).show();
-				speed = (distance / 10) * 18 / 5;
+				speed = (lastDistance / 10) * 18 / 5;
+				// making sure if speed is too big reach the max of the chart
+				if (speed>50){
+					speed=0;
+				}
 				//Toast.makeText(MainActivity.getMyApplicationContext(), "speed: " + speed, Toast.LENGTH_SHORT).show();
 				lastLocation = gps.getLocation();
 
-				currentDistance = String.format("%.0f", (speed));
+				currentDistance = String.format("%.0f", (distance));
 				currentSpeed = String.format("%.0f", (speed));
 				distanceTv.setText(currentDistance);
 				speedTv.setText(currentSpeed);
-
-				RunShape newRunShape = new RunShape((int) speed, lastSpeed);
-				runSegments.add(newRunShape);
 				lastSpeed = (int) speed;
-				addPath((int) speed);
-				timeStamp = "|                 |" + timeStamp;
-				timePastTv.setText(timeStamp);
 
-				Random rnd = new Random();
-				int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
+				//RunShape newRunShape = new RunShape((int) speed, lastSpeed);
+				//runSegments.add(newRunShape);
 
-				/////////
+				//timeStamp = "|              |" + timeStamp;
+				//timePastTv.setText(timeStamp);
 
-				DisplayMetrics displaymetrics = new DisplayMetrics();
-				getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-				int newHeight = (displaymetrics.heightPixels)/5;
-				int newWidth = (displaymetrics.widthPixels);
-				Bitmap bg2 = Bitmap.createBitmap(newWidth , height , Bitmap.Config.ARGB_8888);
-
-				Canvas canvas2 = new Canvas(bg2);
-				canvas2.drawColor(0, PorterDuff.Mode.CLEAR);
-				//ll.setBackgroundDrawable(new BitmapDrawable(bg));
-
-				float llWidth = ll.getWidth();
-				drawHeightUnit = height/70;
-				unitWidth = width / 20;
-
-				// setting the colors
-				//canvas.drawColor(0, PorterDuff.Mode.CLEAR);
-				Paint circlePaint = new Paint();
-				circlePaint.setColor(Color.parseColor("#fdff37"));
-				Paint polygonPaint = new Paint();
-				polygonPaint.setColor(Color.parseColor("#88ecfb"));
-				polygonPaint.setStrokeWidth(1);
-				polygonPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-				Paint newSpeedLinePaint = new Paint();
-				newSpeedLinePaint.setColor(Color.parseColor("#ffffd4"));
-				newSpeedLinePaint.setStrokeWidth(5);
-				newSpeedLinePaint.setStyle(Paint.Style.FILL_AND_STROKE);
-				newSpeedLinePaint.setAntiAlias(true);
-				newSpeedLinePaint.setShader(new LinearGradient(0, 0, 0, height - 180, Color.WHITE, Color.rgb(242, 292, 202), Shader.TileMode.CLAMP));
-				polygonPaint.setAntiAlias(true);
-				polygonPaint.setShader(new LinearGradient(0, 0, 0, height - 100, Color.WHITE, Color.WHITE, Shader.TileMode.CLAMP));
-				Paint textPaint = new Paint();
-				textPaint.setColor(Color.parseColor("#ffffff"));
-				textPaint.setTextSize(24.0f);
-				textPaint.setTypeface(Typeface.DEFAULT_BOLD);
-				Paint speedMarkPaint = new Paint();
-				speedMarkPaint.setColor(Color.parseColor("#204060"));
-
-				// drawing the polygon from the last speed to the current speed
-				Random rnd2 = new Random();
-				int nowSpeed = rnd2.nextInt(50);
-				path = new Path();
-				path.setFillType(Path.FillType.EVEN_ODD);
-				path.moveTo(0, height - 60);
-				path.lineTo(0, height - 60 - (nowSpeed * drawHeightUnit));// the random number = curSpeed
-				path.lineTo(width, height - 60 - (newLastSpeed * drawHeightUnit));// the random number = lastSpeed
-				path.lineTo(width, height - 60);
-				path.lineTo(0, height - 60);
-				path.close();
-
-				newLastSpeed = nowSpeed;
-				canvas2.drawPath(path, polygonPaint);
-
-				backgrounds.add(0 , new BitmapDrawable(bg2));
-				////////
-				simpleCount++;
-				backgroundColors.add( color);
-				countries.add(" " + simpleCount);
-				RecyclerView.Adapter adapter = new DataAdapter(backgrounds);
-				recyclerView.setAdapter(adapter);
-
-				customHandler.postDelayed(this, 10000/3);
+				customHandler.postDelayed(this, 5000);
 			}
 			else {
 				stop();
@@ -609,53 +596,100 @@ public class Running extends Fragment {
 			//customHandler.postDelayed(this, 10000/3);
 		}
 	};
-	public class initViews extends AsyncTask<String, Void, String> {
 
-		@Override
-		protected String doInBackground(String... params) {
+	private void addEntry() {
 
+		LineData data = lineGraph.getData();
 
-			return null;
+		if (data != null) {
+
+			ILineDataSet set = data.getDataSetByIndex(0);
+			// set.addEntry(...); // can be called as well
+
+			if (set == null) {
+				set = createSet();
+				data.addDataSet(set);
+			}
+
+			/*
+			Legend l = lineGraph.getLegend();
+			l.setFormSize(10f); // set the size of the legend forms/shapes
+			l.setForm(Legend.LegendForm.CIRCLE); // set what type of form/shape should be used
+			l.setPosition(Legend.LegendPosition.RIGHT_OF_CHART_INSIDE);
+			l.setTextSize(12f);
+			l.setTextColor(Color.BLACK);
+			l.setXEntrySpace(5f); // set the space between the legend entries on the x-axis
+			l.setYEntrySpace(5f); // set the space between the legend entries on the y-axis
+
+			// set custom labels and colors
+			l.setCustom(ColorTemplate.VORDIPLOM_COLORS, new String[] { "Set1", "Set2", "Set3", "Set4", "Set5" });
+
+			*/
+
+			data.addEntry(new Entry(set.getEntryCount(),speed), 0);//speed instead random
+			//List list = new LinkedList(lineGraph.getLineData().getDataSets());
+			//Collections.sort(list, new EntryXComparator());
+			data.notifyDataChanged();
+
+			// let the chart know it's data has changed
+			lineGraph.notifyDataSetChanged();
+
+			// limit the number of visible entries
+			lineGraph.setVisibleXRangeMaximum(6f);
+			// mChart.setVisibleYRange(30, AxisDependency.LEFT);
+
+			// move to the latest entry
+			lineGraph.moveViewToX(data.getEntryCount());
+
+			// this automatically refreshes the chart (calls invalidate())
+			// mChart.moveViewTo(data.getXValCount()-7, 55f,
+			// AxisDependency.LEFT);
 		}
 	}
 
-	private void initViews(){
-		recyclerView.setHasFixedSize(true);
-		RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(MainActivity.getMyApplicationContext() , LinearLayoutManager.HORIZONTAL , false);
-		recyclerView.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
-		recyclerView.setLayoutManager(layoutManager);
-		//countries.add("1");
+	private LineDataSet createSet(){
+		LineDataSet dataSet = new LineDataSet(null, null); // add entries to dataset
+		dataSet.setHighlightEnabled(false);
+		dataSet.setColor(Color.RED);
+		dataSet.setValueTextColor(Color.BLUE);
+		dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+		dataSet.setColor(ColorTemplate.getHoloBlue());
+		dataSet.setCircleColor(Color.WHITE);
+		dataSet.setLineWidth(2f);
+		dataSet.setCircleRadius(1f);
+		dataSet.setFillAlpha(65);
+		dataSet.setFillColor(ColorTemplate.getHoloBlue());
+		dataSet.setHighLightColor(Color.rgb(244, 117, 117));
+		dataSet.setValueTextColor(Color.WHITE);
+		dataSet.setValueTextSize(9f);
+		dataSet.setDrawValues(false);
 
-		recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
-			GestureDetector gestureDetector = new GestureDetector(MainActivity.getMyApplicationContext(), new GestureDetector.SimpleOnGestureListener() {
 
-				@Override public boolean onSingleTapUp(MotionEvent e) {
-					return true;
-				}
+		return dataSet;
+	}
 
-			});
-			@Override
-			public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+	public class MyXAxisValueFormatter implements AxisValueFormatter {
 
-				View child = rv.findChildViewUnder(e.getX(), e.getY());
-				if(child != null && gestureDetector.onTouchEvent(e)) {
-					int position = rv.getChildAdapterPosition(child);
-					Toast.makeText(MainActivity.getMyApplicationContext(), countries.get(position), Toast.LENGTH_SHORT).show();
-				}
+		private String[] mValues;
+		String lastValue ="";
 
-				return false;
+		public MyXAxisValueFormatter(String[] values) {
+			this.mValues = values;
+		}
+
+		@Override
+		public String getFormattedValue(float value, AxisBase axis) {
+			// "value" represents the position of the label on the axis (x or y)
+			if ( mValues[(int) value].equals(lastValue)){
+				return "";
 			}
+			lastValue =  mValues[(int) value];
+			return mValues[(int) value];
+		}
 
-			@Override
-			public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-
-			}
-
-			@Override
-			public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
-			}
-		});
+		/** this is only needed if numbers are returned, else return 0 */
+		@Override
+		public int getDecimalDigits() { return 0; }
 	}
 
 }

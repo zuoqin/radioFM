@@ -45,10 +45,11 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 
 	Music music = null;
 	Video video = null;
+	Running running = null;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater,
-			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+							 @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		state = savedInstanceState;
 
 		v = inflater.inflate(R.layout.tabs_viewpager_layout, container, false);
@@ -85,7 +86,7 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 
 		fragmentsList.add(music = new Music());
 		fragmentsList.add(video = new Video());
-		//fragmentsList.add(new Running());
+		fragmentsList.add(running = new Running());
 		fragmentsList.add(new Schedule());
 
 		this.myViewPagerAdapter = new MyFragmentPagerAdapter(
@@ -105,7 +106,7 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 		Drawable running = getResources().getDrawable(R.drawable.run_off);
 		Drawable schedule = getResources().getDrawable(R.drawable.menu_off);
 
-		Drawable[] drawables = new Drawable[]{music, video, /*running ,*/ schedule};
+		Drawable[] drawables = new Drawable[]{music, video, running ,schedule};
 
 
 		setTabsIcons(drawables);
@@ -126,7 +127,7 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 
 		//tabsNames = new String[]{"running", "music", "video"};
 
-		tabsNames = new String[]{"music", "video", /*"running" ,*/ "schedule"};
+		tabsNames = new String[]{"music", "video", "running" , "schedule"};
 
 		for (int i=0 ; i < drawables.length ; i++){
 			TabHost.TabSpec myTabSpec = tabHost.newTabSpec(tabsNames[i]);
@@ -148,6 +149,7 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 		Log.e("MyLog", "does it	 fall here onTabChange???");
 		if(null != getActivity() ) {
 			int pos = this.tabHost.getCurrentTab();
+			/*
 			if(isRTL()==true){
 				Log.e("RunLog", "CAN THIS WORK " + "TRUE BABY " + isRTL());
 				this.viewPager.setCurrentItem(fragmentsList.size() - 1 - pos);
@@ -155,6 +157,7 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 				Log.e("RunLog", "CAN THIS WORK " + "FALSE BABY" + isRTL());
 				this.viewPager.setCurrentItem(pos);
 			}
+			 */
 			this.viewPager.setCurrentItem(pos);
 			//method makes tab selected icon change to selected icon(with circle)
 			highlightCurrentTab(pos);
@@ -169,8 +172,8 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 	}
 
 	private void highlightCurrentTab(int selectedItem) {
-		int [] resurce_off = new int[] {R.drawable.radio_off, R.drawable.video_off, /*R.drawable.run_off,*/ R.drawable.menu_off};
-		int [] resurce_on = new int[] {R.drawable.radio_on, R.drawable.video_on, /*R.drawable.run_on,*/ R.drawable.menu_on};
+		int [] resurce_off = new int[] {R.drawable.radio_off, R.drawable.video_off, R.drawable.run_off, R.drawable.menu_off};
+		int [] resurce_on = new int[] {R.drawable.radio_on, R.drawable.video_on, R.drawable.run_on, R.drawable.menu_on};
 
 		for( int i = 0; i < resurce_off.length; i++ ) {
 			ImageView iv = (ImageView) tabHost.getTabWidget().getChildAt(i).findViewById(R.id.tabImage);

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/mainoutlinewithbg"
+    android:gravity="center_vertical|center_horizontal">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="גרף הריצה בטעינה, נא המתן..."
+                android:id="@+id/waitText"
+                android:textColor="#ffffff"
+                android:layout_gravity="center_horizontal"
+                android:textAlignment="center"
+                android:textSize="12sp"
+                android:paddingBottom="10dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp" />
+
+            <ProgressBar
+                android:id="@+id/popProgress"
+                style="?android:attr/progressBarStyle"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:visibility="visible"/>
+        </LinearLayout>
+
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:layout_width="match_parent"
+            android:id="@+id/dialogLineGraph"
+            android:layout_height="200dp"
+            android:paddingBottom="30dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+
+            ></com.github.mikephil.charting.charts.LineChart>
+
+    </FrameLayout>
+
+
+</LinearLayout>

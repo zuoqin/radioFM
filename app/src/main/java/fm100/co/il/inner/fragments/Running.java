@@ -1,7 +1,10 @@
 package fm100.co.il.inner.fragments;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -18,6 +21,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -26,9 +30,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,15 +49,26 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.AxisValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 import fm100.co.il.MainActivity;
 import fm100.co.il.R;
+import fm100.co.il.adapters.RunningListAdapter;
 import fm100.co.il.helpers.GPSTracker;
+import fm100.co.il.helpers.Pop;
 import fm100.co.il.models.RunShape;
+import fm100.co.il.models.RunningObject;
 import lecho.lib.hellocharts.util.ChartUtils;
 
 /************************************************
@@ -90,15 +107,17 @@ public class Running extends Fragment {
 
 	//private LinearLayout ll;
 
-	//private int curSpeed=34;
+	//private float curSpeed=0;
 	//private int lastSpeed =23;
 
 	// the distance of the start of the graph from screen
 	private int graphStartPoint = 100;
-	private int lastSpeed = 1 / 2;
+	private float lastSpeed = 0.1f;
 
 	private int drawHeightUnit;
 	private float unitWidth;
+
+	private float totalDistance = 0;
 
 	private Canvas canvas = null;
 	private Bitmap bg = null;
@@ -119,7 +138,7 @@ public class Running extends Fragment {
 	String timerText = "";
 	String tentime = "00:00:00";
 
-	//private Handler timeStampHandler = new Handler();
+	private Handler timeStampHandler = new Handler();
 
 	GPSTracker gps;
 
@@ -145,6 +164,29 @@ public class Running extends Fragment {
 
 	private float lastDistance =0;
 
+	//private static List<Entry> entries = new ArrayList<Entry>();
+
+	private int entryCounter = 0;
+
+	private static List<Integer> xValues = new ArrayList<>();
+
+	private static List<Integer> yValues = new ArrayList<>();
+
+	private static ArrayList<RunningObject> jsonEntries = new ArrayList<>();
+
+	private int speedSum = 0;
+
+	private ListView runningLv;
+
+	private RunningListAdapter myRunningListAdapter;
+
+	private List<RunningObject> runObjList = new ArrayList<>();
+
+	private TextView runningHistoryText;
+
+
+	private static List<Entry> specificItemEntries = new ArrayList<>();
+
 	@Override
 	public View onCreateView(LayoutInflater inflater,
 							 @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -166,6 +208,25 @@ public class Running extends Fragment {
 		timerTv = (TextView) v.findViewById(R.id.timerTv);
 		//lastTimeTv = (TextView) v.findViewById(R.id.lastTimeTv);
 		//timePastTv = (TextView) v.findViewById(R.id.timePastTv);
+		runningLv = (ListView) v.findViewById(R.id.runningLv);
+		runningHistoryText = (TextView) v.findViewById(R.id.runningHistoryText);
+
+		////
+
+		Gson gson = new Gson();
+		String listFromShared = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("runningJson", "defaultStringIfNothingFound");
+
+		Type type = new TypeToken<ArrayList<RunningObject>>(){}.getType();
+		jsonEntries = gson.fromJson(listFromShared, type);
+
+		runObjList = jsonEntries;
+		////
+
+
+		myRunningListAdapter = new RunningListAdapter(getActivity(),runObjList);
+		runningLv.setAdapter(myRunningListAdapter);
+
+		runningLv.setOnItemClickListener(runningListOnItemClick);
 
 		//ll = (LinearLayout) v.findViewById(R.id.drawingArea);
 
@@ -206,19 +267,26 @@ public class Running extends Fragment {
 		}
 
 		// setting 1st entry
-		final List<Entry> entries = new ArrayList<Entry>();
-		entries.add(new Entry(0, 0));
+		//final List<Entry> entries = new ArrayList<Entry>();
+		//entries.add(new Entry(0, 0));
+		//List<Entry> newEntriesSet = new ArrayList<Entry>();
+		//newEntriesSet.add(new Entry(0, 0));
+		//runObjList.add(new RunningObject(newEntriesSet));
 
+		List<Entry> newEntriesSet = new ArrayList<Entry>();
+		newEntriesSet.add(new Entry(0, 0));
 
-		LineDataSet dataSet = new LineDataSet(entries, null); // add entries to dataset
+		LineDataSet dataSet = new LineDataSet(newEntriesSet, null);
+		//LineDataSet dataSet = new LineDataSet(entries, null); // add entries to dataset
 		dataSet.setHighlightEnabled(false);
 		dataSet.setColor(Color.RED);
 		dataSet.setValueTextColor(Color.BLUE);
 		dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
 		dataSet.setColor(ColorTemplate.getHoloBlue());
-		dataSet.setCircleColor(Color.WHITE);
+		//dataSet.setCircleColor(Color.WHITE);
 		dataSet.setLineWidth(2f);
-		dataSet.setCircleRadius(1f);
+		//dataSet.setCircleRadius(1f);
+		dataSet.setDrawCircles(false);
 		dataSet.setFillAlpha(65);
 		dataSet.setFillColor(ColorTemplate.getHoloBlue());
 		dataSet.setHighLightColor(Color.rgb(244, 117, 117));
@@ -330,6 +398,10 @@ public class Running extends Fragment {
 			public void onClick(View v) {
 				if (startStop == 0) {
 					if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+						runningLv.setVisibility(View.INVISIBLE);
+						runningHistoryText.setVisibility(View.INVISIBLE);
+
+						lineGraph.setVisibility(View.VISIBLE);
 						/* buildAlertMessageNoGps();
 					} else {*/
 						//if(gps.canGetLocation()) {
@@ -344,11 +416,12 @@ public class Running extends Fragment {
 						//getActivity().startService(myIntent);
 						startTime = SystemClock.uptimeMillis();
 						customHandler.postDelayed(updateTimerThread, 0);
-						customHandler.postDelayed(timeStampRunnable, 0);
-						customHandler.post(timeSegmentsRunnable);
+						//customHandler.post(timeSegmentsRunnable);
+						//customHandler.post(timeStampRunnable);
+						//customHandler.postDelayed(timeStampRunnable, 0);
 
 						while(lineData.getEntryCount()!=0)
-							lineData.removeEntry(0,0);
+						lineData.removeEntry(0,0);
 
 						lineData.removeDataSet(0);
 						/*
@@ -361,9 +434,10 @@ public class Running extends Fragment {
 						dataSet.setValueTextColor(Color.BLUE);
 						dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
 						dataSet.setColor(ColorTemplate.getHoloBlue());
-						dataSet.setCircleColor(Color.WHITE);
+						//dataSet.setCircleColor(Color.WHITE);
 						dataSet.setLineWidth(2f);
-						dataSet.setCircleRadius(1f);
+						//dataSet.setCircleRadius(1f);
+						dataSet.setDrawCircles(false);
 						dataSet.setFillAlpha(65);
 						dataSet.setFillColor(ColorTemplate.getHoloBlue());
 						dataSet.setHighLightColor(Color.rgb(244, 117, 117));
@@ -376,7 +450,71 @@ public class Running extends Fragment {
 						final LineData lineData = new LineData(dataSet);
 						lineGraph.setData(lineData);
 
+						/*for (int i = 0 ; i<entries.size() ; i++){
+							entries.remove(0);
+						}
+						*/
+						//entries.add(new Entry(0, 0));
+						/*for (int i = 0 ; i<runObjList.get(runObjList.size()-1).getObjectEntries().size() ; i++){
+							runObjList.get(runObjList.size()-1).getObjectEntries().remove(0);
+						}
+						*/
+						List<Entry> newEntriesSet = new ArrayList<Entry>();
+						//newEntriesSet.add(new Entry(0, 0));
+						runObjList.add(new RunningObject(newEntriesSet));
+						//runObjList.get(runObjList.size()-1).getObjectEntries().add(new Entry(0, 0));
 
+						createSet(runObjList.get(runObjList.size()-1).getObjectEntries());
+
+						////////
+						/*
+						LineData data = new LineData(dataSet);
+						lineGraph.setData(data);
+						lineGraph.setDrawGridBackground(false);
+						lineGraph.setDrawBorders(false);
+
+						lineGraph.getAxisLeft().setEnabled(false);
+						lineGraph.getAxisRight().setEnabled(true);
+						lineGraph.setDescription("");
+		/*.setDrawAxisLine(false);
+		lineGraph.getAxisRight().setDrawGridLines(false);
+		*/
+						/*
+						lineGraph.getXAxis().setEnabled(true);
+						lineGraph.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+						lineGraph.getXAxis().setDrawAxisLine(false);
+						lineGraph.getXAxis().setDrawGridLines(false);
+						//lineGraph.getXAxis().setAxisMaxValue(51840);
+						//lineGraph.getXAxis().setAxisMinValue(0);
+						//lineGraph.getXAxis().setGranularity(1f);
+						//lineGraph.getXAxis().setAxisMinValue(0f);
+						//lineGraph.getXAxis().setAxisMaxValue(10f);
+						//lineGraph.getXAxis().setDrawLabels(false);
+				/*.setDrawAxisLine(false);
+		lineGraph.getXAxis().setDrawGridLines(false);
+
+*/
+/*
+						lineGraph.getXAxis().setAxisLineWidth(1.0f);
+
+						// enable touch gestures
+						lineGraph.setTouchEnabled(true);
+
+						// enable scaling and dragging
+						lineGraph.setDragEnabled(true);
+						lineGraph.setScaleEnabled(false);
+
+						// if disabled, scaling can be done on x- and y-axis separately
+						lineGraph.setPinchZoom(false);
+
+						lineGraph.setVisibleXRangeMaximum(6f);
+						//lineGraph.setVisibleXRangeMinimum(6f);
+
+						lineGraph.invalidate();
+
+						*/
+
+						//////
 						startStop = 1;
 
 						//Toast.makeText(MainActivity.getMyApplicationContext() , " GPS STOPPED!" , Toast.LENGTH_LONG).show();
@@ -401,7 +539,21 @@ public class Running extends Fragment {
 
 	private void stop() {
 		//firstTime = 1;
+
 		startStopBtn.setText("התחל ריצה");
+
+		//////
+		long date = System.currentTimeMillis();
+
+		//SimpleDateFormat sdf = new SimpleDateFormat("MMM dd/MM/yyyy , h:mm a"); // different time display
+		SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy , h:mm a");
+		String dateString = sdf.format(date);
+		/////
+
+		runObjList.get(runObjList.size()-1).setDateAdded(" ");
+		runObjList.get(runObjList.size()-1).setTimeAdded(dateString);
+		runObjList.get(runObjList.size()-1).setRunDistance(totalDistance + " מטר ");
+		runObjList.get(runObjList.size()-1).setRunTime(timerText);
 		//getActivity().stopService(myIntent);
 		//lastDistanceTv.setText(currentDistance);
 		currentDistance = "0";
@@ -413,8 +565,8 @@ public class Running extends Fragment {
 		//firstTime = 0;
 		timeSwapBuff += timeInMilliseconds;
 		customHandler.removeCallbacks(updateTimerThread);
-		customHandler.removeCallbacks(timeStampRunnable);
-		customHandler.removeCallbacks(timeSegmentsRunnable);
+		//customHandler.removeCallbacks(timeStampRunnable);
+		//customHandler.removeCallbacks(timeSegmentsRunnable);
 		startStop = 0;
 		// reseting time variables
 		startTime = 0L;
@@ -425,7 +577,105 @@ public class Running extends Fragment {
 		timeStamp = "             ";
 		tentime = "00:00:00";
 		timetenList = new ArrayList<>();
+
+		entryCounter = 0;
+
+		//RunningObject firstRunObj = new RunningObject(entries);
+
+		/*firstRunObj.setDateAdded("29/7");
+		firstRunObj.setTimeAdded("21:50");
+		firstRunObj.setRunDistance("38m");
+		firstRunObj.setRunTime("23:00");
+
+		runObjList.add(firstRunObj);*/
+
+		totalDistance = 0;
+		speedSum = 0;
+
+
+
+		Gson gson = new Gson();
+		String jsonAsString = gson.toJson(runObjList);
+
+		PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putString("runningJson", jsonAsString).commit();
+
+		String listFromShared = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("runningJson", "defaultStringIfNothingFound");
+
+		Type type = new TypeToken<ArrayList<RunningObject>>(){}.getType();
+		jsonEntries = gson.fromJson(listFromShared, type);
+
+		myRunningListAdapter.notifyDataSetChanged();
+
+
+
+		runningLv.setVisibility(View.VISIBLE);
+		lineGraph.setVisibility(View.INVISIBLE);
+		runningHistoryText.setVisibility(View.VISIBLE);
+
+	}
+
+	public void getGraph(List<Entry> getEntries){
+		LineDataSet dataSet = new LineDataSet(getEntries, null);
+		dataSet.setHighlightEnabled(false);
+		dataSet.setColor(Color.RED);
+		dataSet.setValueTextColor(Color.BLUE);
+		dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+		dataSet.setColor(ColorTemplate.getHoloBlue());
+		//dataSet.setCircleColor(Color.WHITE);
+		dataSet.setLineWidth(2f);
+		dataSet.setDrawCircles(false);
+		//dataSet.setCircleRadius(0f);
+		dataSet.setFillAlpha(65);
+		dataSet.setFillColor(ColorTemplate.getHoloBlue());
+		dataSet.setHighLightColor(Color.rgb(244, 117, 117));
+		dataSet.setValueTextColor(Color.WHITE);
+		dataSet.setValueTextSize(8f);
+		dataSet.setDrawValues(false);
+		dataSet.setAxisDependency(YAxis.AxisDependency.RIGHT);
+		LineData data = new LineData(dataSet);
+		lineGraph.setData(data);
+		lineGraph.setDrawGridBackground(false);
+		lineGraph.setDrawBorders(false);
+
+		lineGraph.getAxisLeft().setEnabled(false);
+		lineGraph.getAxisRight().setEnabled(true);
+		lineGraph.setDescription("");
+		/*.setDrawAxisLine(false);
+		lineGraph.getAxisRight().setDrawGridLines(false);
+		*/
+		lineGraph.getXAxis().setEnabled(true);
+		lineGraph.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+		lineGraph.getXAxis().setDrawAxisLine(false);
+		lineGraph.getXAxis().setDrawGridLines(false);
+		//lineGraph.getXAxis().setAxisMaxValue(51840);
+		//lineGraph.getXAxis().setAxisMinValue(0);
+		//lineGraph.getXAxis().setGranularity(1f);
+		//lineGraph.getXAxis().setAxisMinValue(0f);
+		//lineGraph.getXAxis().setAxisMaxValue(10f);
+		//lineGraph.getXAxis().setDrawLabels(false);
+				/*.setDrawAxisLine(false);
+		lineGraph.getXAxis().setDrawGridLines(false);
+
+*/
+
+		lineGraph.getXAxis().setAxisLineWidth(1.0f);
+
+		// enable touch gestures
+		lineGraph.setTouchEnabled(true);
+
+		// enable scaling and dragging
+		lineGraph.setDragEnabled(true);
+		lineGraph.setScaleEnabled(false);
+
+		// if disabled, scaling can be done on x- and y-axis separately
+		lineGraph.setPinchZoom(false);
+
+		lineGraph.setVisibleXRangeMaximum(6f);
+		//lineGraph.setVisibleXRangeMinimum(6f);
+
+		lineGraph.invalidate();
 		//timetenList.add(tentime);
+
 
 	}
 
@@ -434,8 +684,8 @@ public class Running extends Fragment {
 		super.onDestroy();
 		//getActivity().stopService(myIntent);
 		customHandler.removeCallbacks(updateTimerThread);
-		customHandler.removeCallbacks(timeStampRunnable);
-		customHandler.removeCallbacks(timeSegmentsRunnable);
+		//customHandler.removeCallbacks(timeStampRunnable);
+		//customHandler.removeCallbacks(timeSegmentsRunnable);
 		//timeStampHandler.removeCallbacks(timeStampRunnable);
 		//EventBus.getDefault().unregister(this);
 	}
@@ -458,8 +708,7 @@ public class Running extends Fragment {
 			if(secs %5 ==0){
 				tentime = timerText;
 				timetenList.add(tentime);
-				addEntry();
-
+				addEntry(speed);
 			}
 			//if needed milisecs + String.format("%03d", milliseconds));
 
@@ -501,7 +750,7 @@ public class Running extends Fragment {
 		}
 	}
 
-	private Runnable timeStampRunnable = new Runnable() {
+	/*private Runnable timeStampRunnable = new Runnable() {
 		public void run() {
 
 
@@ -533,7 +782,7 @@ public class Running extends Fragment {
 
 			customHandler.postDelayed(this, 5000);
 		}
-	};
+	};*/
 
 	private void buildAlertMessageNoGps() {
 		final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -553,7 +802,7 @@ public class Running extends Fragment {
 		alert.show();
 	}
 
-	private Runnable timeSegmentsRunnable = new Runnable() {
+	/*private Runnable timeSegmentsRunnable = new Runnable() {
 		public void run() {
 
 			if(manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -567,7 +816,7 @@ public class Running extends Fragment {
 				}
 				distance += lastDistance;
 				//Toast.makeText(MainActivity.getMyApplicationContext(), "distance: " + distance, Toast.LENGTH_SHORT).show();
-				speed = (lastDistance / 10) * 18 / 5;
+				//speed = (lastDistance / 10) * 18 / 5;
 				// making sure if speed is too big reach the max of the chart
 				if (speed>50){
 					speed=0;
@@ -595,9 +844,20 @@ public class Running extends Fragment {
 			}
 			//customHandler.postDelayed(this, 10000/3);
 		}
-	};
+	};*/
 
-	private void addEntry() {
+
+
+	private void addEntry(float currentSpeed) {
+
+		entryCounter++;
+		//entries.add(new Entry(entryCounter, currentSpeed));
+		runObjList.get(runObjList.size()-1).getObjectEntries().add(new Entry(entryCounter, currentSpeed));
+		//xValues.add(entryCounter);
+		//yValues.add((int)currentSpeed);
+		//speedSum += currentSpeed;
+
+
 
 		LineData data = lineGraph.getData();
 
@@ -626,10 +886,12 @@ public class Running extends Fragment {
 
 			*/
 
-			data.addEntry(new Entry(set.getEntryCount(),speed), 0);//speed instead random
+			data.addEntry(new Entry(set.getEntryCount(),currentSpeed), 0);//speed instead random
 			//List list = new LinkedList(lineGraph.getLineData().getDataSets());
 			//Collections.sort(list, new EntryXComparator());
 			data.notifyDataChanged();
+
+
 
 			// let the chart know it's data has changed
 			lineGraph.notifyDataSetChanged();
@@ -645,6 +907,29 @@ public class Running extends Fragment {
 			// mChart.moveViewTo(data.getXValCount()-7, 55f,
 			// AxisDependency.LEFT);
 		}
+
+	}
+
+	private LineDataSet createSet(List<Entry> newestEntries){
+		LineDataSet dataSet = new LineDataSet(newestEntries, null); // add entries to dataset
+		dataSet.setHighlightEnabled(false);
+		dataSet.setColor(Color.RED);
+		dataSet.setValueTextColor(Color.BLUE);
+		dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+		dataSet.setColor(ColorTemplate.getHoloBlue());
+		//dataSet.setCircleColor(Color.WHITE);
+		dataSet.setLineWidth(2f);
+		dataSet.setDrawCircles(false);
+		//dataSet.setCircleRadius(0f);
+		dataSet.setFillAlpha(65);
+		dataSet.setFillColor(ColorTemplate.getHoloBlue());
+		dataSet.setHighLightColor(Color.rgb(244, 117, 117));
+		dataSet.setValueTextColor(Color.WHITE);
+		dataSet.setValueTextSize(9f);
+		dataSet.setDrawValues(false);
+
+
+		return dataSet;
 	}
 
 	private LineDataSet createSet(){
@@ -654,9 +939,10 @@ public class Running extends Fragment {
 		dataSet.setValueTextColor(Color.BLUE);
 		dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
 		dataSet.setColor(ColorTemplate.getHoloBlue());
-		dataSet.setCircleColor(Color.WHITE);
+		//dataSet.setCircleColor(Color.WHITE);
 		dataSet.setLineWidth(2f);
-		dataSet.setCircleRadius(1f);
+		dataSet.setDrawCircles(false);
+		//dataSet.setCircleRadius(1f);
 		dataSet.setFillAlpha(65);
 		dataSet.setFillColor(ColorTemplate.getHoloBlue());
 		dataSet.setHighLightColor(Color.rgb(244, 117, 117));
@@ -691,5 +977,59 @@ public class Running extends Fragment {
 		@Override
 		public int getDecimalDigits() { return 0; }
 	}
+
+	/*private Runnable timeStampRunnable = new Runnable() {
+		public void run() {
+
+			//double latitude = gps.getLatitude();
+			//double longitude = gps.getLongitude();
+
+			if (firstLocation == 0){
+				lastLocation = gps.getLocation();
+				firstLocation =1;
+			}
+			Location newLocation = gps.getLocation();
+			//Toast.makeText(MainActivity.getMyApplicationContext(), "Your new Location is " + newLocation + " Your last Location is " + lastLocation, Toast.LENGTH_LONG).show();
+			float distance;
+			distance = lastLocation.distanceTo(newLocation);
+			if (distance < 55){
+				distance = 0;
+			}
+			totalDistance += distance;
+			speed = (distance/10)*18/5;
+			if (speed >50){
+				speed = 0;
+			}
+			//curSpeed = speed;
+			lastLocation = gps.getLocation();
+			lastSpeed = speed;
+			distanceTv.setText(String.format("%.0f", totalDistance));
+			speedTv.setText(String.format("%.0f", speed));
+
+
+
+			timeStampHandler.postDelayed(this, 5000);
+		}
+	};
+	*/
+
+	public static List<Entry> getNewEntries(){
+		List<Entry> newEntries = new ArrayList<>();
+		newEntries = specificItemEntries;
+		//Toast.makeText(MainActivity.getMyApplicationContext() , obj.toString() , Toast.LENGTH_LONG ).show();
+		//newEntries = entries;
+		return  newEntries;
+	}
+
+	AdapterView.OnItemClickListener runningListOnItemClick = new AdapterView.OnItemClickListener() {
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+			getGraph(jsonEntries.get(position).getObjectEntries());//jsonEntries.get(0).getObjectEntries());
+
+			specificItemEntries  = jsonEntries.get(position).getObjectEntries();
+
+			startActivity(new Intent(MainActivity.getMyApplicationContext() , Pop.class));
+		}
+	};
 
 }

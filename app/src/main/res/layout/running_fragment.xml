@@ -178,15 +178,50 @@
 
     </LinearLayout>
 
-
-    <com.github.mikephil.charting.charts.LineChart
+    <FrameLayout
         android:layout_width="match_parent"
-        android:id="@+id/lineGraph"
-        android:layout_height="200dp"
-        android:paddingBottom="30dp"
-        android:layout_marginBottom="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"></com.github.mikephil.charting.charts.LineChart>
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp">
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:layout_width="match_parent"
+            android:id="@+id/lineGraph"
+            android:layout_height="200dp"
+            android:paddingBottom="30dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:visibility="invisible"></com.github.mikephil.charting.charts.LineChart>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:id="@+id/runningHistoryText"
+                android:background="#ffffff"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/runningHistoryText"
+                android:layout_gravity="center_horizontal"
+                android:textColor="#00ccff"
+                android:textAlignment="center"
+                android:textSize="16sp"
+                android:autoText="false"
+                android:gravity="center_vertical" />
+
+            <ListView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/runningLv"
+                ></ListView>
+
+        </LinearLayout>
+
+
+    </FrameLayout>
 
 
     <Button

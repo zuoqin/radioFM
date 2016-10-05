@@ -39,6 +39,9 @@
                 </action>
             </intent-filter>
         </service>
+        <activity android:name=".helpers.Pop"
+            android:theme="@style/AppTheme.CustomTheme">
+        </activity>
     </application>
 
 </manifest>

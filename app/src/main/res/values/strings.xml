@@ -43,6 +43,7 @@
     <string name="notidirsttext">    לא נבחרה תחנה</string>
     <string name="highlightListSelected"><![CDATA[> <]]></string>
     <string name="firstVideoTitle">רדיוס 100FM לייב</string>
+    <string name="runningHistoryText">היסטורית פעילות גופנית</string>
 
     <string-array name="channles_urls">
         <item>@string/Hits</item>

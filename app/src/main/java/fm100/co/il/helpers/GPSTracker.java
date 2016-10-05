@@ -16,7 +16,6 @@ import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 
 
-
 public class GPSTracker extends Service implements LocationListener {
 
     private final Context mContext;
@@ -35,10 +34,10 @@ public class GPSTracker extends Service implements LocationListener {
     double longitude; // longitude
 
     // The minimum distance to change Updates in meters
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 8; // 10 meters
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 6; // 10 meters
 
     // The minimum time between updates in milliseconds
-    private static final long MIN_TIME_BW_UPDATES =4800;// 1000 * 60 * 1; // 1 minute
+    private static final long MIN_TIME_BW_UPDATES =4900;// 1000 * 60 * 1; // 1 minute
 
     // Declaring a Location Manager
     protected LocationManager locationManager;
@@ -228,6 +227,9 @@ public class GPSTracker extends Service implements LocationListener {
 
     @Override
     public void onProviderDisabled(String provider) {
+       // IntBusEvent event = null;
+       // event = new IntBusEvent(0);
+       // EventBus.getDefault().post(event);
     }
 
     @Override
@@ -236,6 +238,9 @@ public class GPSTracker extends Service implements LocationListener {
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
+       // IntBusEvent event = null;
+       // event = new IntBusEvent(0);
+        //EventBus.getDefault().post(event);
     }
 
     @Override

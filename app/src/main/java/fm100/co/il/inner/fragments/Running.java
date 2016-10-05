@@ -520,7 +520,9 @@ public class Running extends Fragment {
 			Location newLocation = gps.getLocation();
 			// just now //Toast.makeText(MainActivity.getMyApplicationContext(), "Your new Location is " + newLocation + " Your last Location is " + lastLocation, Toast.LENGTH_LONG).show();
 			float thisDistance;
-			thisDistance = lastLocation.distanceTo(newLocation);
+			if( lastLocation != null ) {
+				thisDistance = lastLocation.distanceTo(newLocation);
+			}
 			float thisSpeed;
 			// just now //Toast.makeText(MainActivity.getMyApplicationContext(), "distance: " + distance, Toast.LENGTH_SHORT).show();
 			thisSpeed = (distance / 10) * 18 / 5;
@@ -560,8 +562,9 @@ public class Running extends Fragment {
 				Location newLocation = gps.getLocation();
 				//Toast.makeText(MainActivity.getMyApplicationContext(), "Your new Location is " + newLocation + " Your last Location is " + lastLocation, Toast.LENGTH_LONG).show();
 
-
-				lastDistance = lastLocation.distanceTo(newLocation);
+				if( lastLocation != null ) {
+					lastDistance = lastLocation.distanceTo(newLocation);
+				}
 				if (lastDistance>60){
 					lastDistance =0;
 				}

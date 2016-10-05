@@ -9,18 +9,23 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringDef;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabContentFactory;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -48,6 +53,10 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 	Music music = null;
 	Video video = null;
 	Running running = null;
+
+	ActionBar bar = null;
+	DrawerLayout drawer = null;
+	RelativeLayout pane = null;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater,
@@ -93,7 +102,7 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 		//}else {
 		fragmentsList.add(music = new Music());
 		fragmentsList.add(video = new Video());
-		fragmentsList.add(running = new Running());
+		//fragmentsList.add(running = new Running());
 		fragmentsList.add(new Schedule());
 		//}
 
@@ -124,7 +133,7 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 		Drawable running = getResources().getDrawable(R.drawable.run_off);
 		Drawable schedule = getResources().getDrawable(R.drawable.menu_off);
 
-		Drawable[] drawables = new Drawable[]{music, video, running ,schedule};
+		Drawable[] drawables = new Drawable[]{music, video, /*running ,*/schedule};
 
 		//Drawable[] drawables = new Drawable[]{schedule, running, video ,music};
 
@@ -141,28 +150,41 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 		}
 	}
 
-	private void setTabsIcons(Drawable[] drawables) {
-		String[] tabsNames = null;
+	public void setHeaderBar(ActionBar bar, DrawerLayout drawer, RelativeLayout drawerPane) {
+		this.bar = bar;
+		this.bar.hide();
 
-		//tabsNames = new String[]{"running", "music", "video"};
-		if(isRTL()==true){
+		this.drawer = drawer;
+		this.pane = drawerPane;
+	}
+
+	public void openSubmenu() {
+		this.drawer.openDrawer(this.pane);
+	}
+
+	private void setTabsIcons(Drawable[] drawables) {
+		String[] tabsNames = new String[]{"music", "video", /*"running" ,*/ "schedule"};
+		String[] tabsLabel = new String[]{"ערוצים דיגיטליים", "שידור לייב", /*"running" ,*/ "לוח שידורים"};
+		/*if(isRTL()==true){
 			tabsNames = new String[]{"schedule", "running", "video" , "music"};
 		}else {
 			tabsNames = new String[]{"music", "video", "running" , "schedule"};
-		}
+		}*/
 
 		for (int i=0 ; i < drawables.length ; i++){
 			TabHost.TabSpec myTabSpec = tabHost.newTabSpec(tabsNames[i]);
-			myTabSpec.setIndicator(getTabIndicator(tabHost.getContext(), drawables[i] )); //getTabIndicator: new function to inject own tab layout
+			myTabSpec.setIndicator(getTabIndicator(tabHost.getContext(), drawables[i], tabsLabel[i])); //getTabIndicator: new function to inject own tab layout
 			myTabSpec.setContent(new FakeContent(getActivity()));
 			tabHost.addTab(myTabSpec);
 		}
 	}
 	// Set own tab layout
-	private View getTabIndicator(Context context, Drawable drawable) {
+	private View getTabIndicator(Context context, Drawable drawable, String label) {
 		View view = LayoutInflater.from(context).inflate(R.layout.tab_widget_layout, null);
 		ImageView iv = (ImageView) view.findViewById(R.id.tabImage);
 		iv.setImageDrawable(drawable);
+		TextView txt = (TextView) view.findViewById(R.id.txtLabel);
+		txt.setText(label);
 		return view;
 	}
 
@@ -187,15 +209,18 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 			int scrollPos = tabView.getLeft()
 					- (hScrollView.getWidth() - tabView.getWidth()) / 2;
 			hScrollView.smoothScrollTo(scrollPos, 0);*/
+
+
+			//getSupportActionBar().hide();
 		}
 	}
 
 	private void highlightCurrentTab(int selectedItem) {
-		//int [] resurce_off = new int[] {R.drawable.radio_off, R.drawable.video_off, R.drawable.run_off, R.drawable.menu_off};
-		//int [] resurce_on = new int[] {R.drawable.radio_on, R.drawable.video_on, R.drawable.run_on, R.drawable.menu_on};
+		int [] resurce_off = new int[] {R.drawable.radio_off, R.drawable.video_off/*, R.drawable.run_off*/, R.drawable.menu_off};
+		int [] resurce_on = new int[] {R.drawable.radio_on, R.drawable.video_on/*, R.drawable.run_on*/, R.drawable.menu_on};
 
-		int [] resurce_off = new int[] {R.drawable.menu_off, R.drawable.run_off, R.drawable.video_off, R.drawable.radio_off};
-		int [] resurce_on = new int[] {R.drawable.menu_on, R.drawable.run_on, R.drawable.video_on, R.drawable.radio_on};
+		//int [] resurce_off = new int[] {R.drawable.menu_off, /*R.drawable.run_off, */R.drawable.video_off, R.drawable.radio_off};
+		//int [] resurce_on = new int[] {R.drawable.menu_on, /*R.drawable.run_on, */R.drawable.video_on, R.drawable.radio_on};
 
 
 		for( int i = 0; i < resurce_off.length; i++ ) {
@@ -204,6 +229,12 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 		}
 		ImageView iv = (ImageView) tabHost.getTabWidget().getChildAt(selectedItem).findViewById(R.id.tabImage);
 		iv.setImageResource(resurce_on[selectedItem]);
+
+		/*if( selectedItem == 0 ) {
+			bar.hide();
+		} else {
+			bar.show();
+		}*/
 	}
 
 	@Override

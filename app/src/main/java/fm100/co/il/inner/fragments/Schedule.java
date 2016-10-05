@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ListView;
 
 import com.loopj.android.http.AsyncHttpClient;
@@ -40,6 +41,7 @@ import fm100.co.il.adapters.ScheduleListAdapter;
 import fm100.co.il.adapters.StationListAdapter;
 import fm100.co.il.busEvents.NewSongBusEvent;
 import fm100.co.il.busEvents.NotificationBusEvent;
+import fm100.co.il.fragments.MyHome;
 import fm100.co.il.helpers.Downloader;
 import fm100.co.il.helpers.ScheduleXMLParser;
 import fm100.co.il.helpers.SongXMLParser;
@@ -65,6 +67,16 @@ public class Schedule extends Fragment {
 
         ScheduleDownloadTask download = new ScheduleDownloadTask();
         download.execute();
+
+        ImageButton btnMenu = (ImageButton) v.findViewById(R.id.btnMenu);
+        btnMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //drawerLayout.openDrawer(Gravity.RIGHT);
+                MyHome activity = (MyHome) getParentFragment();
+                activity.openSubmenu();
+            }
+        });
 
         return v;
     }

@@ -20,8 +20,10 @@ import java.io.BufferedReader;
         import android.app.PendingIntent;
         import android.content.Context;
         import android.content.Intent;
-        import android.graphics.Typeface;
-        import android.graphics.drawable.Drawable;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
         import android.os.AsyncTask;
         import android.os.Build;
         import android.os.Bundle;
@@ -34,7 +36,8 @@ import java.io.BufferedReader;
         import android.view.Menu;
         import android.view.MenuItem;
         import android.view.View;
-        import android.view.animation.TranslateAnimation;
+import android.view.Window;
+import android.view.animation.TranslateAnimation;
         import android.widget.AdapterView.OnItemClickListener;
         import android.widget.AdapterView;
         import android.widget.LinearLayout;
@@ -114,10 +117,11 @@ public class MainActivity extends ActionBarActivity {
     private ProgressBar drawerListProgressBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         super.onCreate(savedInstanceState);
         myBundle = savedInstanceState;
         if(isRTL()==false) {
-            getWindow().getDecorView().setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+            //getWindow().getDecorView().setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
         }
         setContentView(R.layout.activity_main);
         myApplicationContext = this;
@@ -163,6 +167,7 @@ public class MainActivity extends ActionBarActivity {
                     JSONObject obj = new JSONObject(new String(responseBody));
 
                     home.setStationData(obj);
+                    home.setHeaderBar(getSupportActionBar(), drawerLayout, drawerPane);
 
                     JSONArray parentArray = obj.getJSONArray("stations");
 
@@ -210,17 +215,16 @@ public class MainActivity extends ActionBarActivity {
 
         Drawable titleDrawable = getResources().getDrawable(R.drawable.header);
         getSupportActionBar().setBackgroundDrawable(titleDrawable);
+        //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         setTitle("");
         //getActionBar().setIcon(R.drawable.fm100);
 
         drawerLayout.closeDrawer(drawerPane);
+        //drawerLayout.openDrawer(drawerPane);
 
         // set listener for drawer layout
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
-                R.string.drawer_opened, R.string.drawer_closed) {
-
-
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_opened, R.string.drawer_closed) {
             @Override
             public void onDrawerOpened(View drawerView) {
                 // TODO Auto-generated method stub

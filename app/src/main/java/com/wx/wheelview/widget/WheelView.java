@@ -160,6 +160,7 @@ public class WheelView<T> extends ListView implements IWheelView<T> {
             if (WheelUtils.isEmpty(mList)) {
                 return;
             }
+            int minSelected = 3;
             //Log.i("100fm", "mCurrentPositon " + mCurrentPositon + " getRealPosition " + getRealPosition(mCurrentPositon) + " firstVisibleItem : " + firstVisibleItem + ", totalItemCount : " + totalItemCount );
             int mid = (getRealPosition(mCurrentPositon) - firstVisibleItem) % mList.size();
             //Log.i("100fm", "getRealPosition : " + getRealPosition(mCurrentPositon) + ", firstVisibleItem : " + firstVisibleItem );
@@ -168,14 +169,14 @@ public class WheelView<T> extends ListView implements IWheelView<T> {
                 if (itemView != null) {
                     ImageView imageView = (ImageView) itemView.findViewById(R.id.item_image);
 
-                    int alpha = (int) (250 * Math.cos ((2 + mid - i) * Math.PI / visibleItemCount)) - 70;
-                    if( alpha < 20 ) alpha = 20;
-                    if( 2 + mid - i == 0 ) alpha = 255;
+                    int alpha = (int) (250 * Math.cos ((minSelected + mid - i) * Math.PI / visibleItemCount)) - 100;
+                    if( alpha < 0 ) alpha = 0;
+                    if( minSelected + mid - i == 0 ) alpha = 255;
                     imageView.setImageAlpha(alpha);
 
-                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) imageView.getLayoutParams();
-                    params.height = 50 + 70 * alpha / 255;
-                    imageView.setLayoutParams(params);
+                    //RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) imageView.getLayoutParams();
+                    //params.height = 50 + 70 * alpha / 255;
+                    //imageView.setLayoutParams(params);
                     //imageView.setScaleY(alpha / 250);
                     //imageView.setScaleX(alpha / 250);
 

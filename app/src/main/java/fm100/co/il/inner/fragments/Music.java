@@ -18,9 +18,12 @@ import android.os.Handler;
 import android.preference.PreferenceActivity;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,6 +57,7 @@ import fm100.co.il.adapters.StationListAdapter;
 import fm100.co.il.busEvents.IntBusEvent;
 import fm100.co.il.busEvents.StationBusEvent;
 import fm100.co.il.busEvents.VideoListBusEvent;
+import fm100.co.il.fragments.MyHome;
 import fm100.co.il.helpers.DownloadImageTask;
 import fm100.co.il.helpers.Downloader;
 import fm100.co.il.MainActivity;
@@ -167,6 +171,7 @@ public class Music extends Fragment {
 	private Player myPlayer;
 
 	LinearLayout rLayout;
+	ImageButton btnMenu = null;
 
 	private List<ScheduleItem> scheduleItemList = new ArrayList<>();
 
@@ -254,6 +259,16 @@ public class Music extends Fragment {
 
 		}
 
+		btnMenu = (ImageButton) v.findViewById(R.id.btnMenu);
+		btnMenu.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				//drawerLayout.openDrawer(Gravity.RIGHT);
+				MyHome activity = (MyHome) getParentFragment();
+				activity.openSubmenu();
+			}
+		});
+
 		/*itemTopIb = (ImageButton) v.findViewById(R.id.itemTopIb);
 		itemTopIb.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -308,10 +323,10 @@ public class Music extends Fragment {
 		myWheelView = (WheelView) mView.findViewById(R.id.wheelview);
 		myWheelView.setWheelAdapter(new MyWheelAdapter(getActivity()));
 		myWheelView.setWheelData(createArrays());
-		myWheelView.setWheelSize(5);
+		myWheelView.setWheelSize(7);
 		myWheelView.setSkin(WheelView.Skin.None);
 		myWheelView.setWheelClickable(true);
-		myWheelView.setSelection(3);
+		myWheelView.setSelection(4);
 		WheelView.WheelViewStyle style = new WheelView.WheelViewStyle();
 
 

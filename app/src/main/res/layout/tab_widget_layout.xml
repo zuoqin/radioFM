@@ -9,8 +9,16 @@ android:layout_height="match_parent">
     android:id="@+id/tabImage"
     android:layout_gravity="center"
     android:background="#00000000"
-    android:layout_marginTop="10dp"
-    android:layout_marginBottom="20dp"
-    android:scaleType="fitCenter" />
+    android:scaleType="center"
+    android:layout_marginTop="5dp" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:textAlignment="center"
+        android:id="@+id/txtLabel"
+        android:textColor="@android:color/white" />
 
 </LinearLayout>

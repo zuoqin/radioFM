@@ -269,6 +269,20 @@ public class Music extends Fragment {
 			}
 		});
 
+		ImageButton btnLike = (ImageButton) v.findViewById(R.id.btnLike);
+		btnLike.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+				sharingIntent.setType("text/plain");
+				String shareBody = "http://digital.100fm.co.il/";
+				//sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
+				sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+				startActivity(Intent.createChooser(sharingIntent, "Share via"));
+			}
+		});
+
+
 		/*itemTopIb = (ImageButton) v.findViewById(R.id.itemTopIb);
 		itemTopIb.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -326,7 +340,7 @@ public class Music extends Fragment {
 		myWheelView.setWheelSize(7);
 		myWheelView.setSkin(WheelView.Skin.None);
 		myWheelView.setWheelClickable(true);
-		myWheelView.setSelection(4);
+		myWheelView.setSelection(0);
 		WheelView.WheelViewStyle style = new WheelView.WheelViewStyle();
 
 
@@ -350,7 +364,7 @@ public class Music extends Fragment {
 		myWheelView.setOnWheelItemSelectedListener(new WheelView.OnWheelItemSelectedListener() {
 			@Override
 			public void onItemSelected(int position, Object o) {
-				Log.i("100fm", "onItemSelected " + position);
+				//Log.i("100fm", "onItemSelected " + position);
 				playStation(position);
 			}
 		});

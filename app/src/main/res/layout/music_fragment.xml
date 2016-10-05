@@ -24,20 +24,178 @@
         android:id="@+id/flyingMonkeys"></RelativeLayout>
 
     <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:minHeight="150dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/songBarLL">
+
+        <RelativeLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
+            android:background="#6effffff"
+            android:id="@+id/whiteLine"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_alignParentTop="false"
+            android:paddingBottom="10dp"
+            android:layout_alignParentBottom="true"
+            android:layout_height="0.5dp"></RelativeLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/songBarLL"
-            android:minHeight="80dp"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="ערוצים דיגיטליים:"
+            android:id="@+id/channelNameTv"
+            android:textSize="20sp"
+            android:layout_alignParentTop="false"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:paddingBottom="5dp"
+            android:textColor="#deffffff"
+            android:layout_gravity="center_horizontal"
+            android:layout_below="@+id/header" />
+
+        <FrameLayout
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:background="@drawable/arrow_right"
+            android:id="@+id/wheelPickerLeft"
+            android:layout_centerVertical="false"
+            android:layout_alignParentStart="false"
+            android:layout_alignParentEnd="false"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="false"
+            android:layout_marginTop="240dp"
+            android:layout_alignParentTop="true" />
+
+        <FrameLayout
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:id="@+id/wheelPickerRight"
+            android:background="@drawable/arrow_left"
+            android:layout_centerVertical="false"
+            android:layout_alignParentStart="false"
+            android:layout_alignParentEnd="false"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="240dp"
+            android:layout_alignParentTop="true" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="false"
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentTop="false">
+
+            <com.wx.wheelview.widget.WheelView
+                android:id="@+id/wheelview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:scrollingCache="false"
+                android:smoothScrollbar="false"
+                android:stackFromBottom="true"
+                android:fastScrollEnabled="false"
+                android:layout_alignWithParentIfMissing="false"
+                android:layout_alignParentBottom="false"
+                android:layout_centerInParent="true"></com.wx.wheelview.widget.WheelView>
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleLarge"
+                android:id="@+id/lvProgress"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="visible"
+                android:padding="100dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true" />
+
+
+        </RelativeLayout>
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Download this song on iTunes"
+            android:id="@+id/itunesIb"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:textColor="@android:color/white"
+            android:background="@android:color/holo_red_light"
+            android:clickable="false"
+            android:visibility="gone" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/header"
+            android:gravity="top"
+            android:layout_height="60dp">
+
+            <ImageView
+                android:layout_height="fill_parent"
+                android:id="@+id/imgCokver"
+                android:scaleType="fitCenter"
+                android:src="@drawable/fm1003"
+                android:layout_centerHorizontal="true"
+                android:layout_width="100dp" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/like"
+                android:layout_alignParentTop="false"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:id="@+id/btnLike"
+                android:background="@android:color/transparent"
+                android:paddingBottom="5dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="5dp" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/menu"
+                android:layout_alignParentTop="false"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:id="@+id/btnMenu"
+                android:background="@android:color/transparent"
+                android:paddingBottom="5dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="5dp" />
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/songBarLL"
+        android:minHeight="80dp"
         android:padding="5dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true">
 
         <RelativeLayout
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:layout_alignParentEnd="false"
-                android:layout_alignParentStart="false"
-                android:id="@+id/playHolder"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentStart="false"
+            android:id="@+id/playHolder"
             android:layout_alignParentLeft="true">
 
             <LinearLayout
@@ -47,33 +205,33 @@
                 android:id="@+id/playRotate">
 
                 <ImageButton
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
-                        android:layout_alignParentBottom="false"
-                        android:layout_alignParentStart="false"
-                        android:layout_alignParentRight="false"
-                        android:layout_alignParentLeft="false"
-                        android:layout_weight="2"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:adjustViewBounds="true"
-                        android:scaleType="fitCenter"
-                        android:maxWidth="300dp"
-                        android:src="@drawable/round"
-                        android:background="#00ffffff"
-                        android:paddingTop="6dp"
-                        android:paddingBottom="6dp"
+                    android:layout_alignParentBottom="false"
+                    android:layout_alignParentStart="false"
+                    android:layout_alignParentRight="false"
+                    android:layout_alignParentLeft="false"
+                    android:layout_weight="2"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+                    android:maxWidth="300dp"
+                    android:src="@drawable/round"
+                    android:background="#00ffffff"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
                     android:id="@+id/imgRound" />
             </LinearLayout>
 
             <ProgressBar
-                    android:id="@+id/progress"
-                    style="?android:attr/progressBarStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:visibility="invisible" />
+                android:id="@+id/progress"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:visibility="invisible" />
 
             <ImageButton
                 android:layout_width="fill_parent"
@@ -114,179 +272,23 @@
                 android:gravity="right" />
 
             <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="15sp"
-            android:id="@+id/artistNameTv"
-            android:layout_below="@+id/songNameTv"
-            android:layout_toRightOf="@+id/songImage"
-            android:layout_toEndOf="@+id/songImage"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:textColor="#ffffff"
-            android:textAlignment="textStart"
-            android:text="מוזיקה זה הכלל"
-            android:layout_weight="1" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="15sp"
+                android:id="@+id/artistNameTv"
+                android:layout_below="@+id/songNameTv"
+                android:layout_toRightOf="@+id/songImage"
+                android:layout_toEndOf="@+id/songImage"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:textColor="#ffffff"
+                android:textAlignment="textStart"
+                android:text="מוזיקה זה הכלל"
+                android:layout_weight="1" />
 
         </LinearLayout>
-
-    </RelativeLayout>
-
-    <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="fill_parent"
-            android:minHeight="150dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true">
-
-        <RelativeLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:background="#6effffff"
-            android:id="@+id/whiteLine"
-            android:layout_marginRight="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_alignParentTop="false"
-            android:paddingBottom="10dp"
-            android:layout_alignParentBottom="true"
-            android:layout_height="0.5dp"></RelativeLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="ערוצים דיגיטליים:"
-            android:id="@+id/channelNameTv"
-            android:textSize="20sp"
-            android:layout_alignParentTop="false"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="5dp"
-            android:paddingBottom="5dp"
-            android:textColor="#deffffff"
-            android:layout_gravity="center_horizontal"
-            android:layout_below="@+id/header" />
-
-        <FrameLayout
-                android:layout_width="15dp"
-                android:layout_height="15dp"
-                android:background="@drawable/arrow_right"
-                android:id="@+id/wheelPickerLeft"
-                android:layout_centerVertical="false"
-                android:layout_alignParentStart="false"
-                android:layout_alignParentEnd="false"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="false"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="240dp" />
-
-            <FrameLayout
-                android:layout_width="15dp"
-                android:layout_height="15dp"
-                android:id="@+id/wheelPickerRight"
-                android:background="@drawable/arrow_left"
-                android:layout_centerVertical="false"
-                android:layout_alignParentStart="false"
-                android:layout_alignParentEnd="false"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginTop="240dp" />
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_alignParentStart="false"
-                android:layout_alignParentBottom="false"
-                android:layout_alignParentTop="false">
-
-                <com.wx.wheelview.widget.WheelView
-                    android:id="@+id/wheelview"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:scrollingCache="false"
-                    android:smoothScrollbar="false"
-                    android:stackFromBottom="true"
-                    android:fastScrollEnabled="false"
-                    android:layout_alignWithParentIfMissing="false"
-                    android:layout_alignParentBottom="false"
-                    android:layout_centerInParent="true"></com.wx.wheelview.widget.WheelView>
-
-                <ProgressBar
-                    style="?android:attr/progressBarStyleLarge"
-                    android:id="@+id/lvProgress"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:visibility="visible"
-                    android:padding="100dp"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentStart="true" />
-
-
-            </RelativeLayout>
-
-            <Button
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Download this song on iTunes"
-                android:id="@+id/itunesIb"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:textColor="@android:color/white"
-                android:background="@android:color/holo_red_light"
-                android:clickable="false"
-                android:visibility="gone" />
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:id="@+id/header"
-            android:gravity="top"
-            android:layout_height="60dp">
-            <ImageView
-                android:layout_height="fill_parent"
-                android:id="@+id/imgCokver"
-                android:scaleType="fitCenter"
-                android:src="@drawable/fm100"
-                android:layout_width="80dp"
-                android:layout_centerHorizontal="true" />
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/like"
-                android:layout_alignParentTop="false"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:id="@+id/btnLike"
-                android:background="@android:color/transparent"
-                android:paddingBottom="5dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:paddingTop="5dp" />
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/menu"
-                android:layout_alignParentTop="false"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:layout_centerHorizontal="true"
-                android:id="@+id/btnMenu"
-                android:background="@android:color/transparent"
-                android:paddingBottom="5dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:paddingTop="5dp" />
-        </RelativeLayout>
 
     </RelativeLayout>
 

@@ -2,6 +2,7 @@ package fm100.co.il.inner.fragments;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -75,6 +76,19 @@ public class Schedule extends Fragment {
                 //drawerLayout.openDrawer(Gravity.RIGHT);
                 MyHome activity = (MyHome) getParentFragment();
                 activity.openSubmenu();
+            }
+        });
+
+        ImageButton btnLike = (ImageButton) v.findViewById(R.id.btnLike);
+        btnLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                sharingIntent.setType("text/plain");
+                String shareBody = "http://digital.100fm.co.il/";
+                //sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
+                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                startActivity(Intent.createChooser(sharingIntent, "Share via"));
             }
         });
 

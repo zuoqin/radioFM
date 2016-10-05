@@ -11,7 +11,7 @@
         android:id="@+id/header"
         android:gravity="top"
         android:layout_height="60dp"
-        android:background="@drawable/title100fm">
+        android:background="@drawable/header">
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -46,10 +46,10 @@
             android:layout_height="fill_parent"
             android:id="@+id/imgCokver"
             android:scaleType="fitCenter"
-            android:src="@drawable/fm100"
-            android:layout_width="80dp"
+            android:src="@drawable/fm1003"
             android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:layout_width="100dp" />
     </RelativeLayout>
 
     <ListView

@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:adjustViewBounds="true"
         android:scaleType="centerCrop"
-        android:src="@drawable/mousepad" />
+        android:src="@drawable/splash" />
 
     <ProgressBar
         android:layout_width="40dp"

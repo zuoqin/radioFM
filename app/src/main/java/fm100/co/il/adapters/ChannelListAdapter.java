@@ -32,7 +32,9 @@ public class ChannelListAdapter extends BaseAdapter {
         this.context = context;
         this.nameObjArray = namesList;
 
-        inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        if( context != null ) {
+            inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        }
     }
     @Override
     public int getCount() {

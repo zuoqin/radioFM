@@ -411,23 +411,26 @@ public class WheelView<T> extends ListView implements IWheelView<T> {
     @Override
     public void setSelection(final int selection) {
         mSelection = selection;
-        //setVisibility(View.INVISIBLE);
+        setVisibility(View.INVISIBLE);
         WheelView.super.setSelection(getRealPosition(selection));
         refreshCurrentPosition(false);
         /*WheelView.this.postDelayed(new Runnable() {
             @Override
             public void run() {
-                //WheelView.super.setSelection(getRealPosition(selection));
-                //refreshCurrentPosition(false);
-                //setVisibility(View.VISIBLE);
+                WheelView.super.setSelection(getRealPosition(selection));
+                refreshCurrentPosition(false);
+                setVisibility(View.VISIBLE);
             }
         }, 500);*/
     }
 
     public void smoothScrollToPosition(final int selection) {
         Log.i("100fm", "selection : " + getRealPosition(selection));
-        //mSelection = selection;
-        //WheelView.super.smoothScrollToPosition(getRealPosition(selection));
+        WheelView.super.smoothScrollToPosition(getRealPosition(selection) + 4);
+        //this.scrollListBy((mSelection - selection) * 60);
+        //this.smoothScrollToPosition(getRealPosition(selection));
+        //mSelection = getRealPosition(selection);
+        //WheelView.super.smoothScrollToPosition(getRealPosition(selection) - 3);
         //refreshCurrentPosition(false);
     }
 

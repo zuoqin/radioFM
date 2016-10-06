@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -20,9 +21,8 @@
             android:layout_height="32dp"
             android:id="@+id/playPauseIb"
             android:layout_margin="10dp"
-            android:scaleType="fitXY"
-            android:src="@drawable/newpauseicon1"
-            android:background="#00ffffff"
+            android:src="@drawable/stop2"
+            android:background="@android:color/white"
             android:layout_gravity="center_vertical" />
 
         <LinearLayout
@@ -40,7 +40,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:singleLine="true"
-                android:textColor="#4b4b4b"
+                android:textColor="#ff000000"
                 android:textSize="16dp"
                 android:textStyle="bold"
                 android:text="Song Name" />
@@ -51,17 +51,18 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:singleLine="true"
-                android:textColor="#b7b7b7"
+                android:textColor="#4b4b4b"
                 android:textSize="12dp"
                 android:text="Artist Name" />
         </LinearLayout>
 
-        <Button
+        <ImageButton
             android:id="@+id/btnDelete"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:background="@android:drawable/ic_delete"
-            android:layout_margin="10dp" />
+            android:layout_margin="10dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/delete2" />
     </LinearLayout>
 
 </LinearLayout>

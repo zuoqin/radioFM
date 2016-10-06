@@ -177,6 +177,7 @@ public class Music extends Fragment {
 
 	RelativeLayout flying;
 	public ArrayList<View> monkeys = new ArrayList<>();
+	int monkeysIndex = 0;
 	int flyingColor = 0xFFF8F301;
 	Timer timer_flying = null;
 
@@ -283,6 +284,29 @@ public class Music extends Fragment {
 		});
 
 
+		ImageButton btn100 = (ImageButton) v.findViewById(R.id.img100fm);
+		btn100.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				playStation(0);
+				myWheelView.smoothScrollToPosition(0);
+			}
+		});
+
+		for( int i = 0; i < 6; i++ ) {
+			Random r = new Random();
+			View myButton = new View(getContext());
+			int s = r.nextInt(60) + 40;
+			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(s, s);
+			params.rightMargin = 0;
+			params.topMargin = 1500;
+			myButton.setLayoutParams(params);
+			myButton.setBackgroundColor(flyingColor);
+			//myButton.setAlpha(.5f);
+			flying.addView(myButton);
+			monkeys.add(myButton);
+		}
+
 		/*itemTopIb = (ImageButton) v.findViewById(R.id.itemTopIb);
 		itemTopIb.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -380,18 +404,20 @@ public class Music extends Fragment {
 			//firstChannel = 1;
 			currentChannel = channelsArray.get(position);
 			//if (!Objects.equals(currentChannel.getChannelName(), lastChannel.getChannelName())) {
-				event = new NotificationBusEvent("play");
-				EventBus.getDefault().post(event);
+				//isPlaying = 1;
+
 				//channelNameTv.setText("Current Channel Selected : " + channelsArray.get(position).getChannelName());
 				playPauseBtn.setImageResource(R.drawable.stop);
 				lastChannel.setChannelName(currentChannel.getChannelName());
 				lastChannel.setChannelUrl(currentChannel.getChannelUrl());
-				mediaPlayer.reset();
-				myPlayer = new Player();
-				myPlayer.execute(currentChannel.getChannelUrl());
-				isPlaying = 1;
+				event = new NotificationBusEvent("play");
+				EventBus.getDefault().post(event);
+				//mediaPlayer.reset();
+				//myPlayer = new Player();
+				//myPlayer.execute(currentChannel.getChannelUrl());
 
-				Animation an = new RotateAnimation(0.0f, 360.0f, rLayout.getWidth()/2, rLayout.getHeight()/2);
+
+				/*Animation an = new RotateAnimation(0.0f, 360.0f, rLayout.getWidth()/2, rLayout.getHeight()/2);
 
 				an.setDuration(2000);
 				an.setRepeatCount(-1);
@@ -416,7 +442,7 @@ public class Music extends Fragment {
 				rLayout.startAnimation(an);
 			//}
 			reloadSongName();
-			//startFlyingMonkeys();
+			startFlyingMonkeys();*/
 	}
 	private void stopStation() {
 		NotificationBusEvent event = new NotificationBusEvent("pause");
@@ -856,7 +882,7 @@ public class Music extends Fragment {
 							}
 
 							if( getContext() != null ) {
-								View myButton = new View(getContext());
+								/*View myButton = new View(getContext());
 								int s = r.nextInt(60) + 40;
 								RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(s, s);
 								params.rightMargin = r.nextInt(flying.getWidth());
@@ -865,44 +891,29 @@ public class Music extends Fragment {
 								myButton.setBackgroundColor(flyingColor);
 								myButton.setAlpha(.5f);
 								flying.addView(myButton);
+								monkeys.add(myButton);*/
+								View myButton = monkeys.get(monkeysIndex);
+								myButton.setBackgroundColor(flyingColor);
 
-								monkeys.add(myButton);
+								monkeysIndex = (monkeysIndex + 1) % monkeys.size();
+								//Log.i("100fm", "monkeysIndex " + monkeysIndex + " size " + monkeys.size());
 
 								AnimationSet snowMov1 = new AnimationSet(true);
 
-								RotateAnimation rotate1 = new RotateAnimation(-90, r.nextInt(180), s/2, s/2);
+								RotateAnimation rotate1 = new RotateAnimation(-90, r.nextInt(180), myButton.getWidth(), myButton.getHeight());
 								rotate1.setStartOffset(50);
 								rotate1.setDuration(3000);
 								rotate1.setRepeatCount(1);
-								rotate1.setInterpolator(new AccelerateInterpolator());
+								//rotate1.setInterpolator(new AccelerateInterpolator());
 								snowMov1.addAnimation(rotate1);
 
-								TranslateAnimation trans1 = new TranslateAnimation(0, 0, flying.getHeight(), -100);
+								int x = r.nextInt(flying.getWidth());
+								TranslateAnimation trans1 = new TranslateAnimation(x, x, flying.getHeight() + 100, -150);
 								trans1.setDuration(3000);
 								snowMov1.addAnimation(trans1);
 
-								trans1.setAnimationListener(new Animation.AnimationListener() {
-									@Override
-									public void onAnimationStart(Animation animation) {
-
-									}
-
-									@Override
-									public void onAnimationEnd(Animation animation) {
-										if( monkeys.size() > 0 ) {
-											View v = monkeys.get(0);
-											flying.removeView(v);
-											monkeys.remove(0);
-										}
-									}
-
-									@Override
-									public void onAnimationRepeat(Animation animation) {
-									}
-								});
-
-								//myButton.startAnimation(snowMov1);
-								myButton.startAnimation(trans1);
+								myButton.startAnimation(snowMov1);
+								//myButton.startAnimation(trans1);
 								//myButton.setVisibility(View.VISIBLE);
 							}
 						}
@@ -914,18 +925,54 @@ public class Music extends Fragment {
 
 	@Subscribe
 	public void onEvent(NotificationBusEvent event) {
+		Log.i("100fm", "event.getNotificationBusMsg() " + event.getNotificationBusMsg() + " isPlaying " + isPlaying);
 		// set a "pause" notification
-		if (event.getNotificationBusMsg().equals("pause")) {
+		if (event.getNotificationBusMsg().equals("pause") ) {
 			playPauseBtn.setImageResource(R.drawable.play);
 			if (mediaPlayer.isPlaying())
 				mediaPlayer.stop();
 			isPlaying = 0;
-		}
-		// set a "play" notification
-		else if (event.getNotificationBusMsg().equals("play")) {
+			rLayout.clearAnimation();
+			if( timer_flying != null ) {
+				timer_flying.cancel();
+				timer_flying = null;
+			}
+		} else if (event.getNotificationBusMsg().equals("play")) {
 			playPauseBtn.setImageResource(R.drawable.stop);
-			mediaPlayer.start();
+			mediaPlayer.stop();
+			mediaPlayer.reset();
+			myPlayer = new Player();
+			myPlayer.execute(currentChannel.getChannelUrl());
+			//mediaPlayer.start();
+			//playStation(myWheelView.getCurrentPosition());
 			isPlaying = 1;
+			reloadSongName();
+
+			Animation an = new RotateAnimation(0.0f, 360.0f, rLayout.getWidth()/2, rLayout.getHeight()/2);
+
+			an.setDuration(2000);
+			an.setRepeatCount(-1);
+			an.setFillAfter(false);              // DO NOT keep rotation after animation
+			an.setFillEnabled(true);             // Make smooth ending of Animation
+			an.setInterpolator(new LinearInterpolator());
+			an.setAnimationListener(new Animation.AnimationListener() {
+				@Override
+				public void onAnimationStart(Animation animation) {}
+
+				@Override
+				public void onAnimationRepeat(Animation animation) {}
+
+				@Override
+				public void onAnimationEnd(Animation animation) {
+					rLayout.setRotation(0.0f);      // Make instant rotation when Animation is finished
+				}
+			});
+
+			// Aply animation to image view
+			//rLayout.setAnimation(an);
+			rLayout.startAnimation(an);
+
+			startFlyingMonkeys();
 		}
 	}
 

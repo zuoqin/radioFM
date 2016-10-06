@@ -96,7 +96,7 @@ public class MainActivity extends ActionBarActivity {
 
     // setting last variables to remember the last
     private String lastAction = "com.example.hpuser.rad100fm.ACTION_PLAY";
-    private int lastBtnImage = R.drawable.newplayicon1;
+    private int lastBtnImage = R.drawable.play2;
     private String lastSongName = " ";
     private String lastArtistName = " ";
 
@@ -186,7 +186,7 @@ public class MainActivity extends ActionBarActivity {
                         tempStation.setStationLogo(finalObject.getString("logo"));
                         stationList.add(tempStation);
 
-                        Log.i("100fm", finalObject.getString("slug"));
+                        //Log.i("100fm", finalObject.getString("slug"));
                     }
 
                     drawerListProgressBar.setVisibility(View.GONE);
@@ -197,7 +197,7 @@ public class MainActivity extends ActionBarActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                Log.d("fm100", "100fm loaded : " + stationList.size());
+                //Log.d("fm100", "100fm loaded : " + stationList.size());
             }
 
             @Override
@@ -337,7 +337,7 @@ public class MainActivity extends ActionBarActivity {
       public void onEvent(NotificationBusEvent event) {
         // set a "pause" notification
         if (event.getNotificationBusMsg().equals("pause")){
-            int buttonImage = R.drawable.newplayicon1;
+            int buttonImage = R.drawable.play2;
             String actionName = "com.example.hpuser.rad100fm.ACTION_PLAY";
             setNotification(buttonImage, actionName , lastSongName , lastArtistName);
             lastAction = actionName;
@@ -346,7 +346,7 @@ public class MainActivity extends ActionBarActivity {
 
         // set a "play" notification
         else if (event.getNotificationBusMsg().equals("play")){
-            int buttonImage = R.drawable.newpauseicon1;
+            int buttonImage = R.drawable.stop2;
             String actionName = "com.example.hpuser.rad100fm.ACTION_PAUSE";
             setNotification(buttonImage, actionName , lastSongName , lastArtistName);
             lastAction = actionName;
@@ -435,11 +435,11 @@ public class MainActivity extends ActionBarActivity {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             IntBusEvent event = new IntBusEvent(position);
             EventBus.getDefault().post(event);
-            //if (lastItemClicked != position) {
-                int buttonImage = R.drawable.newpauseicon1;
+            if (lastItemClicked != position) {
+                int buttonImage = R.drawable.stop2;
                 String actionName = "com.example.hpuser.rad100fm.ACTION_PAUSE";
                 setNotification(buttonImage, actionName, lastSongName, lastArtistName);
-           // }
+           }
            // else{
                 /*
                 int buttonImage = R.drawable.newplayicon1;

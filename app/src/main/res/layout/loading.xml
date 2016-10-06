@@ -20,6 +20,8 @@
         android:layout_alignParentTop="false"
         android:layout_centerHorizontal="true"
         android:id="@+id/loadingPanel"
+        android:startColor="#ffffffff"
+        android:endColor="#fffff400"
         android:layout_marginBottom="10dp"
         android:layout_alignParentBottom="true"
         android:indeterminateOnly="false" />

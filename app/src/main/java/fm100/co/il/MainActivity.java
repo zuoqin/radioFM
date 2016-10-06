@@ -24,7 +24,8 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-        import android.os.AsyncTask;
+import android.net.Uri;
+import android.os.AsyncTask;
         import android.os.Build;
         import android.os.Bundle;
         import android.support.v4.app.Fragment;
@@ -40,7 +41,8 @@ import android.view.Window;
 import android.view.animation.TranslateAnimation;
         import android.widget.AdapterView.OnItemClickListener;
         import android.widget.AdapterView;
-        import android.widget.LinearLayout;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
         import android.widget.ListView;
         import android.widget.ProgressBar;
         import android.widget.RelativeLayout;
@@ -154,7 +156,7 @@ public class MainActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         AsyncHttpClient client = new AsyncHttpClient();
-        client.get("http://demo.goufo.co.il/100fm/", new AsyncHttpResponseHandler() {
+        client.get("http://digital.100fm.co.il/app/", new AsyncHttpResponseHandler() {
 
             @Override
             public void onStart() {
@@ -173,8 +175,8 @@ public class MainActivity extends ActionBarActivity {
 
                     Station tempStation = null;
 
+                    stationList.clear();
                     for (int i = 0; i < parentArray.length(); i++) {
-
                         tempStation = new Station();
                         JSONObject finalObject = parentArray.getJSONObject(i);
                         tempStation.setStationName(finalObject.getString("name"));
@@ -183,6 +185,8 @@ public class MainActivity extends ActionBarActivity {
                         tempStation.setStationSlug(finalObject.getString("slug"));
                         tempStation.setStationLogo(finalObject.getString("logo"));
                         stationList.add(tempStation);
+
+                        Log.i("100fm", finalObject.getString("slug"));
                     }
 
                     drawerListProgressBar.setVisibility(View.GONE);
@@ -193,7 +197,7 @@ public class MainActivity extends ActionBarActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                Log.d("fm100", "100fm loaded : " + stationList.size()	 );
+                Log.d("fm100", "100fm loaded : " + stationList.size());
             }
 
             @Override
@@ -245,6 +249,33 @@ public class MainActivity extends ActionBarActivity {
 
         Intent intent = new Intent(MainActivity.this, Loading.class);
         startActivity(intent);
+
+        ImageButton btnFb = (ImageButton) findViewById(R.id.btnFacebook);
+        btnFb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("fb://profile/158664457479014"));
+                    startActivity(intent);
+                } catch(Exception e) {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/100FMRADIOS/")));
+                }
+            }
+        });
+        ImageButton btnIns = (ImageButton) findViewById(R.id.btnInstagram);
+        btnIns.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.instagram.com/radios_100fm/")));
+            }
+        });
+        ImageButton btnWeb = (ImageButton) findViewById(R.id.btnChrome);
+        btnWeb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.100fm.co.il/")));
+            }
+        });
     }
 
     @Override
@@ -377,10 +408,10 @@ public class MainActivity extends ActionBarActivity {
         if (!lastAction.equals("delete")) {
             try {
             setNotification(lastBtnImage, lastAction, songEvent.getSongName(), songEvent.getArtistName());
-            lastSongName = songEvent.getSongName();
-            lastArtistName = songEvent.getArtistName();
+                lastSongName = songEvent.getSongName();
+                lastArtistName = songEvent.getArtistName();
             } catch (Exception e) {
-            Log.e("MyLog", "onSongChange exception : " + e.getMessage());
+            Log.e("100fm", "onSongChange exception : " + e.getMessage());
             }
         }
     }
@@ -402,8 +433,8 @@ public class MainActivity extends ActionBarActivity {
     AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener(){
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                IntBusEvent event = new IntBusEvent(position);
-                EventBus.getDefault().post(event);
+            IntBusEvent event = new IntBusEvent(position);
+            EventBus.getDefault().post(event);
             //if (lastItemClicked != position) {
                 int buttonImage = R.drawable.newpauseicon1;
                 String actionName = "com.example.hpuser.rad100fm.ACTION_PAUSE";

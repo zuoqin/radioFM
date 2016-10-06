@@ -2,6 +2,7 @@ package fm100.co.il.adapters;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,18 +69,26 @@ public class StationListAdapter extends BaseAdapter{
 
             holder.stationItemText.setTypeface(custom_font_eng_light);
 
+
             rowView.setTag(holder);
         }
         else {
             holder = (ViewHolder) rowView.getTag();
         }
         if (nameObjArray.size() <= 0){
-            Toast.makeText(MainActivity.getMyApplicationContext(), "no stations to display", Toast.LENGTH_LONG).show();
+            //Toast.makeText(MainActivity.getMyApplicationContext(), "no stations to display", Toast.LENGTH_LONG).show();
         }
         else{
             tempValues = null;
             tempValues = nameObjArray.get(position);
             holder.stationItemText.setText(tempValues.getChannelName());
+
+            //Log.i("ufo", "slug " + tempValues.getChannelSlug());
+            if( tempValues.getChannelSlug().equals("100FM שידור חי") ) {
+                holder.stationItemText.setTextColor(0xFFFFEB3D);
+            } else {
+                holder.stationItemText.setTextColor(0xFFFFFFFF);
+            }
         }
 
         return rowView;

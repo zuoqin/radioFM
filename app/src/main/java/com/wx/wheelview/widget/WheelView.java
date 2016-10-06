@@ -425,8 +425,34 @@ public class WheelView<T> extends ListView implements IWheelView<T> {
     }
 
     public void smoothScrollToPosition(final int selection) {
-        Log.i("100fm", "selection : " + getRealPosition(selection));
-        WheelView.super.smoothScrollToPosition(getRealPosition(selection) + 4);
+        int offset = 6;
+
+        if( selection < mCurrentPositon || mCurrentPositon == 0 || selection > 10 ) {
+            offset = -1;
+        }
+        Log.i("100fm", "selection " + selection + " mCurrentPositon " + mCurrentPositon + " offset " + offset);
+
+        WheelView.super.setSelection(getRealPosition(selection));
+        /*WheelView.super.smoothScrollToPosition(getRealPosition(mCurrentPositon) + offset);
+        WheelView.this.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mSelection = selection;
+                WheelView.super.setSelection(getRealPosition(selection));
+                refreshCurrentPosition(false);
+            }
+        }, 500);*/
+        //this.smoothScrollToPosition(getRealPosition(mCurrentPositon) + offset);
+        //WheelView.super.smoothScrollToPosition(getRealPosition(mCurrentPositon) + offset);
+        /*WheelView.this.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                WheelView.super.setSelection(getRealPosition(selection));
+                refreshCurrentPosition(false);
+                setVisibility(View.VISIBLE);
+            }
+        }, 500);*/
+
         //this.scrollListBy((mSelection - selection) * 60);
         //this.smoothScrollToPosition(getRealPosition(selection));
         //mSelection = getRealPosition(selection);

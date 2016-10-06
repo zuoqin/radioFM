@@ -161,7 +161,7 @@ public class Music extends Fragment {
 	private WheelView myWheelView;
 	private View mView;
 
-	private int lastSelectionLoaded = 0;
+	private int lastSelectionLoaded = -1;
 
 	private Handler customHandler = new Handler();
 	Runnable runnable;
@@ -937,8 +937,13 @@ public class Music extends Fragment {
 	// catching item clicks on drawer pane from main activity by position
 	@Subscribe
 	public void onIntEvent(IntBusEvent intEvent) {
-		currentChannel = channelsArray.get(intEvent.getintBusEvent());
-		firstChannel = 1;
+		int pos = intEvent.getintBusEvent();
+		Log.i("100fm", "playPauseListener " + isPlaying + " " + lastSelectionLoaded + " " + pos);
+		playStation(pos);
+		myWheelView.smoothScrollToPosition(pos);
+
+		//playStation(currentChannel.);
+		/*firstChannel = 1;
 			//NotificationBusEvent notiEvent = null;
 			if (lastStationLoading == 0) {
 				if (!Objects.equals(currentChannel.getChannelName(), lastChannel.getChannelName())) {
@@ -954,13 +959,13 @@ public class Music extends Fragment {
 					/*
 					NotificationBusEvent event = new NotificationBusEvent("play");
 					EventBus.getDefault().post(event);
-					*/
+
 				} else {
 					Toast.makeText(MainActivity.getMyApplicationContext() , "channel already selected" , Toast.LENGTH_SHORT ).show();
 				}
 			} else {
 				Toast.makeText(MainActivity.getMyApplicationContext(), "please waite while loading last station selected", Toast.LENGTH_LONG).show();
-			}
+			}*/
 
 	}
 	// catching list of stations from main activity and attaching to list

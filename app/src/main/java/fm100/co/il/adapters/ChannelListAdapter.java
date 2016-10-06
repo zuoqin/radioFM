@@ -71,7 +71,7 @@ public class ChannelListAdapter extends BaseAdapter {
             holder = (ViewHolder) rowView.getTag();
         }
         if (nameObjArray.size() <= 0){
-            Toast.makeText(MainActivity.getMyApplicationContext(), "no stations to display" , Toast.LENGTH_LONG).show();
+            //Toast.makeText(MainActivity.getMyApplicationContext(), "no stations to display" , Toast.LENGTH_LONG).show();
         }
         else{
             tempValues = null;

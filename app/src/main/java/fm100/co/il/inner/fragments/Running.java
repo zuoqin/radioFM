@@ -38,6 +38,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -147,7 +148,9 @@ public class Running extends Fragment implements SensorEventListener {
 
 	private List<RunningObject> runObjList = new ArrayList<>();
 
-	private TextView runningHistoryText;
+	//private TextView runningHistoryText;
+	private FrameLayout runningHistoryFrame;
+	private Button clearHistoryBtn;
 
 
 	private static List<Entry> specificItemEntries = new ArrayList<>();
@@ -164,7 +167,7 @@ public class Running extends Fragment implements SensorEventListener {
 	private float lastStepDistance = 0;
 
 	private String m_Text = "";
-	private int mHeight = 0;
+	private int mHeight = 175;
 	////////////////
 
 	@Override
@@ -185,7 +188,9 @@ public class Running extends Fragment implements SensorEventListener {
 		speedTv = (TextView) v.findViewById(R.id.speedTv);
 		timerTv = (TextView) v.findViewById(R.id.timerTv);
 		runningLv = (ListView) v.findViewById(R.id.runningLv);
-		runningHistoryText = (TextView) v.findViewById(R.id.runningHistoryText);
+		//runningHistoryText = (TextView) v.findViewById(R.id.runningHistoryText);
+		runningHistoryFrame = (FrameLayout) v.findViewById(R.id.runningHistoryFrame);
+		clearHistoryBtn = (Button) v.findViewById(R.id.clearHistoryBtn);
 		Gson gson = new Gson();
 		String listFromShared = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("runningJson", "defaultStringIfNothingFound");
 
@@ -205,6 +210,8 @@ public class Running extends Fragment implements SensorEventListener {
 		getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
 		height = (displaymetrics.heightPixels) / 5;
 		width = displaymetrics.widthPixels;
+
+		clearHistoryBtn.setOnClickListener(clearHistory);
 
 		//setting the xAxis values (72 hours by 5 secs)
 		int hours = 0;
@@ -307,10 +314,13 @@ public class Running extends Fragment implements SensorEventListener {
 					// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
 					input.setInputType(InputType.TYPE_CLASS_NUMBER);
 					input.setHintTextColor(Color.LTGRAY);
+					String mHeightString = Integer.toString(mHeight);
+					input.setText(mHeightString);
 					input.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
 					input.setTextColor(Color.WHITE);
-					input.setHint("...");
+
 					builder.setView(input);
+
 
 					// Set up the buttons
 					builder.setNeutralButton("אישור", new DialogInterface.OnClickListener() {
@@ -321,7 +331,8 @@ public class Running extends Fragment implements SensorEventListener {
 							mSensorManager.registerListener(Running.this, mStepCounterSensor, SensorManager.SENSOR_DELAY_FASTEST);
 							customHandler.postDelayed(speedRunnable, 0);
 							runningLv.setVisibility(View.INVISIBLE);
-							runningHistoryText.setVisibility(View.INVISIBLE);
+							//runningHistoryText.setVisibility(View.INVISIBLE);
+							runningHistoryFrame.setVisibility(View.INVISIBLE);
 
 							lineGraph.setVisibility(View.VISIBLE);
 
@@ -376,7 +387,6 @@ public class Running extends Fragment implements SensorEventListener {
 					});
 
 					builder.show();
-
 				} else {
 					stop();
 
@@ -386,6 +396,42 @@ public class Running extends Fragment implements SensorEventListener {
 		});
 		return v;
 	}
+
+	View.OnClickListener clearHistory = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity() ,  Theme_Holo_Dialog_NoActionBar_MinWidth);
+			builder.setTitle("האם את/ה בטוח כי ברצונך לנקות את היסטורית הריצה?");
+
+			// Set up the buttons
+			builder.setNeutralButton("כן", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					runObjList.clear();
+					Gson gson = new Gson();
+					String jsonAsString = gson.toJson(runObjList);
+
+					PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putString("runningJson", jsonAsString).commit();
+
+					String listFromShared = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("runningJson", "defaultStringIfNothingFound");
+
+					Type type = new TypeToken<ArrayList<RunningObject>>(){}.getType();
+					jsonEntries = gson.fromJson(listFromShared, type);
+
+					myRunningListAdapter.notifyDataSetChanged();
+				}
+			});
+			builder.setNegativeButton("לא", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.cancel();
+				}
+			});
+
+			builder.show();
+		}
+	};
+
 
 	private void stop() {
 		//firstTime = 1;
@@ -459,7 +505,8 @@ public class Running extends Fragment implements SensorEventListener {
 
 		runningLv.setVisibility(View.VISIBLE);
 		lineGraph.setVisibility(View.INVISIBLE);
-		runningHistoryText.setVisibility(View.VISIBLE);
+		//runningHistoryText.setVisibility(View.VISIBLE);
+		runningHistoryFrame.setVisibility(View.VISIBLE);
 
 	}
 

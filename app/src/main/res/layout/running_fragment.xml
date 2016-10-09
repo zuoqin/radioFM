@@ -198,10 +198,16 @@
             android:layout_height="200dp"
             android:orientation="vertical">
 
-            <TextView
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
+                android:id="@+id/runningHistoryFrame"
+                >
+
+            <TextView
+                android:layout_width="match_parent"
                 android:id="@+id/runningHistoryText"
+                android:layout_height="40dp"
                 android:background="#ffffff"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:text="@string/runningHistoryText"
@@ -211,6 +217,16 @@
                 android:textSize="16sp"
                 android:autoText="false"
                 android:gravity="center_vertical" />
+
+                <Button
+                    android:text="נקה"
+                    android:layout_width="87dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/clearHistoryBtn"
+                    android:background="@drawable/ltgray_outline"
+                    android:textColor="@color/light_gray_nlue" />
+
+            </FrameLayout>
 
             <ListView
                 android:layout_width="match_parent"

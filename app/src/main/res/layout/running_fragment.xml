@@ -220,7 +220,7 @@
 
                 <Button
                     android:text="נקה"
-                    android:layout_width="87dp"
+                    android:layout_width="50dp"
                     android:layout_height="wrap_content"
                     android:id="@+id/clearHistoryBtn"
                     android:background="@drawable/ltgray_outline"

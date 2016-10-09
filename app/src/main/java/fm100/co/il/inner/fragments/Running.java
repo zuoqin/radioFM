@@ -623,6 +623,7 @@ public class Running extends Fragment implements SensorEventListener {
 		}
 	}
 
+
 	private void addEntry(float currentSpeed) {
 
 		entryCounter++;

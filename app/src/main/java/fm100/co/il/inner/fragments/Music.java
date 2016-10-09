@@ -175,6 +175,8 @@ public class Music extends Fragment {
 	int flyingColor = 0xFFF8F301;
 	Timer timer_flying = null;
 
+	private int wheelLastPos;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater,
 							 @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -328,15 +330,22 @@ public class Music extends Fragment {
 			public void onItemClick(int position, Object o) {
 				Log.i("100fm", "onItemClick " + position + " last " + lastSelectionLoaded);
 				myWheelView.smoothScrollToPosition(position);
-				//myWheelView.smoothScrollBy( position < lastSelectionLoaded ? -350 : 350,0);
-				//myWheelView.smoothScrollToPosition(position);
 			}
 		});
 		myWheelView.setOnWheelItemSelectedListener(new WheelView.OnWheelItemSelectedListener() {
 			@Override
-			public void onItemSelected(int position, Object o) {
+			public void onItemSelected(final int position, Object o) {
 				Log.i("100fm", "onItemSelected " + position);
-				playStation(position);
+
+				if (lastStationLoading == 0) {
+					playStation(position);
+					wheelLastPos = position;
+				}
+				else {
+					myPlayer.cancel(true);
+					playStation(position);
+					wheelLastPos = position;
+				}
 			}
 		});
 	}
@@ -508,7 +517,7 @@ public class Music extends Fragment {
 
 		@Override
 		protected Boolean doInBackground(String... params) {
-			lastStationLoading = 1;
+
 			Boolean prepared= false;
 			try {
 				mediaPlayer.setDataSource(params[0]);
@@ -542,6 +551,7 @@ public class Music extends Fragment {
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
+			lastStationLoading = 1;
 			progressView.setVisibility(View.VISIBLE);
 			playPauseBtn.setVisibility(View.INVISIBLE);
 			imgRound.setVisibility(View.INVISIBLE);

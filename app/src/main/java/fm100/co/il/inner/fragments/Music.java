@@ -556,6 +556,15 @@ public class Music extends Fragment {
 			playPauseBtn.setVisibility(View.INVISIBLE);
 			imgRound.setVisibility(View.INVISIBLE);
 		}
+
+		@Override
+		protected void onCancelled() {
+			super.onCancelled();
+			lastStationLoading = 1;
+			progressView.setVisibility(View.VISIBLE);
+			playPauseBtn.setVisibility(View.INVISIBLE);
+			imgRound.setVisibility(View.INVISIBLE);
+		}
 	}
 
 	@Override

@@ -42,6 +42,7 @@ import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,6 +60,7 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -310,6 +312,7 @@ public class Running extends Fragment implements SensorEventListener {
 					builder.setTitle("נא הכנס/י גובה בס''מ");
 
 					// Set up the input
+					/*
 					final EditText input = new EditText(getActivity());
 					// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
 					input.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -320,14 +323,26 @@ public class Running extends Fragment implements SensorEventListener {
 					input.setTextColor(Color.WHITE);
 
 					builder.setView(input);
+					*/
+
+					/////
+					final NumberPicker numberPicker = new NumberPicker(getActivity());
+					numberPicker.setMinValue(100);
+					numberPicker.setMaxValue(250);
+					numberPicker.setValue(175);
+					numberPicker.setWrapSelectorWheel(true);
+					setNumberPickerTextColor(numberPicker,Color.WHITE);
+					builder.setView(numberPicker);
+					/////
 
 
 					// Set up the buttons
 					builder.setNeutralButton("אישור", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							m_Text = input.getText().toString();
-							mHeight = Integer.parseInt(m_Text);
+						//	m_Text = input.getText().toString();
+							mHeight = numberPicker.getValue();
+							//mHeight = Integer.parseInt(m_Text);
 							mSensorManager.registerListener(Running.this, mStepCounterSensor, SensorManager.SENSOR_DELAY_FASTEST);
 							customHandler.postDelayed(speedRunnable, 0);
 							runningLv.setVisibility(View.INVISIBLE);
@@ -779,4 +794,27 @@ public class Running extends Fragment implements SensorEventListener {
 		}
 
 	};
+
+	public static boolean setNumberPickerTextColor(NumberPicker numberPicker, int color)
+	{
+		final int count = numberPicker.getChildCount();
+		for(int i = 0; i < count; i++){
+			View child = numberPicker.getChildAt(i);
+			if(child instanceof EditText){
+				try{
+					Field selectorWheelPaintField = numberPicker.getClass()
+							.getDeclaredField("mSelectorWheelPaint");
+					selectorWheelPaintField.setAccessible(true);
+					((Paint)selectorWheelPaintField.get(numberPicker)).setColor(color);
+					((EditText)child).setTextColor(color);
+					numberPicker.invalidate();
+					return true;
+				}
+				catch(Exception e){
+					Log.e("loglog", e.getMessage());
+				}
+			}
+		}
+		return false;
+	}
 }

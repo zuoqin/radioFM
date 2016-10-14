@@ -570,6 +570,7 @@ public class Music extends Fragment {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		//EventBus.getDefault().post(new NotificationBusEvent("delete"));
 		customHandler.removeCallbacks(runnable);
 		if (mediaPlayer != null) {
 			mediaPlayer.reset();

@@ -329,7 +329,7 @@ public class Running extends Fragment implements SensorEventListener {
 					final NumberPicker numberPicker = new NumberPicker(getActivity());
 					numberPicker.setMinValue(100);
 					numberPicker.setMaxValue(250);
-					numberPicker.setValue(175);
+					numberPicker.setValue(mHeight);
 					numberPicker.setWrapSelectorWheel(true);
 					setNumberPickerTextColor(numberPicker,Color.WHITE);
 					builder.setView(numberPicker);

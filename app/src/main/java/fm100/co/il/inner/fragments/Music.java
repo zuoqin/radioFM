@@ -908,8 +908,8 @@ public class Music extends Fragment {
 								snowMov1.addAnimation(rotate1);
 
 								int x = r.nextInt(flying.getWidth());
-								TranslateAnimation trans1 = new TranslateAnimation(x, x, flying.getHeight() + 100, -150);
-								trans1.setDuration(3000);
+								TranslateAnimation trans1 = new TranslateAnimation(x, x, flying.getHeight() + 100, flying.getHeight() * -1);
+								trans1.setDuration(5000);
 								snowMov1.addAnimation(trans1);
 
 								myButton.startAnimation(snowMov1);

@@ -21,7 +21,9 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/flyingMonkeys"></RelativeLayout>
+        android:id="@+id/flyingMonkeys"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"></RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"

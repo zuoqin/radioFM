@@ -20,9 +20,12 @@ import java.io.BufferedReader;
         import android.app.PendingIntent;
         import android.content.Context;
         import android.content.Intent;
-        import android.graphics.Typeface;
-        import android.graphics.drawable.Drawable;
-        import android.os.AsyncTask;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.AsyncTask;
         import android.os.Build;
         import android.os.Bundle;
         import android.support.v4.app.Fragment;
@@ -34,10 +37,12 @@ import java.io.BufferedReader;
         import android.view.Menu;
         import android.view.MenuItem;
         import android.view.View;
-        import android.view.animation.TranslateAnimation;
+import android.view.Window;
+import android.view.animation.TranslateAnimation;
         import android.widget.AdapterView.OnItemClickListener;
         import android.widget.AdapterView;
-        import android.widget.LinearLayout;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
         import android.widget.ListView;
         import android.widget.ProgressBar;
         import android.widget.RelativeLayout;
@@ -91,7 +96,7 @@ public class MainActivity extends ActionBarActivity {
 
     // setting last variables to remember the last
     private String lastAction = "com.example.hpuser.rad100fm.ACTION_PLAY";
-    private int lastBtnImage = R.drawable.newplayicon1;
+    private int lastBtnImage = R.drawable.play2;
     private String lastSongName = " ";
     private String lastArtistName = " ";
 
@@ -114,10 +119,11 @@ public class MainActivity extends ActionBarActivity {
     private ProgressBar drawerListProgressBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         super.onCreate(savedInstanceState);
         myBundle = savedInstanceState;
         if(isRTL()==false) {
-            getWindow().getDecorView().setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+            //getWindow().getDecorView().setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
         }
         setContentView(R.layout.activity_main);
         myApplicationContext = this;
@@ -150,7 +156,7 @@ public class MainActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         AsyncHttpClient client = new AsyncHttpClient();
-        client.get("http://demo.goufo.co.il/100fm/", new AsyncHttpResponseHandler() {
+        client.get("http://digital.100fm.co.il/app/", new AsyncHttpResponseHandler() {
 
             @Override
             public void onStart() {
@@ -163,13 +169,14 @@ public class MainActivity extends ActionBarActivity {
                     JSONObject obj = new JSONObject(new String(responseBody));
 
                     home.setStationData(obj);
+                    home.setHeaderBar(getSupportActionBar(), drawerLayout, drawerPane);
 
                     JSONArray parentArray = obj.getJSONArray("stations");
 
                     Station tempStation = null;
 
+                    stationList.clear();
                     for (int i = 0; i < parentArray.length(); i++) {
-
                         tempStation = new Station();
                         JSONObject finalObject = parentArray.getJSONObject(i);
                         tempStation.setStationName(finalObject.getString("name"));
@@ -178,6 +185,8 @@ public class MainActivity extends ActionBarActivity {
                         tempStation.setStationSlug(finalObject.getString("slug"));
                         tempStation.setStationLogo(finalObject.getString("logo"));
                         stationList.add(tempStation);
+
+                        //Log.i("100fm", finalObject.getString("slug"));
                     }
 
                     drawerListProgressBar.setVisibility(View.GONE);
@@ -188,7 +197,7 @@ public class MainActivity extends ActionBarActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                Log.d("fm100", "100fm loaded : " + stationList.size()	 );
+                //Log.d("fm100", "100fm loaded : " + stationList.size());
             }
 
             @Override
@@ -210,17 +219,16 @@ public class MainActivity extends ActionBarActivity {
 
         Drawable titleDrawable = getResources().getDrawable(R.drawable.header);
         getSupportActionBar().setBackgroundDrawable(titleDrawable);
+        //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         setTitle("");
         //getActionBar().setIcon(R.drawable.fm100);
 
         drawerLayout.closeDrawer(drawerPane);
+        //drawerLayout.openDrawer(drawerPane);
 
         // set listener for drawer layout
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
-                R.string.drawer_opened, R.string.drawer_closed) {
-
-
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_opened, R.string.drawer_closed) {
             @Override
             public void onDrawerOpened(View drawerView) {
                 // TODO Auto-generated method stub
@@ -241,6 +249,33 @@ public class MainActivity extends ActionBarActivity {
 
         Intent intent = new Intent(MainActivity.this, Loading.class);
         startActivity(intent);
+
+        ImageButton btnFb = (ImageButton) findViewById(R.id.btnFacebook);
+        btnFb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("fb://profile/158664457479014"));
+                    startActivity(intent);
+                } catch(Exception e) {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/100FMRADIOS/")));
+                }
+            }
+        });
+        ImageButton btnIns = (ImageButton) findViewById(R.id.btnInstagram);
+        btnIns.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.instagram.com/radios_100fm/")));
+            }
+        });
+        ImageButton btnWeb = (ImageButton) findViewById(R.id.btnChrome);
+        btnWeb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.100fm.co.il/")));
+            }
+        });
     }
 
     @Override
@@ -302,7 +337,7 @@ public class MainActivity extends ActionBarActivity {
       public void onEvent(NotificationBusEvent event) {
         // set a "pause" notification
         if (event.getNotificationBusMsg().equals("pause")){
-            int buttonImage = R.drawable.newplayicon1;
+            int buttonImage = R.drawable.play2;
             String actionName = "com.example.hpuser.rad100fm.ACTION_PLAY";
             setNotification(buttonImage, actionName , lastSongName , lastArtistName);
             lastAction = actionName;
@@ -311,7 +346,7 @@ public class MainActivity extends ActionBarActivity {
 
         // set a "play" notification
         else if (event.getNotificationBusMsg().equals("play")){
-            int buttonImage = R.drawable.newpauseicon1;
+            int buttonImage = R.drawable.stop2;
             String actionName = "com.example.hpuser.rad100fm.ACTION_PAUSE";
             setNotification(buttonImage, actionName , lastSongName , lastArtistName);
             lastAction = actionName;
@@ -373,10 +408,10 @@ public class MainActivity extends ActionBarActivity {
         if (!lastAction.equals("delete")) {
             try {
             setNotification(lastBtnImage, lastAction, songEvent.getSongName(), songEvent.getArtistName());
-            lastSongName = songEvent.getSongName();
-            lastArtistName = songEvent.getArtistName();
+                lastSongName = songEvent.getSongName();
+                lastArtistName = songEvent.getArtistName();
             } catch (Exception e) {
-            Log.e("MyLog", "onSongChange exception : " + e.getMessage());
+            Log.e("100fm", "onSongChange exception : " + e.getMessage());
             }
         }
     }
@@ -398,13 +433,13 @@ public class MainActivity extends ActionBarActivity {
     AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener(){
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                IntBusEvent event = new IntBusEvent(position);
-                EventBus.getDefault().post(event);
-            //if (lastItemClicked != position) {
-                int buttonImage = R.drawable.newpauseicon1;
+            IntBusEvent event = new IntBusEvent(position);
+            EventBus.getDefault().post(event);
+            if (lastItemClicked != position) {
+                int buttonImage = R.drawable.stop2;
                 String actionName = "com.example.hpuser.rad100fm.ACTION_PAUSE";
                 setNotification(buttonImage, actionName, lastSongName, lastArtistName);
-           // }
+           }
            // else{
                 /*
                 int buttonImage = R.drawable.newplayicon1;

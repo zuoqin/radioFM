@@ -160,6 +160,7 @@ public class WheelView<T> extends ListView implements IWheelView<T> {
             if (WheelUtils.isEmpty(mList)) {
                 return;
             }
+            int minSelected = 3;
             //Log.i("100fm", "mCurrentPositon " + mCurrentPositon + " getRealPosition " + getRealPosition(mCurrentPositon) + " firstVisibleItem : " + firstVisibleItem + ", totalItemCount : " + totalItemCount );
             int mid = (getRealPosition(mCurrentPositon) - firstVisibleItem) % mList.size();
             //Log.i("100fm", "getRealPosition : " + getRealPosition(mCurrentPositon) + ", firstVisibleItem : " + firstVisibleItem );
@@ -168,14 +169,14 @@ public class WheelView<T> extends ListView implements IWheelView<T> {
                 if (itemView != null) {
                     ImageView imageView = (ImageView) itemView.findViewById(R.id.item_image);
 
-                    int alpha = (int) (250 * Math.cos ((2 + mid - i) * Math.PI / visibleItemCount)) - 70;
-                    if( alpha < 20 ) alpha = 20;
-                    if( 2 + mid - i == 0 ) alpha = 255;
+                    int alpha = (int) (250 * Math.cos ((minSelected + mid - i) * Math.PI / visibleItemCount)) - 100;
+                    if( alpha < 0 ) alpha = 0;
+                    if( minSelected + mid - i == 0 ) alpha = 255;
                     imageView.setImageAlpha(alpha);
 
-                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) imageView.getLayoutParams();
-                    params.height = 50 + 70 * alpha / 255;
-                    imageView.setLayoutParams(params);
+                    //RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) imageView.getLayoutParams();
+                    //params.height = 50 + 70 * alpha / 255;
+                    //imageView.setLayoutParams(params);
                     //imageView.setScaleY(alpha / 250);
                     //imageView.setScaleX(alpha / 250);
 
@@ -410,23 +411,52 @@ public class WheelView<T> extends ListView implements IWheelView<T> {
     @Override
     public void setSelection(final int selection) {
         mSelection = selection;
-        //setVisibility(View.INVISIBLE);
+        setVisibility(View.INVISIBLE);
         WheelView.super.setSelection(getRealPosition(selection));
         refreshCurrentPosition(false);
         /*WheelView.this.postDelayed(new Runnable() {
             @Override
             public void run() {
-                //WheelView.super.setSelection(getRealPosition(selection));
-                //refreshCurrentPosition(false);
-                //setVisibility(View.VISIBLE);
+                WheelView.super.setSelection(getRealPosition(selection));
+                refreshCurrentPosition(false);
+                setVisibility(View.VISIBLE);
             }
         }, 500);*/
     }
 
     public void smoothScrollToPosition(final int selection) {
-        Log.i("100fm", "selection : " + getRealPosition(selection));
-        //mSelection = selection;
-        //WheelView.super.smoothScrollToPosition(getRealPosition(selection));
+        int offset = 6;
+
+        if( selection < mCurrentPositon || mCurrentPositon == 0 || selection > 10 ) {
+            offset = -1;
+        }
+        Log.i("100fm", "selection " + selection + " mCurrentPositon " + mCurrentPositon + " offset " + offset);
+
+        WheelView.super.setSelection(getRealPosition(selection));
+        /*WheelView.super.smoothScrollToPosition(getRealPosition(mCurrentPositon) + offset);
+        WheelView.this.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mSelection = selection;
+                WheelView.super.setSelection(getRealPosition(selection));
+                refreshCurrentPosition(false);
+            }
+        }, 500);*/
+        //this.smoothScrollToPosition(getRealPosition(mCurrentPositon) + offset);
+        //WheelView.super.smoothScrollToPosition(getRealPosition(mCurrentPositon) + offset);
+        /*WheelView.this.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                WheelView.super.setSelection(getRealPosition(selection));
+                refreshCurrentPosition(false);
+                setVisibility(View.VISIBLE);
+            }
+        }, 500);*/
+
+        //this.scrollListBy((mSelection - selection) * 60);
+        //this.smoothScrollToPosition(getRealPosition(selection));
+        //mSelection = getRealPosition(selection);
+        //WheelView.super.smoothScrollToPosition(getRealPosition(selection) - 3);
         //refreshCurrentPosition(false);
     }
 

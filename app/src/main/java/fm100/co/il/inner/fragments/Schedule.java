@@ -2,6 +2,7 @@ package fm100.co.il.inner.fragments;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ListView;
 
 import com.loopj.android.http.AsyncHttpClient;
@@ -40,6 +42,7 @@ import fm100.co.il.adapters.ScheduleListAdapter;
 import fm100.co.il.adapters.StationListAdapter;
 import fm100.co.il.busEvents.NewSongBusEvent;
 import fm100.co.il.busEvents.NotificationBusEvent;
+import fm100.co.il.fragments.MyHome;
 import fm100.co.il.helpers.Downloader;
 import fm100.co.il.helpers.ScheduleXMLParser;
 import fm100.co.il.helpers.SongXMLParser;
@@ -65,6 +68,29 @@ public class Schedule extends Fragment {
 
         ScheduleDownloadTask download = new ScheduleDownloadTask();
         download.execute();
+
+        ImageButton btnMenu = (ImageButton) v.findViewById(R.id.btnMenu);
+        btnMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //drawerLayout.openDrawer(Gravity.RIGHT);
+                MyHome activity = (MyHome) getParentFragment();
+                activity.openSubmenu();
+            }
+        });
+
+        ImageButton btnLike = (ImageButton) v.findViewById(R.id.btnLike);
+        btnLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                sharingIntent.setType("text/plain");
+                String shareBody = "http://digital.100fm.co.il/";
+                //sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
+                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                startActivity(Intent.createChooser(sharingIntent, "Share via"));
+            }
+        });
 
         return v;
     }

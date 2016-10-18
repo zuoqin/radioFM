@@ -45,6 +45,7 @@ import fm100.co.il.adapters.VideoLvAdapter;
 import fm100.co.il.busEvents.NotificationBusEvent;
 import fm100.co.il.busEvents.StationBusEvent;
 import fm100.co.il.busEvents.VideoListBusEvent;
+import fm100.co.il.fragments.MyHome;
 import fm100.co.il.models.RunShape;
 import fm100.co.il.models.VideoObj;
 
@@ -92,6 +93,28 @@ public class Video extends Fragment {
 		videoLvProgress = (ProgressBar) v.findViewById(R.id.videoLvProgress);
 		//task.execute("JsonCo.json");
 
+		ImageButton btnMenu = (ImageButton) v.findViewById(R.id.btnMenu);
+		btnMenu.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				//drawerLayout.openDrawer(Gravity.RIGHT);
+				MyHome activity = (MyHome) getParentFragment();
+				activity.openSubmenu();
+			}
+		});
+
+		ImageButton btnLike = (ImageButton) v.findViewById(R.id.btnLike);
+		btnLike.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+				sharingIntent.setType("text/plain");
+				String shareBody = "http://digital.100fm.co.il/";
+				//sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
+				sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+				startActivity(Intent.createChooser(sharingIntent, "Share via"));
+			}
+		});
 		//webView.setVisibility(View.INVISIBLE);
 
 		/*Intent i = new Intent(android.content.Intent.ACTION_VIEW , vidUri);
@@ -119,7 +142,7 @@ public class Video extends Fragment {
 		//changeVideoUrl(vidAddress);
 
 
-		webView.loadData("<html><body style=\"margin: 0;\"><video width=\"100%\" height=\"100%\" preload=\"none\" poster=\"http://assets-jpcust.jwpsrv.com/thumbs/teD8sDdM-720.jpg\"><source type=\"application/x-mpegURL\" src=\"http://hlscdn.streamgates.net/radios100fm/abr/playlist.m3u8\" /></video></body></html>", "text/html; charset=UTF-8", null);
+		webView.loadData("<html><body style=\"margin: 0; background: #132f54;\"><video width=\"100%\" height=\"100%\" preload=\"none\" poster=\"http://assets-jpcust.jwpsrv.com/thumbs/teD8sDdM-720.jpg\"><source type=\"application/x-mpegURL\" src=\"http://hlscdn.streamgates.net/radios100fm/abr/playlist.m3u8\" /></video></body></html>", "text/html; charset=UTF-8", null);
 
 		return v;
 	}
@@ -189,7 +212,7 @@ public class Video extends Fragment {
 
 			if( videoId.equals("live") ) {
 				webView.loadUrl("");
-				webView.loadData("<html><body style=\"margin: 0;\"><video width=\"100%\" height=\"100%\" preload=\"none\" poster=\"http://assets-jpcust.jwpsrv.com/thumbs/teD8sDdM-720.jpg\"><source type=\"application/x-mpegURL\" src=\"http://hlscdn.streamgates.net/radios100fm/abr/playlist.m3u8\" /></video></body></html>", "text/html; charset=UTF-8", null);
+				webView.loadData("<html><body style=\"margin: 0;  background: #132f54;\"><video width=\"100%\" height=\"100%\" preload=\"none\" poster=\"http://assets-jpcust.jwpsrv.com/thumbs/teD8sDdM-720.jpg\"><source type=\"application/x-mpegURL\" src=\"http://hlscdn.streamgates.net/radios100fm/abr/playlist.m3u8\" /></video></body></html>", "text/html; charset=UTF-8", null);
 				webView.reload();
 			} else {
 				webView.loadData("", "text/html; charset=UTF-8", null);

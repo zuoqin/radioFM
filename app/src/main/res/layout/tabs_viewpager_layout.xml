@@ -49,8 +49,8 @@
         <TabWidget
             android:id="@android:id/tabs"
             android:layout_width="fill_parent"
-            android:layout_height="55dp"
-            android:background="@drawable/footer">
+            android:background="@drawable/footer"
+            android:layout_height="65dp">
         </TabWidget>
 
     </LinearLayout>

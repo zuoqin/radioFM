@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:adjustViewBounds="true"
         android:scaleType="centerCrop"
-        android:src="@drawable/mousepad" />
+        android:src="@drawable/splash" />
 
     <ProgressBar
         android:layout_width="40dp"
@@ -20,6 +20,8 @@
         android:layout_alignParentTop="false"
         android:layout_centerHorizontal="true"
         android:id="@+id/loadingPanel"
+        android:startColor="#ffffffff"
+        android:endColor="#fffff400"
         android:layout_marginBottom="10dp"
         android:layout_alignParentBottom="true"
         android:indeterminateOnly="false" />

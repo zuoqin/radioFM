@@ -21,7 +21,7 @@
         android:id="@+id/drawer_pane"
         android:layout_width="220dp"
         android:layout_height="match_parent"
-        android:layout_gravity="start"
+        android:layout_gravity="right"
         android:background="@drawable/bg">
 
         <!-- Profile box ; currently not displaying anything can display current channel or something-->
@@ -41,7 +41,8 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/inDrawLayout">
+            android:id="@+id/inDrawLayout"
+            android:weightSum="1">
 
             <ListView
                 android:id="@+id/nav_list"
@@ -60,7 +61,7 @@
                 <ImageButton
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/imageButton"
+                    android:id="@+id/btnFacebook"
                     android:padding="15dp"
                     android:layout_weight="1"
                     android:scaleType="fitCenter"
@@ -70,7 +71,7 @@
                 <ImageButton
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/imageButton2"
+                    android:id="@+id/btnInstagram"
                     android:padding="15dp"
                     android:layout_weight="1"
                     android:scaleType="fitCenter"
@@ -80,7 +81,7 @@
                 <ImageButton
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/imageButton3"
+                    android:id="@+id/btnChrome"
                     android:padding="15dp"
                     android:layout_weight="1"
                     android:scaleType="fitCenter"
@@ -88,29 +89,29 @@
                     android:src="@drawable/chrome" />
             </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="ערוצים דיגיטליים"
-                android:id="@+id/textView4"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:textColor="#afe8e8e8"
-                android:layout_marginRight="20dp"
-                android:layout_marginLeft="20dp" />
-
             <ProgressBar
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/progressBarView"
-                android:visibility="visible"
-                android:paddingTop="30dp" />
+                android:visibility="visible" />
 
             <ListView
                 android:layout_width="match_parent"
+                android:id="@+id/stationsLv"
                 android:layout_height="wrap_content"
-                android:id="@+id/stationsLv" />
+                android:layout_weight="1" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="תקנון שימוש באפליקציה"
+                android:id="@+id/textView4"
+                android:textColor="#ffffff"
+                android:layout_height="20dp"
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:textSize="14sp"
+                android:visibility="gone" />
         </LinearLayout>
 
     </RelativeLayout>

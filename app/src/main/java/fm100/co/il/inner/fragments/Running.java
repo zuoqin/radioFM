@@ -193,13 +193,23 @@ public class Running extends Fragment implements SensorEventListener {
 		//runningHistoryText = (TextView) v.findViewById(R.id.runningHistoryText);
 		runningHistoryFrame = (FrameLayout) v.findViewById(R.id.runningHistoryFrame);
 		clearHistoryBtn = (Button) v.findViewById(R.id.clearHistoryBtn);
+
+
 		Gson gson = new Gson();
-		String listFromShared = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("runningJson", "defaultStringIfNothingFound");
 
-		Type type = new TypeToken<ArrayList<RunningObject>>(){}.getType();
-		jsonEntries = gson.fromJson(listFromShared, type);
+		String listFromShared = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("runningJ", "defaultStringIfNothingFound");
+			if (listFromShared == null) {
+				Type type = new TypeToken<ArrayList<RunningObject>>() {
+				}.getType();
+				if (listFromShared != null) {
 
-		runObjList = jsonEntries;
+					jsonEntries = gson.fromJson(listFromShared, type);
+					runObjList = jsonEntries;
+				}
+			}else{
+				runObjList = new ArrayList<>();
+			}
+
 
 		myRunningListAdapter = new RunningListAdapter(getActivity(),runObjList);
 		runningLv.setAdapter(myRunningListAdapter);
@@ -423,12 +433,18 @@ public class Running extends Fragment implements SensorEventListener {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					runObjList.clear();
+
+					////
+
+					////
+
+
 					Gson gson = new Gson();
 					String jsonAsString = gson.toJson(runObjList);
 
-					PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putString("runningJson", jsonAsString).commit();
+					PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putString("runningJ", jsonAsString).commit();
 
-					String listFromShared = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("runningJson", "defaultStringIfNothingFound");
+					String listFromShared = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("runningJ", "defaultStringIfNothingFound");
 
 					Type type = new TypeToken<ArrayList<RunningObject>>(){}.getType();
 					jsonEntries = gson.fromJson(listFromShared, type);
@@ -509,9 +525,9 @@ public class Running extends Fragment implements SensorEventListener {
 		Gson gson = new Gson();
 		String jsonAsString = gson.toJson(runObjList);
 
-		PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putString("runningJson", jsonAsString).commit();
+		PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putString("runningJ", jsonAsString).commit();
 
-		String listFromShared = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("runningJson", "defaultStringIfNothingFound");
+		String listFromShared = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("runningJ", "defaultStringIfNothingFound");
 
 		Type type = new TypeToken<ArrayList<RunningObject>>(){}.getType();
 		jsonEntries = gson.fromJson(listFromShared, type);

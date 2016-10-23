@@ -52,7 +52,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-import fm100.co.il.R;
+import com.nxcast.stations.il.fm100.R;
 
 /**
  * 滚轮控件

@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "587650242597",
+    "firebase_url": "https://tactical-snow-135823.firebaseio.com",
+    "project_id": "tactical-snow-135823",
+    "storage_bucket": "tactical-snow-135823.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:587650242597:android:c14c5d1126a83692",
+        "android_client_info": {
+          "package_name": "com.nxcast.stations.il.fm100"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "587650242597-10kui8k7dsguenaa3k6o38n9o1vcd2f6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAm_AGDQKVR1V1Df32qchP6kYI2rc6HeVo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -4,251 +4,223 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="מרחק"
-        android:id="@+id/distanceTitleTv"
-        android:layout_gravity="center"
-        android:textColor="@color/cardview_dark_background"
-        android:textSize="20sp"
-        android:layout_weight="2"
-        android:textAlignment="center"
-        android:layout_marginTop="30dp" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/header"
+        android:gravity="top"
+        android:layout_height="60dp"
+        android:background="@drawable/header">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/like"
+            android:layout_alignParentTop="false"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:id="@+id/btnLike"
+            android:background="@android:color/transparent"
+            android:paddingBottom="5dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="5dp" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/menu"
+            android:layout_alignParentTop="false"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/btnMenu"
+            android:background="@android:color/transparent"
+            android:paddingBottom="5dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="5dp" />
+
+        <ImageView
+            android:layout_height="fill_parent"
+            android:id="@+id/imgCokver"
+            android:scaleType="fitCenter"
+            android:src="@drawable/fm1003"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_width="100dp" />
+    </RelativeLayout>
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="2"
-        android:id="@+id/runningFragLL1">
+        android:layout_height="match_parent"
+        android:background="@color/light_gray_nlue">
+
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="מרחק"
+            android:id="@+id/distanceTitleTv"
+            android:textAlignment="center"
+            android:paddingTop="15dp"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="0"
             android:id="@+id/distanceTv"
             android:layout_gravity="center_horizontal"
             android:textColor="#ffffff"
             android:gravity="right"
-            android:layout_marginRight="5dp"
-            android:layout_weight="1"
             android:textStyle="bold"
             android:textAlignment="center"
-            android:textSize="38sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="מטר"
-            android:id="@+id/textView"
-            android:textColor="#ffffff"
-            android:gravity="left"
-            android:layout_weight="1"
-            android:layout_gravity="center_horizontal"
-            android:textAlignment="center"
-            android:textSize="36sp" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:id="@+id/runningFragLL2"
-        android:layout_weight="1"
-        android:layout_marginTop="15dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="זמן"
-            android:id="@+id/timerTitleTv"
-            android:layout_gravity="center_horizontal"
-            android:textColor="@color/cardview_dark_background"
-            android:layout_weight="1"
-            android:textAlignment="center"
-            android:textSize="20sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="מהירות"
-            android:id="@+id/speedTitleTv"
-            android:layout_gravity="center_horizontal"
-            android:layout_weight="1"
-            android:textColor="@color/cardview_dark_background"
-            android:textAlignment="center"
-            android:textSize="20sp" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:id="@+id/whiteLines">
+            android:textSize="50sp"
+            android:paddingBottom="15dp" />
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/whiteLine1"
-            android:layout_weight="1"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:background="#93ffffff"></LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/whiteLine2"
-            android:layout_weight="1"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:background="#73ffffff"></LinearLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="1"
-        android:id="@+id/runningFragLL3">
-
-        <TextView
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="00:00:00"
-            android:id="@+id/timerTv"
-            android:layout_gravity="center_horizontal"
-            android:textColor="#ffffff"
-            android:gravity="right"
-            android:layout_weight="1"
-            android:textAlignment="center"
-            android:textSize="24sp" />
+            android:layout_gravity="center_horizontal">
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_gravity="center_horizontal"
-            android:id="@+id/speedLL"
-            android:gravity="center">
-
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="0"
-                android:id="@+id/speedTv"
-                android:layout_gravity="center_horizontal"
-                android:textColor="#ffffff"
-                android:gravity="right"
-                android:textAlignment="center"
-                android:textSize="24sp"
-                android:layout_marginRight="10dp"
-                android:layout_marginLeft="20dp" />
+                android:layout_weight="1">
 
-            <TextView
-                android:layout_width="wrap_content"
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="זמן"
+                    android:id="@+id/timerTitleTv"
+                    android:textColor="@color/cardview_dark_background"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:layout_width="fill_parent" />
+
+                <RelativeLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:background="#6effffff"
+                    android:id="@+id/whiteLine2"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_alignParentTop="false"
+                    android:paddingBottom="10dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_height="0.5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp"></RelativeLayout>
+
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="00:00:00"
+                    android:id="@+id/timerTv"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="#ffffff"
+                    android:gravity="right"
+                    android:layout_weight="1"
+                    android:textAlignment="center"
+                    android:textSize="24sp"
+                    android:layout_width="wrap_content" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text='קמ"ש'
-                android:id="@+id/textView2"
-                android:textColor="#ffffff"
-                android:gravity="left"
-                android:layout_gravity="center_horizontal"
-                android:textAlignment="center"
-                android:textSize="24sp"
-                android:layout_marginRight="5dp"
-                android:layout_marginLeft="5dp" />
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical">
+
+                <TextView
+                    android:layout_height="match_parent"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="מהירות"
+                    android:id="@+id/speedTitleTv"
+                    android:layout_weight="1"
+                    android:textColor="@color/cardview_dark_background"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:layout_width="fill_parent" />
+
+                <RelativeLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:background="#6effffff"
+                    android:id="@+id/whiteLine3"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_alignParentTop="false"
+                    android:paddingBottom="10dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_height="0.5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp"></RelativeLayout>
+
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="0"
+                    android:id="@+id/speedTv"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="#ffffff"
+                    android:gravity="right"
+                    android:layout_weight="1"
+                    android:textAlignment="center"
+                    android:textSize="24sp"
+                    android:layout_width="wrap_content" />
+
+            </LinearLayout>
+
         </LinearLayout>
 
-    </LinearLayout>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp">
-
-        <com.github.mikephil.charting.charts.LineChart
-            android:layout_width="match_parent"
-            android:id="@+id/lineGraph"
-            android:layout_height="200dp"
-            android:paddingBottom="30dp"
-            android:layout_marginBottom="20dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:visibility="invisible"></com.github.mikephil.charting.charts.LineChart>
-
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="match_parent"
             android:orientation="vertical">
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:id="@+id/runningHistoryFrame"
-                >
 
             <TextView
                 android:layout_width="match_parent"
                 android:id="@+id/runningHistoryText"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
                 android:background="#ffffff"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:text="@string/runningHistoryText"
-                android:layout_gravity="center_horizontal"
                 android:textColor="#00ccff"
                 android:textAlignment="center"
                 android:textSize="16sp"
                 android:autoText="false"
-                android:gravity="center_vertical" />
-
-                <Button
-                    android:text="נקה"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/clearHistoryBtn"
-                    android:background="@drawable/ltgray_outline"
-                    android:textColor="@color/light_gray_nlue" />
-
-            </FrameLayout>
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp" />
 
             <ListView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:id="@+id/runningLv"
-                ></ListView>
+                android:layout_weight="1"></ListView>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="התחל ריצה"
+                android:id="@+id/startStopBtn"
+                android:background="#aa4a728b"
+                android:textColor="#bad2f0ff"
+                android:textSize="30sp" />
 
         </LinearLayout>
 
 
-    </FrameLayout>
+    </LinearLayout>
 
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:text="התחל ריצה"
-        android:id="@+id/startStopBtn"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="2"
-        android:background="#aa4a728b"
-        android:textColor="#bad2f0ff"
-        android:textSize="30sp" />
 
 </LinearLayout>

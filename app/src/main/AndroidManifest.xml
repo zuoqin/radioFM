@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="fm100.co.il">
+    package="com.nxcast.stations.il.fm100">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -39,9 +39,10 @@
                 </action>
             </intent-filter>
         </service>
-        <activity android:name=".helpers.Pop"
-            android:theme="@style/AppTheme.CustomTheme">
-        </activity>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="772acf0f546ef70c34f4c92644ad73fcce66d19c"
+            />
     </application>
 
 </manifest>

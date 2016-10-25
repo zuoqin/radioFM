@@ -63,7 +63,13 @@ public class MyRun extends Activity {
 		((TextView) findViewById(R.id.txtSpeedToKm)).setTypeface(custom_font_heb_regular);
 
 
-		((Button) findViewById(R.id.btnClose)).setTypeface(custom_font_heb_regular);
-
+		Button close = (Button) findViewById(R.id.btnClose);
+		close.setTypeface(custom_font_heb_regular);
+		close.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				finish();
+			}
+		});
 	}
 }

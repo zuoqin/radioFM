@@ -362,7 +362,7 @@ public class Running extends Fragment {
 					}
 					Log.i("100fm", "sumDistance " + sumDistance);
 
-					speedTv.setText(String.format("%.02f קמ״ש", sumDistance / 3 * 3.6 ));
+					speedTv.setText(String.format("%.02f קמ״ש", sumDistance / 3 * 18 / 5 ));
 				}
 
 				locations.add(currentLocation);

@@ -189,7 +189,7 @@ public class MainActivity extends ActionBarActivity {
                 .build();
         audioSession.setPlaybackState(state);
 
-        audioSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS);// | MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
+        audioSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS | MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
 
         audioSession.setActive(true);
 

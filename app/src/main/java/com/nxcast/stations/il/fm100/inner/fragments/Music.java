@@ -704,7 +704,6 @@ public class Music extends Fragment {
 
 	private Runnable updateSongName = new Runnable() {
 		public void run() {
-			Log.i("100fm", "updateSongName");
 			reloadSongName();
 			customHandler.postDelayed(updateSongName, 15000);
 		}
@@ -872,11 +871,14 @@ public class Music extends Fragment {
 
 			startFlyingMonkeys();
 		} else if (event.getNotificationBusMsg().equals("next")) {
-			playStation( (lastSelectionLoaded + 1) % stationList.size() );
+			int pos = (lastSelectionLoaded + 1) % stationList.size();
+			//playStation( pos );
+			myWheelView.smoothScrollToPosition(pos);
 		} else if (event.getNotificationBusMsg().equals("prev")) {
 			int pos = lastSelectionLoaded - 1;
 			if( pos < 0 ) pos = stationList.size() - 1;
-			playStation( pos );
+			//playStation( pos );
+			myWheelView.smoothScrollToPosition(pos);
 		}
 	}
 

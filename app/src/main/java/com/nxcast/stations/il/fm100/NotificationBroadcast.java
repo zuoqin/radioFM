@@ -3,6 +3,7 @@ package com.nxcast.stations.il.fm100;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.nxcast.stations.il.fm100.busEvents.NotificationBusEvent;
 
@@ -19,6 +20,8 @@ public class NotificationBroadcast extends BroadcastReceiver {
 
         NotificationBusEvent event = null;
         String action = intent.getAction();
+
+        Log.i("100fm", "action ");
 
         if(action.equalsIgnoreCase("com.example.hpuser.rad100fm.ACTION_PAUSE")) {
             event = new NotificationBusEvent("pause");

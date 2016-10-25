@@ -115,7 +115,7 @@ public class Music extends Fragment {
 	int firstChannel = 0;
 	private Boolean intialStage = true;
 
-	private int isPlaying = 0;
+	public int isPlaying = 0;
 
 	public ArrayList<Channel> channelsArray = new ArrayList<>();
 	//ListView channelsLv;
@@ -424,6 +424,10 @@ public class Music extends Fragment {
 			}
 		}
 	};
+
+	public boolean isPlaying() {
+		return isPlaying == 1;
+	}
 
 	private void pauseOnPhoneCalls() {
 		telephonyManager = (TelephonyManager) MainActivity.getMyApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);

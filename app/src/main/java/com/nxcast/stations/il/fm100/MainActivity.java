@@ -1,39 +1,24 @@
 package com.nxcast.stations.il.fm100;
 
-import java.io.BufferedReader;
-        import java.io.File;
-        import java.io.FileInputStream;
-        import java.io.FileOutputStream;
-        import java.io.IOException;
-        import java.io.InputStream;
-        import java.io.InputStreamReader;
-        import java.net.HttpURLConnection;
-        import java.net.MalformedURLException;
-        import java.net.URL;
-        import java.util.ArrayList;
+import java.util.ArrayList;
         import java.util.List;
         import java.util.Locale;
 
-        import android.annotation.SuppressLint;
-        import android.app.Notification;
+import android.app.Notification;
         import android.app.NotificationManager;
         import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
         import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.media.AudioManager;
+import android.media.session.MediaSession;
+import android.media.session.PlaybackState;
 import android.net.Uri;
-import android.os.AsyncTask;
-        import android.os.Build;
-        import android.os.Bundle;
-        import android.support.v4.app.Fragment;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
         import android.support.v4.app.FragmentManager;
-        import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.DrawerLayout;
         import android.support.v7.app.ActionBarActivity;
         import android.support.v7.app.ActionBarDrawerToggle;
         import android.util.Log;
@@ -42,39 +27,29 @@ import android.view.Menu;
         import android.view.MenuItem;
         import android.view.View;
 import android.view.Window;
-import android.view.animation.TranslateAnimation;
-        import android.widget.AdapterView.OnItemClickListener;
-        import android.widget.AdapterView;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
         import android.widget.ListView;
         import android.widget.ProgressBar;
         import android.widget.RelativeLayout;
         import android.widget.RemoteViews;
-        import android.widget.TextView;
-        import android.widget.Toast;
+import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import cz.msebera.android.httpclient.Header;
-import com.nxcast.stations.il.fm100.adapters.ChannelListAdapter;
+
 import com.nxcast.stations.il.fm100.adapters.StationListAdapter;
         import com.nxcast.stations.il.fm100.busEvents.IntBusEvent;
         import com.nxcast.stations.il.fm100.busEvents.NewSongBusEvent;
         import com.nxcast.stations.il.fm100.busEvents.NotificationBusEvent;
-        import com.nxcast.stations.il.fm100.adapters.NavListAdapter;
-        import com.nxcast.stations.il.fm100.busEvents.StationBusEvent;
-        import com.nxcast.stations.il.fm100.busEvents.VideoListBusEvent;
-        import com.nxcast.stations.il.fm100.fragments.MyAbout;
-        import com.nxcast.stations.il.fm100.fragments.MyHome;
-        import com.nxcast.stations.il.fm100.fragments.MySettings;
-        import com.nxcast.stations.il.fm100.models.Channel;
-import com.nxcast.stations.il.fm100.models.MyObject;
+import com.nxcast.stations.il.fm100.fragments.MyHome;
+import com.nxcast.stations.il.fm100.models.Channel;
 import com.nxcast.stations.il.fm100.models.NavItem;
         import com.nxcast.stations.il.fm100.models.Station;
-        import com.nxcast.stations.il.fm100.R;
-        import com.nxcast.stations.il.fm100.models.VideoObj;
+import com.nxcast.stations.il.fm100.models.VideoObj;
 
         import org.greenrobot.eventbus.EventBus;
         import org.greenrobot.eventbus.Subscribe;
@@ -123,6 +98,10 @@ public class MainActivity extends ActionBarActivity {
     private LinearLayout inDrawLayout ;
 
     private ProgressBar drawerListProgressBar;
+
+    MediaSession audioSession;
+    RemoteControlReceiver mButtonReceiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
@@ -153,14 +132,74 @@ public class MainActivity extends ActionBarActivity {
         }
         */
 
-        /*IntentFilter filter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);//"android.intent.action.MEDIA_BUTTON"
-        RemoteControlReceiver r = new RemoteControlReceiver();
-        filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY); //this line sets receiver priority
+        /*mButtonReceiver = new RemoteControlReceiver();
+
+        IntentFilter filter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);//"android.intent.action.MEDIA_BUTTON"
+        filter.setPriority(1000);
+
+        registerReceiver(mButtonReceiver, filter);*/
+
+        audioSession = new MediaSession(getApplicationContext(), "100fm");
+        audioSession.setCallback(new MediaSession.Callback() {
+
+            @Override
+            public boolean onMediaButtonEvent(final Intent mediaButtonIntent) {
+                String intentAction = mediaButtonIntent.getAction();
+                Log.d("100fm", "mediaButtonIntent " + mediaButtonIntent);
+                if (Intent.ACTION_MEDIA_BUTTON.equals(intentAction)) {
+                    KeyEvent event = mediaButtonIntent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+
+                    if (event != null) {
+                        int code = event.getKeyCode();
+                        NotificationBusEvent e = null;
+
+                        Log.d("100fm", "onMediaButtonEvent " + code);
+
+                        if (KeyEvent.KEYCODE_HEADSETHOOK == code) {
+                            if( home.isPlaying() ) {
+                                e = new NotificationBusEvent("pause");
+                            } else {
+                                //e = new NotificationBusEvent("play");
+                            }
+                            e = new NotificationBusEvent("pause");
+                        } else if (KeyEvent.KEYCODE_MEDIA_PLAY == code) {
+                            e = new NotificationBusEvent("play");
+                        } else if (KeyEvent.KEYCODE_MEDIA_PAUSE == code) {
+                            e = new NotificationBusEvent("pause");
+                        } else if (KeyEvent.KEYCODE_MEDIA_NEXT == code) {
+                            e = new NotificationBusEvent("next");
+                        } else if (KeyEvent.KEYCODE_MEDIA_PREVIOUS == code) {
+                            e = new NotificationBusEvent("prev");
+                        }
+
+                        if( e != null ) {
+                            EventBus.getDefault().post(e);
+                        }
+                    }
+                }
+                return true;
+            }
+
+
+        });
+
+        PlaybackState state = new PlaybackState.Builder()
+                .setActions(PlaybackState.ACTION_PLAY_PAUSE)
+                .setState(PlaybackState.STATE_PLAYING, 0, 0, 0)
+                .build();
+        audioSession.setPlaybackState(state);
+
+        audioSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS);// | MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
+        audioSession.setActive(true);
+
+        /*NotificationBroadcast r = new NotificationBroadcast();
+        filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY + 1); //this line sets receiver priority
         registerReceiver(r, filter);*/
 
         //AudioManager am = (AudioManager)getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
 
-        IntentFilter mediaButtonFilter = new IntentFilter(
+        /*/IntentFilter mediaButtonFilter = new IntentFilter(
                 Intent.ACTION_MEDIA_BUTTON);
         mediaButtonFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
         BroadcastReceiver brMediaButton = new BroadcastReceiver() {
@@ -182,7 +221,7 @@ public class MainActivity extends ActionBarActivity {
 
             }
         };
-        registerReceiver(brMediaButton, mediaButtonFilter);
+        registerReceiver(brMediaButton, mediaButtonFilter);*/
 
         drawerPane = (RelativeLayout) findViewById(R.id.drawer_pane);
         // flipLayouts();
@@ -317,6 +356,24 @@ public class MainActivity extends ActionBarActivity {
         });
     }
 
+    // Broadcast Receiver for Music play.
+    private BroadcastReceiver musicPlay = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // TODO Auto-generated method stub
+            Log.v("100fm", "Music play started");
+        }
+    };
+
+    // Broadcast Receiver for Music pause.
+    private BroadcastReceiver musicPause = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // TODO Auto-generated method stub
+            Log.v("100fm", "Music paused");
+        }
+    };
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -398,6 +455,8 @@ public class MainActivity extends ActionBarActivity {
                     notificationManager.cancelAll();
                     lastAction = "delete";
                 }
+            finish();
+            System.exit(0);
         }
     }
 
@@ -446,11 +505,11 @@ public class MainActivity extends ActionBarActivity {
     public void onSongChange(NewSongBusEvent songEvent) {
         if (!lastAction.equals("delete")) {
             try {
-            setNotification(lastBtnImage, lastAction, songEvent.getSongName(), songEvent.getArtistName());
-                lastSongName = songEvent.getSongName();
-                lastArtistName = songEvent.getArtistName();
-            } catch (Exception e) {
-            Log.e("100fm", "onSongChange exception : " + e.getMessage());
+                setNotification(lastBtnImage, lastAction, songEvent.getSongName(), songEvent.getArtistName());
+                    lastSongName = songEvent.getSongName();
+                    lastArtistName = songEvent.getArtistName();
+                } catch (Exception e) {
+                Log.e("100fm", "onSongChange exception : " + e.getMessage());
             }
         }
     }

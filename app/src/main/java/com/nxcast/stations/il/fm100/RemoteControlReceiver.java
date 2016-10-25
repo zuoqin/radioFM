@@ -15,6 +15,10 @@ import org.greenrobot.eventbus.EventBus;
  */
 
 public class RemoteControlReceiver extends BroadcastReceiver {
+    public RemoteControlReceiver() {
+        super();
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.i("100fm", "RemoteControlReceiver ");

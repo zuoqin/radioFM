@@ -14,6 +14,9 @@ public class RunningObject {
     private String dateAdded;
     private String timeAdded;
 
+    public RunningObject() {
+    }
+
     public RunningObject(List<Entry> objectEntries) {
         this.objectEntries = objectEntries;
     }

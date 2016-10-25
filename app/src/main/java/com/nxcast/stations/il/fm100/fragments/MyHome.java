@@ -75,6 +75,10 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 
 		return v;
 	}
+
+	public boolean isPlaying() {
+		return music.isPlaying();
+	}
 	// fake(temp) content for tabhost
 	class FakeContent implements TabContentFactory {
 		private final Context mContext;

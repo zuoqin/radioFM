@@ -53,7 +53,6 @@ public class RunningListAdapter extends BaseAdapter {
         public TextView runDistance;
         public TextView runTime;
         public TextView dateAdded;
-        public TextView timeAdded;
 
         public List<Entry> entriesList;
 
@@ -71,14 +70,12 @@ public class RunningListAdapter extends BaseAdapter {
             holder.runDistance = (TextView) rowView.findViewById(R.id.runDistance);
             holder.runTime = (TextView) rowView.findViewById(R.id.runTime);
             holder.dateAdded = (TextView) rowView.findViewById(R.id.dateAdded);
-            holder.timeAdded = (TextView) rowView.findViewById(R.id.timeAdded);
 
             Typeface custom_font_heb_regular = Typeface.createFromAsset(MainActivity.getMyApplicationContext().getAssets(), "fonts/FbSpoilerRegular.ttf");
 
             holder.runDistance.setTypeface(custom_font_heb_regular);
             holder.runTime.setTypeface(custom_font_heb_regular);
             holder.dateAdded.setTypeface(custom_font_heb_regular);
-            holder.timeAdded.setTypeface(custom_font_heb_regular);
 
             rowView.setTag(holder);
         }
@@ -95,9 +92,6 @@ public class RunningListAdapter extends BaseAdapter {
             holder.runDistance.setText(tempRunObj.getRunDistance());
             holder.runTime.setText(tempRunObj.getRunTime());
             holder.dateAdded.setText(tempRunObj.getDateAdded());
-            holder.timeAdded.setText(tempRunObj.getTimeAdded());
-
-
 
         }
 

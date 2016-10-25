@@ -1,7 +1,6 @@
 package com.nxcast.stations.il.fm100.adapters;
 
 import android.content.Context;
-import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +12,6 @@ import com.wx.wheelview.adapter.BaseWheelAdapter;
 
 import com.nxcast.stations.il.fm100.MainActivity;
 import com.nxcast.stations.il.fm100.R;
-import com.nxcast.stations.il.fm100.fragments.MyAbout;
 import com.nxcast.stations.il.fm100.models.MyObject;
 
 //////////////////////////////////

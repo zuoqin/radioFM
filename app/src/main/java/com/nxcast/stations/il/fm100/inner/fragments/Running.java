@@ -67,8 +67,10 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -82,6 +84,7 @@ import com.nxcast.stations.il.fm100.MainActivity;
 import com.nxcast.stations.il.fm100.R;
 import com.nxcast.stations.il.fm100.adapters.RunningListAdapter;
 import com.nxcast.stations.il.fm100.fragments.MyHome;
+import com.nxcast.stations.il.fm100.fragments.MyRun;
 import com.nxcast.stations.il.fm100.helpers.GPSTracker;
 import com.nxcast.stations.il.fm100.models.RunShape;
 import com.nxcast.stations.il.fm100.models.RunningObject;
@@ -232,6 +235,8 @@ public class Running extends Fragment {
 				isPoused = true;
 				startStopBtn.setVisibility(View.VISIBLE);
 				runContoller.setVisibility(View.GONE);
+
+				stop_run();
 			}
 		});
 		return v;
@@ -261,7 +266,6 @@ public class Running extends Fragment {
 
 		// Register the listener with the Location Manager to receive location updates
 		if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-			Toast.makeText(this.getContext(), "PERMISSION_GRANTED error", Toast.LENGTH_LONG).show();
 			ActivityCompat.requestPermissions(this.getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
 			return;
 		}
@@ -279,67 +283,19 @@ public class Running extends Fragment {
 		runContoller.setVisibility(View.VISIBLE);
 	}
 
-	private void makeUseOfNewLocation(Location location) {
-		currentLocation = location;
-	}
+	private void stop_run() {
 
-	private void stop() {
-		//firstTime = 1;
-		/*mSensorManager.unregisterListener(Running.this, mStepCounterSensor);
-		firstValue = 0;
-		lastStepDistance = 0;
+		RunningObject firstRunObj = new RunningObject();
 
-		startStopBtn.setText("התחל ריצה");
+		Calendar c = Calendar.getInstance();
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM HH:mm"); //"yyyy-MM-dd HH:mm:ss"
 
-		//////
-		long date = System.currentTimeMillis();
+		firstRunObj.setDateAdded( sdf.format(c.getTime()) );
+		firstRunObj.setTimeAdded( "" );
+		firstRunObj.setRunDistance( String.format("%.02f ק״מ", distance / 1000) );
+		firstRunObj.setRunTime( String.format("%02.0f:%02.0f", seconds / 60, seconds % 60) );
 
-		//SimpleDateFormat sdf = new SimpleDateFormat("MMM dd/MM/yyyy , h:mm a"); // different time display
-		SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy , h:mm a");
-		String dateString = sdf.format(date);
-		/////
-
-		runObjList.get(runObjList.size()-1).setDateAdded(" ");
-		runObjList.get(runObjList.size()-1).setTimeAdded(dateString);
-		runObjList.get(runObjList.size()-1).setRunDistance(totalDistance + " מטר ");
-		runObjList.get(runObjList.size()-1).setRunTime(timerText);
-		//getActivity().stopService(myIntent);
-		//lastDistanceTv.setText(currentDistance);
-		currentDistance = "0";
-		currentSpeed = "0";
-		distanceTv.setText(currentDistance);
-		speedTv.setText(currentSpeed);
-		//lastTimeTv.setText(timerTv.getText());
-		timerTv.setText("00:00:00");
-		//firstTime = 0;
-		timeSwapBuff += timeInMilliseconds;
-		customHandler.removeCallbacks(updateTimerThread);
-		//customHandler.removeCallbacks(timeStampRunnable);
-		//customHandler.removeCallbacks(timeSegmentsRunnable);
-		startStop = 0;
-		// reseting time variables
-		startTime = 0L;
-		timeInMilliseconds = 0L;
-		timeSwapBuff = 0L;
-		updatedTime = 0L;
-		runSegments = null;
-		timeStamp = "             ";
-		tentime = "00:00:00";
-		timetenList = new ArrayList<>();
-
-		entryCounter = 0;
-
-		//RunningObject firstRunObj = new RunningObject(entries);
-
-		/*firstRunObj.setDateAdded("29/7");
-		firstRunObj.setTimeAdded("21:50");
-		firstRunObj.setRunDistance("38m");
-		firstRunObj.setRunTime("23:00");
-
-		runObjList.add(firstRunObj);*/
-
-		/*totalDistance = 0;
-		speedSum = 0;
+		runObjList.add(firstRunObj);
 
 		Gson gson = new Gson();
 		String jsonAsString = gson.toJson(runObjList);
@@ -353,9 +309,9 @@ public class Running extends Fragment {
 
 		myRunningListAdapter.notifyDataSetChanged();
 
-		runningLv.setVisibility(View.VISIBLE);*/
-		//runningHistoryText.setVisibility(View.VISIBLE);
+		Intent myIntent = new Intent(getContext(), MyRun.class);
 
+		startActivity(myIntent);
 	}
 
 	@Override

@@ -4,6 +4,204 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="מרחק"
+            android:id="@+id/distanceTitleTv"
+            android:textAlignment="center"
+            android:paddingTop="15dp"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="0.00 ק״מ"
+            android:id="@+id/distanceTv"
+            android:layout_gravity="center_horizontal"
+            android:textColor="#ffffff"
+            android:gravity="right"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:textSize="80sp"
+            android:paddingBottom="15dp" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:paddingBottom="15dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="זמן"
+                    android:id="@+id/timerTitleTv"
+                    android:textColor="@color/cardview_dark_background"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:layout_width="fill_parent" />
+
+                <RelativeLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:background="#6effffff"
+                    android:id="@+id/whiteLine2"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_alignParentTop="false"
+                    android:paddingBottom="10dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_height="0.5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp"></RelativeLayout>
+
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="00:00:00"
+                    android:id="@+id/timerTv"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="#ffffff"
+                    android:gravity="right"
+                    android:layout_weight="1"
+                    android:textAlignment="center"
+                    android:textSize="35sp"
+                    android:layout_width="wrap_content" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical">
+
+                <TextView
+                    android:layout_height="match_parent"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="מהירות"
+                    android:id="@+id/speedTitleTv"
+                    android:layout_weight="1"
+                    android:textColor="@color/cardview_dark_background"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:layout_width="fill_parent" />
+
+                <RelativeLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:background="#6effffff"
+                    android:id="@+id/whiteLine3"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_alignParentTop="false"
+                    android:paddingBottom="10dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_height="0.5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp"></RelativeLayout>
+
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="0.0 קמ״ש"
+                    android:id="@+id/speedTv"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="#ffffff"
+                    android:gravity="right"
+                    android:layout_weight="1"
+                    android:textAlignment="center"
+                    android:layout_width="wrap_content"
+                    android:textSize="35sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:id="@+id/runningHistoryText"
+                android:layout_height="wrap_content"
+                android:background="#ffffff"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/runningHistoryText"
+                android:textColor="#00ccff"
+                android:textAlignment="center"
+                android:textSize="16sp"
+                android:autoText="false"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp" />
+
+            <ListView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/runningLv"
+                android:layout_weight="1"></ListView>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="התחל ריצה"
+                android:id="@+id/startStopBtn"
+                android:background="#ff339900"
+                android:textColor="@android:color/white"
+                android:textSize="30sp" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/runContoller"
+                android:visibility="gone">
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:text="סיים"
+                    android:id="@+id/stopBtn"
+                    android:background="#ffFF0000"
+                    android:textColor="@android:color/white"
+                    android:textSize="30sp"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:text="הפסקה"
+                    android:id="@+id/pouseBtn"
+                    android:background="#ffFFCC33"
+                    android:textColor="@android:color/white"
+                    android:textSize="30sp"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_alignParentTop="true"
@@ -51,176 +249,6 @@
             android:layout_centerHorizontal="true"
             android:layout_width="100dp" />
     </RelativeLayout>
-
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/light_gray_nlue">
-
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="מרחק"
-            android:id="@+id/distanceTitleTv"
-            android:textAlignment="center"
-            android:paddingTop="15dp"
-            android:textSize="18sp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="0"
-            android:id="@+id/distanceTv"
-            android:layout_gravity="center_horizontal"
-            android:textColor="#ffffff"
-            android:gravity="right"
-            android:textStyle="bold"
-            android:textAlignment="center"
-            android:textSize="50sp"
-            android:paddingBottom="15dp" />
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal">
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1">
-
-                <TextView
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="זמן"
-                    android:id="@+id/timerTitleTv"
-                    android:textColor="@color/cardview_dark_background"
-                    android:textAlignment="center"
-                    android:textSize="18sp"
-                    android:layout_width="fill_parent" />
-
-                <RelativeLayout
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:background="#6effffff"
-                    android:id="@+id/whiteLine2"
-                    android:layout_marginRight="15dp"
-                    android:layout_marginLeft="15dp"
-                    android:layout_alignParentTop="false"
-                    android:paddingBottom="10dp"
-                    android:layout_alignParentBottom="true"
-                    android:layout_height="0.5dp"
-                    android:layout_marginBottom="5dp"
-                    android:layout_marginTop="5dp"></RelativeLayout>
-
-                <TextView
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="00:00:00"
-                    android:id="@+id/timerTv"
-                    android:layout_gravity="center_horizontal"
-                    android:textColor="#ffffff"
-                    android:gravity="right"
-                    android:layout_weight="1"
-                    android:textAlignment="center"
-                    android:textSize="24sp"
-                    android:layout_width="wrap_content" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_gravity="center_vertical">
-
-                <TextView
-                    android:layout_height="match_parent"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="מהירות"
-                    android:id="@+id/speedTitleTv"
-                    android:layout_weight="1"
-                    android:textColor="@color/cardview_dark_background"
-                    android:textAlignment="center"
-                    android:textSize="18sp"
-                    android:layout_width="fill_parent" />
-
-                <RelativeLayout
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:background="#6effffff"
-                    android:id="@+id/whiteLine3"
-                    android:layout_marginRight="15dp"
-                    android:layout_marginLeft="15dp"
-                    android:layout_alignParentTop="false"
-                    android:paddingBottom="10dp"
-                    android:layout_alignParentBottom="true"
-                    android:layout_height="0.5dp"
-                    android:layout_marginBottom="5dp"
-                    android:layout_marginTop="5dp"></RelativeLayout>
-
-                <TextView
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="0"
-                    android:id="@+id/speedTv"
-                    android:layout_gravity="center_horizontal"
-                    android:textColor="#ffffff"
-                    android:gravity="right"
-                    android:layout_weight="1"
-                    android:textAlignment="center"
-                    android:textSize="24sp"
-                    android:layout_width="wrap_content" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:id="@+id/runningHistoryText"
-                android:layout_height="wrap_content"
-                android:background="#ffffff"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="@string/runningHistoryText"
-                android:textColor="#00ccff"
-                android:textAlignment="center"
-                android:textSize="16sp"
-                android:autoText="false"
-                android:paddingBottom="10dp"
-                android:paddingTop="10dp" />
-
-            <ListView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/runningLv"
-                android:layout_weight="1"></ListView>
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:text="התחל ריצה"
-                android:id="@+id/startStopBtn"
-                android:background="#aa4a728b"
-                android:textColor="#bad2f0ff"
-                android:textSize="30sp" />
-
-        </LinearLayout>
-
-
-    </LinearLayout>
 
 
 </LinearLayout>

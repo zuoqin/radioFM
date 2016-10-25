@@ -18,12 +18,15 @@ import java.io.BufferedReader;
         import android.app.Notification;
         import android.app.NotificationManager;
         import android.app.PendingIntent;
-        import android.content.Context;
+import android.content.BroadcastReceiver;
+import android.content.Context;
         import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.AsyncTask;
         import android.os.Build;
@@ -34,7 +37,8 @@ import android.os.AsyncTask;
         import android.support.v7.app.ActionBarActivity;
         import android.support.v7.app.ActionBarDrawerToggle;
         import android.util.Log;
-        import android.view.Menu;
+import android.view.KeyEvent;
+import android.view.Menu;
         import android.view.MenuItem;
         import android.view.View;
 import android.view.Window;
@@ -149,6 +153,36 @@ public class MainActivity extends ActionBarActivity {
         }
         */
 
+        /*IntentFilter filter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);//"android.intent.action.MEDIA_BUTTON"
+        RemoteControlReceiver r = new RemoteControlReceiver();
+        filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY); //this line sets receiver priority
+        registerReceiver(r, filter);*/
+
+        //AudioManager am = (AudioManager)getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+
+        IntentFilter mediaButtonFilter = new IntentFilter(
+                Intent.ACTION_MEDIA_BUTTON);
+        mediaButtonFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+        BroadcastReceiver brMediaButton = new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+                Log.d("Event", "Media button!");
+                this.abortBroadcast();
+
+                KeyEvent key = (KeyEvent) intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+                if(key.getAction() == KeyEvent.ACTION_UP) {
+                    int keycode = key.getKeyCode();
+                    if(keycode == KeyEvent.KEYCODE_MEDIA_NEXT) {
+                        Log.d("TestApp", "Next Pressed");
+                    } else if(keycode == KeyEvent.KEYCODE_MEDIA_PREVIOUS) {
+                        Log.d("TestApp", "Previous pressed");
+                    } else if(keycode == KeyEvent.KEYCODE_HEADSETHOOK) {
+                        Log.d("TestApp", "Head Set Hook pressed");
+                    }
+                }
+
+            }
+        };
+        registerReceiver(brMediaButton, mediaButtonFilter);
 
         drawerPane = (RelativeLayout) findViewById(R.id.drawer_pane);
         // flipLayouts();

@@ -18,40 +18,42 @@
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/like"
-            android:layout_alignParentTop="false"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:id="@+id/btnLike"
-            android:background="@android:color/transparent"
-            android:paddingBottom="5dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:paddingTop="5dp" />
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:src="@drawable/menu"
             android:layout_alignParentTop="false"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="false"
             android:layout_centerHorizontal="true"
             android:id="@+id/btnMenu"
             android:background="@android:color/transparent"
             android:paddingBottom="5dp"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
-            android:paddingTop="5dp" />
+            android:paddingTop="5dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true" />
 
-        <ImageView
+        <ImageButton
             android:layout_height="fill_parent"
-            android:id="@+id/imgCokver"
+            android:id="@+id/img100fm"
             android:scaleType="fitCenter"
             android:src="@drawable/fm1003"
+            android:background="@android:color/transparent"
+            android:layout_width="100dp"
             android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_width="100dp" />
+            android:layout_centerHorizontal="true" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/like"
+            android:id="@+id/btnLike"
+            android:background="@android:color/transparent"
+            android:paddingBottom="5dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="5dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true" />
+
     </RelativeLayout>
 
     <FrameLayout

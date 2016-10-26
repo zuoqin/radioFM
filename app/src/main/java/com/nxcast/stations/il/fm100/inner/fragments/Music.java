@@ -9,6 +9,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -104,16 +105,12 @@ public class Music extends Fragment {
 	String lastCoverImage = "";
 
 	//default channel url
-	Channel currentChannel = new Channel();//("100fm" , "http://audio.100fm.co.il/100fmAudio" , "http://digital.100fm.co.il/label/Ch0-100fm.xml" , "http://demo.goufo.co.il/100fm/images/100fmlive.png" );
-	Channel lastChannel = new Channel();//("100fm" , "http://audio.100fm.co.il/100fmAudio" , "http://digital.100fm.co.il/label/Ch0-100fm.xml" , "http://demo.goufo.co.il/100fm/images/100fmlive.png");
+	Channel currentChannel = new Channel();
+	Channel lastChannel = new Channel();
 
 	//default songs
 	Song lastSong = new Song(" " , " ");
 	Song currentSong = new Song(" " , " ");
-	int firstSong = 0; // checking if it is the 1st song since starting the app in order to set lastSong in motion
-
-	int firstChannel = 0;
-	private Boolean intialStage = true;
 
 	public int isPlaying = 0;
 
@@ -297,7 +294,7 @@ public class Music extends Fragment {
 			tempStation = new Station();
 			JSONObject finalObject = parentArray.getJSONObject(i);
 			tempStation.setStationName(finalObject.getString("name"));
-			tempStation.setStationAudio(finalObject.getString("audio"));
+			tempStation.setStationAudio(finalObject.getString("audioA"));
 			tempStation.setSongInfo(finalObject.getString("info"));
 			tempStation.setStationSlug(finalObject.getString("slug"));
 			tempStation.setStationLogo(finalObject.getString("logo"));
@@ -747,21 +744,29 @@ public class Music extends Fragment {
 
 								AnimationSet snowMov1 = new AnimationSet(true);
 
-								RotateAnimation rotate1 = new RotateAnimation(-90, r.nextInt(180), myButton.getWidth(), myButton.getHeight());
+								RotateAnimation rotate1 = new RotateAnimation(0, -40 + r.nextInt(80), myButton.getWidth(), myButton.getHeight());
+
+								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+									rotate1 = new RotateAnimation(-90, r.nextInt(180), myButton.getWidth(), myButton.getHeight());
+								}
+
 								rotate1.setDuration(3000);
-								//rotate1.setRepeatCount(1);
-								//rotate1.setInterpolator(new AccelerateInterpolator());
 								snowMov1.addAnimation(rotate1);
 
 								int x = r.nextInt(flying.getWidth());
 								int y = flying.getHeight();
-								TranslateAnimation trans1 = new TranslateAnimation(x, x, y + 150, -150);
+
+								if( isRTL() ) {
+									x = x * -1;
+								}
+								TranslateAnimation trans1 = new TranslateAnimation(x, x, y, -150);
 								//TranslateAnimation trans1 = new TranslateAnimation(Animation.RELATIVE_TO_SELF, x, Animation.RELATIVE_TO_SELF, x, Animation.ABSOLUTE, y, Animation.ABSOLUTE, 0);
 
 								trans1.setDuration(3000);
 								snowMov1.addAnimation(trans1);
 
 								myButton.setVisibility(View.VISIBLE);
+								myButton.setPadding(1,1,1,1);
 								myButton.startAnimation(snowMov1);
 								//myButton.startAnimation(trans1);
 								//myButton.setVisibility(View.VISIBLE);

@@ -20,7 +20,7 @@ android {
     buildToolsVersion "23.0.3"
     defaultConfig {
         applicationId "com.nxcast.stations.il.fm100"
-        minSdkVersion 21
+        minSdkVersion 19
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -48,7 +48,6 @@ dependencies {
     compile 'com.loopj.android:android-async-http:1.4.9'
     compile 'com.github.PhilJay:MPAndroidChart:v3.0.0-beta1'
     compile 'com.google.firebase:firebase-core:9.6.1'
-    compile 'com.github.wseemann:FFmpegMediaPlayer:1.0.3'
     compile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
         transitive = true;
     }

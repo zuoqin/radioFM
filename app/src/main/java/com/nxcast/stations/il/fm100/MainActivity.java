@@ -15,6 +15,7 @@ import android.graphics.drawable.Drawable;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
         import android.support.v4.app.FragmentManager;
@@ -132,66 +133,69 @@ public class MainActivity extends ActionBarActivity {
         }
         */
 
-        /*mButtonReceiver = new RemoteControlReceiver();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            audioSession = new MediaSession(getApplicationContext(), "100fm");
 
-        IntentFilter filter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);//"android.intent.action.MEDIA_BUTTON"
-        filter.setPriority(1000);
+            audioSession.setCallback(new MediaSession.Callback() {
 
-        registerReceiver(mButtonReceiver, filter);*/
+                @Override
+                public boolean onMediaButtonEvent(final Intent mediaButtonIntent) {
+                    String intentAction = mediaButtonIntent.getAction();
+                    Log.d("100fm", "mediaButtonIntent " + mediaButtonIntent);
+                    if (Intent.ACTION_MEDIA_BUTTON.equals(intentAction)) {
+                        KeyEvent event = mediaButtonIntent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
 
-        audioSession = new MediaSession(getApplicationContext(), "100fm");
-        audioSession.setCallback(new MediaSession.Callback() {
+                        if (event != null) {
+                            int code = event.getKeyCode();
+                            NotificationBusEvent e = null;
 
-            @Override
-            public boolean onMediaButtonEvent(final Intent mediaButtonIntent) {
-                String intentAction = mediaButtonIntent.getAction();
-                Log.d("100fm", "mediaButtonIntent " + mediaButtonIntent);
-                if (Intent.ACTION_MEDIA_BUTTON.equals(intentAction)) {
-                    KeyEvent event = mediaButtonIntent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+                            Log.d("100fm", "onMediaButtonEvent " + code);
 
-                    if (event != null) {
-                        int code = event.getKeyCode();
-                        NotificationBusEvent e = null;
-
-                        Log.d("100fm", "onMediaButtonEvent " + code);
-
-                        if (KeyEvent.KEYCODE_HEADSETHOOK == code) {
-                            if( home.isPlaying() ) {
+                            if (KeyEvent.KEYCODE_HEADSETHOOK == code) {
+                                if( home.isPlaying() ) {
+                                    e = new NotificationBusEvent("pause");
+                                } else {
+                                    e = new NotificationBusEvent("play");
+                                }
+                            } else if (KeyEvent.KEYCODE_MEDIA_PLAY == code) {
+                                e = new NotificationBusEvent("play");
+                            } else if (KeyEvent.KEYCODE_MEDIA_PAUSE == code) {
                                 e = new NotificationBusEvent("pause");
-                            } else {
-                                //e = new NotificationBusEvent("play");
+                            } else if (KeyEvent.KEYCODE_MEDIA_NEXT == code) {
+                                e = new NotificationBusEvent("next");
+                            } else if (KeyEvent.KEYCODE_MEDIA_PREVIOUS == code) {
+                                e = new NotificationBusEvent("prev");
                             }
-                            e = new NotificationBusEvent("pause");
-                        } else if (KeyEvent.KEYCODE_MEDIA_PLAY == code) {
-                            e = new NotificationBusEvent("play");
-                        } else if (KeyEvent.KEYCODE_MEDIA_PAUSE == code) {
-                            e = new NotificationBusEvent("pause");
-                        } else if (KeyEvent.KEYCODE_MEDIA_NEXT == code) {
-                            e = new NotificationBusEvent("next");
-                        } else if (KeyEvent.KEYCODE_MEDIA_PREVIOUS == code) {
-                            e = new NotificationBusEvent("prev");
-                        }
 
-                        if( e != null ) {
-                            EventBus.getDefault().post(e);
+                            if( e != null ) {
+                                EventBus.getDefault().post(e);
+                            }
                         }
                     }
+                    return true;
                 }
-                return true;
-            }
 
 
-        });
+            });
 
-        PlaybackState state = new PlaybackState.Builder()
-                .setActions(PlaybackState.ACTION_PLAY_PAUSE)
-                .setState(PlaybackState.STATE_PLAYING, 0, 0, 0)
-                .build();
-        audioSession.setPlaybackState(state);
+            PlaybackState state = new PlaybackState.Builder()
+                    .setActions(PlaybackState.ACTION_PLAY_PAUSE)
+                    .setState(PlaybackState.STATE_PLAYING, 0, 0, 0)
+                    .build();
+            audioSession.setPlaybackState(state);
 
-        audioSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS | MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
+            audioSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS | MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
 
-        audioSession.setActive(true);
+            audioSession.setActive(true);
+        } else {
+            mButtonReceiver = new RemoteControlReceiver();
+
+            IntentFilter filter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);//"android.intent.action.MEDIA_BUTTON"
+            filter.setPriority(1000);
+
+            registerReceiver(mButtonReceiver, filter);
+        }
+
 
         /*NotificationBroadcast r = new NotificationBroadcast();
         filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY + 1); //this line sets receiver priority
@@ -258,7 +262,7 @@ public class MainActivity extends ActionBarActivity {
                         tempStation = new Station();
                         JSONObject finalObject = parentArray.getJSONObject(i);
                         tempStation.setStationName(finalObject.getString("name"));
-                        tempStation.setStationAudio(finalObject.getString("audio"));
+                        tempStation.setStationAudio(finalObject.getString("audioA"));
                         tempStation.setSongInfo(finalObject.getString("info"));
                         tempStation.setStationSlug(finalObject.getString("slug"));
                         tempStation.setStationLogo(finalObject.getString("logo"));

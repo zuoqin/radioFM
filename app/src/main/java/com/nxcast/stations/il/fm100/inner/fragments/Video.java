@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
@@ -141,8 +142,17 @@ public class Video extends Fragment {
 
 		//changeVideoUrl(vidAddress);
 
-
 		webView.loadData("<html><body style=\"margin: 0; background: #132f54;\"><video width=\"100%\" height=\"100%\" preload=\"none\" poster=\"http://assets-jpcust.jwpsrv.com/thumbs/teD8sDdM-720.jpg\"><source type=\"application/x-mpegURL\" src=\"http://hlscdn.streamgates.net/radios100fm/abr/playlist.m3u8\" /></video></body></html>", "text/html; charset=UTF-8", null);
+		webView.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+
+				NotificationBusEvent e = new NotificationBusEvent("pause");
+				EventBus.getDefault().post(e);
+
+				return false;
+			}
+		});
 
 		return v;
 	}

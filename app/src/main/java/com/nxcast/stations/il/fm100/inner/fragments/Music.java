@@ -1,5 +1,9 @@
 package com.nxcast.stations.il.fm100.inner.fragments;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -8,6 +12,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -34,6 +39,9 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.facebook.share.model.ShareHashtag;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareDialog;
 import com.nxcast.stations.il.fm100.RemoteControlReceiver;
 import com.wx.wheelview.common.WheelData;
 import com.wx.wheelview.widget.WheelView;
@@ -105,8 +113,8 @@ public class Music extends Fragment {
 	String lastCoverImage = "";
 
 	//default channel url
-	Channel currentChannel = new Channel();
-	Channel lastChannel = new Channel();
+	Station currentChannel = new Station();
+	Station lastChannel = new Station();
 
 	//default songs
 	Song lastSong = new Song(" " , " ");
@@ -114,7 +122,7 @@ public class Music extends Fragment {
 
 	public int isPlaying = 0;
 
-	public ArrayList<Channel> channelsArray = new ArrayList<>();
+	public ArrayList<Station> channelsArray = new ArrayList<>();
 	//ListView channelsLv;
 	ChannelListAdapter myCustomAdapter;
 
@@ -243,12 +251,19 @@ public class Music extends Fragment {
 		btnLike.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-				sharingIntent.setType("text/plain");
-				String shareBody = "http://digital.100fm.co.il/";
-				//sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
-				sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
-				startActivity(Intent.createChooser(sharingIntent, "Share via"));
+
+				ShareLinkContent linkContent = new ShareLinkContent.Builder()
+						.setContentTitle("")
+						.setContentDescription("")
+						.setContentUrl(Uri.parse("http://digital.100fm.co.il/#" + currentChannel.getStationSlug()))
+						.setQuote("I'm listening to " + currentSong.getSongName() + " on " + currentChannel.getStationName() + " radios 100fm app")
+						.setShareHashtag(new ShareHashtag.Builder()
+								.setHashtag("#100fmDigital")
+								.build())
+						.build();
+
+				ShareDialog shareDialog = new ShareDialog(getActivity());
+				shareDialog.show(linkContent, ShareDialog.Mode.AUTOMATIC);
 			}
 		});
 
@@ -267,8 +282,6 @@ public class Music extends Fragment {
 			View myButton = new View(getContext());
 			int s = r.nextInt(60) + 40;
 			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(s, s);
-			params.rightMargin = 0;
-			//params.topMargin = 1500;
 			myButton.setLayoutParams(params);
 			myButton.setBackgroundColor(flyingColor);
 			myButton.setAlpha(.8f);
@@ -278,8 +291,6 @@ public class Music extends Fragment {
 		}
 
 		startSongThread();
-
-
 
 		return v;
 	}
@@ -307,7 +318,7 @@ public class Music extends Fragment {
 		lvProgressView.setVisibility(View.INVISIBLE);
 		List<MyObject> newMyObjList = new ArrayList<>();
 		for (int i = 0; i < channelsArray.size(); i++) {
-			newMyObjList.add(new MyObject(channelsArray.get(i).getChannelLogo()));
+			newMyObjList.add(new MyObject(channelsArray.get(i).getStationLogo()));
 		}
 		myWheelView.setWheelData(newMyObjList);
 		myWheelView.setSelection(0);
@@ -361,8 +372,8 @@ public class Music extends Fragment {
 		currentChannel = channelsArray.get(position);
 
 		playPauseBtn.setImageResource(R.drawable.stop);
-		lastChannel.setChannelName(currentChannel.getChannelName());
-		lastChannel.setChannelUrl(currentChannel.getChannelUrl());
+		lastChannel.setStationName(currentChannel.getStationName());
+		lastChannel.setStationAudio(currentChannel.getStationAudio());
 		event = new NotificationBusEvent("play");
 		EventBus.getDefault().post(event);
 	}
@@ -403,9 +414,10 @@ public class Music extends Fragment {
 
 	private void setListData(List<Station> stations) {
 		for (int i = 0 ; i<stations.size() ; i++){
-			final Channel newChannel = new Channel(stations.get(i).getStationSlug()
+			/*final Station newChannel = new Station(stations.get(i).getStationSlug()
 					, stations.get(i).getStationAudio()
-					, stations.get(i).getSongInfo(), stations.get(i).getStationLogo());
+					, stations.get(i).getSongInfo(), stations.get(i).getStationLogo());*/
+			final Station newChannel = new Station(stations.get(i).getSongInfo(), stations.get(i).getStationAudio(), stations.get(i).getStationLogo(), stations.get(i).getStationName(), stations.get(i).getStationSlug());
 			channelsArray.add(newChannel);
 		}
 	}
@@ -611,7 +623,7 @@ public class Music extends Fragment {
 		protected Void doInBackground(Void... arg0) {
 			//Download the file
 			try {
-				Downloader.DownloadFromUrl(currentChannel.getSongDataUrl(), MainActivity.getMyApplicationContext().openFileOutput("Song.xml", Context.MODE_PRIVATE));
+				Downloader.DownloadFromUrl(currentChannel.getSongInfo(), MainActivity.getMyApplicationContext().openFileOutput("Song.xml", Context.MODE_PRIVATE));
 				String path=MainActivity.getMyApplicationContext().getFilesDir().getAbsolutePath()+"/Song.xml";
 				File file = new File ( path );
 				if ( file.exists() ){
@@ -726,24 +738,41 @@ public class Music extends Fragment {
 							}
 
 							if( getContext() != null ) {
-								/*View myButton = new View(getContext());
-								int s = r.nextInt(60) + 40;
-								RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(s, s);
-								params.rightMargin = r.nextInt(flying.getWidth());
-								params.topMargin = 0;
-								myButton.setLayoutParams(params);
-								myButton.setBackgroundColor(flyingColor);
-								myButton.setAlpha(.5f);
-								flying.addView(myButton);
-								monkeys.add(myButton);*/
 								View myButton = monkeys.get(monkeysIndex);
 								myButton.setBackgroundColor(flyingColor);
 
 								monkeysIndex = (monkeysIndex + 1) % monkeys.size();
-								//Log.i("100fm", "monkeysIndex " + monkeysIndex + " size " + monkeys.size());
 
-								AnimationSet snowMov1 = new AnimationSet(true);
+								int x = r.nextInt(flying.getWidth());
+								int y = flying.getHeight();
 
+								myButton.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+								myButton.setY(y);
+								myButton.setX(x);
+								myButton.setAlpha(1f);
+								myButton.setRotation(0);
+
+								ObjectAnimator animY = ObjectAnimator.ofFloat(myButton, "y", -50f);
+								animY.addListener(new AnimatorListenerAdapter() {
+									@Override
+									public void onAnimationEnd(Animator animation) {
+									}
+								});
+
+								ObjectAnimator animR = ObjectAnimator.ofFloat(myButton, "rotation", 180 - r.nextInt(360));
+								animY.addListener(new AnimatorListenerAdapter() {
+									@Override
+									public void onAnimationEnd(Animator animation) {
+									}
+								});
+
+								AnimatorSet animSetXY = new AnimatorSet();
+								animSetXY.playTogether(animR, animY);
+								animSetXY.setDuration(3000);
+								animSetXY.start();
+
+								myButton.setVisibility(View.VISIBLE);
+								/*AnimationSet snowMov1 = new AnimationSet(true);
 								RotateAnimation rotate1 = new RotateAnimation(0, -40 + r.nextInt(80), myButton.getWidth(), myButton.getHeight());
 
 								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -760,16 +789,13 @@ public class Music extends Fragment {
 									x = x * -1;
 								}
 								TranslateAnimation trans1 = new TranslateAnimation(x, x, y, -150);
-								//TranslateAnimation trans1 = new TranslateAnimation(Animation.RELATIVE_TO_SELF, x, Animation.RELATIVE_TO_SELF, x, Animation.ABSOLUTE, y, Animation.ABSOLUTE, 0);
 
 								trans1.setDuration(3000);
 								snowMov1.addAnimation(trans1);
 
 								myButton.setVisibility(View.VISIBLE);
 								myButton.setPadding(1,1,1,1);
-								myButton.startAnimation(snowMov1);
-								//myButton.startAnimation(trans1);
-								//myButton.setVisibility(View.VISIBLE);
+								myButton.startAnimation(snowMov1);*/
 							}
 						}
 					});
@@ -778,11 +804,26 @@ public class Music extends Fragment {
 		}, 0, 500);
 	}
 
+	int headsethook = 0;
+
 	@Subscribe
 	public void onEvent(NotificationBusEvent event) throws IOException {
-		Log.i("100fm", "event.getNotificationBusMsg() " + event.getNotificationBusMsg() + " isPlaying " + isPlaying);
+		String eventSlug = event.getNotificationBusMsg();
 
-		if (event.getNotificationBusMsg().equals("pause") ) {
+		Log.i("100fm", "event.getNotificationBusMsg() " + eventSlug + " isPlaying " + isPlaying);
+
+		if (eventSlug.equals("headsethook") ) {
+			if( isPlaying() ) {
+				eventSlug = "pause";
+			} else {
+				eventSlug = "play";
+			}
+			if( headsethook++ % 2 == 1 ) {
+				eventSlug  = "";
+			}
+		}
+
+		if (eventSlug.equals("pause") ) {
 			playPauseBtn.setImageResource(R.drawable.play);
 			if (mediaPlayer.isPlaying())
 				mediaPlayer.stop();
@@ -799,10 +840,19 @@ public class Music extends Fragment {
 
 				for( int i = 0; i < monkeys.size(); i++ ) {
 					monkeys.get(i).clearAnimation();
-					monkeys.get(i).setVisibility(View.INVISIBLE);
+					//monkeys.get(i).setVisibility(View.INVISIBLE);
+					ObjectAnimator anim = ObjectAnimator.ofFloat(monkeys.get(i), "alpha", 0f);
+					anim.addListener(new AnimatorListenerAdapter() {
+						@Override
+						public void onAnimationEnd(Animator animation) {
+						}
+					});
+
+					anim.setDuration(1000);
+					anim.start();
 				}
 			}
-		} else if (event.getNotificationBusMsg().equals("play")) {
+		} else if (eventSlug.equals("play")) {
 			playPauseBtn.setImageResource(R.drawable.stop);
 			if( mediaPlayer != null ) {
 				mediaPlayer.stop();
@@ -841,7 +891,7 @@ public class Music extends Fragment {
 					return false;
 				}
 			});
-			mediaPlayer.setDataSource(currentChannel.getChannelUrl());
+			mediaPlayer.setDataSource(currentChannel.getStationAudio());
 			mediaPlayer.prepareAsync(); // might take long! (for buffering, etc)
 			progressView.setVisibility(View.VISIBLE);
 			playPauseBtn.setVisibility(View.INVISIBLE);
@@ -875,11 +925,11 @@ public class Music extends Fragment {
 			rLayout.startAnimation(an);
 
 			startFlyingMonkeys();
-		} else if (event.getNotificationBusMsg().equals("next")) {
+		} else if (eventSlug.equals("next")) {
 			int pos = (lastSelectionLoaded + 1) % stationList.size();
 			//playStation( pos );
 			myWheelView.smoothScrollToPosition(pos);
-		} else if (event.getNotificationBusMsg().equals("prev")) {
+		} else if (eventSlug.equals("prev")) {
 			int pos = lastSelectionLoaded - 1;
 			if( pos < 0 ) pos = stationList.size() - 1;
 			//playStation( pos );

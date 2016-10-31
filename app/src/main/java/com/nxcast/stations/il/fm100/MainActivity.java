@@ -1,5 +1,6 @@
 package com.nxcast.stations.il.fm100;
 
+import java.io.IOException;
 import java.util.ArrayList;
         import java.util.List;
         import java.util.Locale;
@@ -8,10 +9,12 @@ import android.app.Notification;
         import android.app.NotificationManager;
         import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
         import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.drawable.Drawable;
+import android.media.AudioManager;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
 import android.net.Uri;
@@ -37,6 +40,8 @@ import android.widget.LinearLayout;
         import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
@@ -47,6 +52,7 @@ import com.nxcast.stations.il.fm100.adapters.StationListAdapter;
         import com.nxcast.stations.il.fm100.busEvents.NewSongBusEvent;
         import com.nxcast.stations.il.fm100.busEvents.NotificationBusEvent;
 import com.nxcast.stations.il.fm100.fragments.MyHome;
+import com.nxcast.stations.il.fm100.helpers.DownloadImageTask;
 import com.nxcast.stations.il.fm100.models.Channel;
 import com.nxcast.stations.il.fm100.models.NavItem;
         import com.nxcast.stations.il.fm100.models.Station;
@@ -58,6 +64,8 @@ import com.nxcast.stations.il.fm100.models.VideoObj;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.crashlytics.android.Crashlytics;
+import com.squareup.picasso.Picasso;
+
 import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends ActionBarActivity {
@@ -86,7 +94,7 @@ public class MainActivity extends ActionBarActivity {
     private static Context myApplicationContext = null;
 
     // ---------------------------------------
-    public static ArrayList<Channel> channelsArray = new ArrayList<>();
+    public static ArrayList<Station> channelsArray = new ArrayList<>();
     StationListAdapter myCustomAdapter;
     public List<Station> stationList = new ArrayList<>();
     public List<VideoObj> videoList = new ArrayList<>();
@@ -108,9 +116,7 @@ public class MainActivity extends ActionBarActivity {
         requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         super.onCreate(savedInstanceState);
         myBundle = savedInstanceState;
-        if(isRTL()==false) {
-            //getWindow().getDecorView().setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-        }
+
         setContentView(R.layout.activity_main);
         myApplicationContext = this;
 
@@ -119,19 +125,11 @@ public class MainActivity extends ActionBarActivity {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerListProgressBar = (ProgressBar) findViewById(R.id.progressBarView);
         inDrawLayout = (LinearLayout) findViewById(R.id.inDrawLayout);
-        //flipLayouts();
-       /* if(isRTL()==false) {
-            ArrayList<View> views = new ArrayList<View>();
-            for (int x = 0; x < inDrawLayout.getChildCount(); x++) {
-                views.add(inDrawLayout.getChildAt(x));
-                Log.e("mynewlog" , "FALSE WAS HERE");
-            }
-            inDrawLayout.removeAllViews();
-            for (int x = views.size() - 1; x >= 0; x--) {
-                inDrawLayout.addView(views.get(x));
-            }
-        }
-        */
+
+
+
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        AppEventsLogger.activateApp(this);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             audioSession = new MediaSession(getApplicationContext(), "100fm");
@@ -141,7 +139,6 @@ public class MainActivity extends ActionBarActivity {
                 @Override
                 public boolean onMediaButtonEvent(final Intent mediaButtonIntent) {
                     String intentAction = mediaButtonIntent.getAction();
-                    Log.d("100fm", "mediaButtonIntent " + mediaButtonIntent);
                     if (Intent.ACTION_MEDIA_BUTTON.equals(intentAction)) {
                         KeyEvent event = mediaButtonIntent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
 
@@ -149,14 +146,8 @@ public class MainActivity extends ActionBarActivity {
                             int code = event.getKeyCode();
                             NotificationBusEvent e = null;
 
-                            Log.d("100fm", "onMediaButtonEvent " + code);
-
                             if (KeyEvent.KEYCODE_HEADSETHOOK == code) {
-                                if( home.isPlaying() ) {
-                                    e = new NotificationBusEvent("pause");
-                                } else {
-                                    e = new NotificationBusEvent("play");
-                                }
+                                e = new NotificationBusEvent("headsethook");
                             } else if (KeyEvent.KEYCODE_MEDIA_PLAY == code) {
                                 e = new NotificationBusEvent("play");
                             } else if (KeyEvent.KEYCODE_MEDIA_PAUSE == code) {
@@ -194,6 +185,10 @@ public class MainActivity extends ActionBarActivity {
             filter.setPriority(1000);
 
             registerReceiver(mButtonReceiver, filter);
+
+            /*AudioManager mAudioManager =  (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            ComponentName mReceiverComponent = new ComponentName(this,RemoteControlReceiver.class);
+            mAudioManager.registerMediaButtonEventReceiver(mReceiverComponent);*/
         }
 
 
@@ -268,7 +263,9 @@ public class MainActivity extends ActionBarActivity {
                         tempStation.setStationLogo(finalObject.getString("logo"));
                         stationList.add(tempStation);
 
-                        //Log.i("100fm", finalObject.getString("slug"));
+                        //new DownloadImageTask(null, getApplicationContext()).execute(tempStation.getStationLogo());
+                        Picasso.with(getMyApplicationContext()).load(tempStation.getStationLogo()).fetch();//.into(viewHolder.imageView);
+                        Log.i("100fm", finalObject.getString("name"));
                     }
 
                     drawerListProgressBar.setVisibility(View.GONE);
@@ -525,9 +522,7 @@ public class MainActivity extends ActionBarActivity {
 
     private void setListData(List<Station> stations) {
         for (int i = 0 ; i<stations.size() ; i++){
-            final Channel newChannel = new Channel(stations.get(i).getStationName()
-                    , stations.get(i).getStationAudio()
-                    , stations.get(i).getSongInfo(),stations.get(i).getStationLogo(),stations.get(i).getStationName());
+            final Station newChannel = new Station(stations.get(i).getSongInfo(), stations.get(i).getStationAudio(), stations.get(i).getStationLogo(), stations.get(i).getStationName(), stations.get(i).getStationSlug());
             channelsArray.add(newChannel);
         }
     }

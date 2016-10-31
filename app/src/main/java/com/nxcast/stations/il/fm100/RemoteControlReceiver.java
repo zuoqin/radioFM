@@ -21,23 +21,31 @@ public class RemoteControlReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.i("100fm", "RemoteControlReceiver ");
-        if (Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction())) {
+        String intentAction = intent.getAction();
+        Log.i("100fm", "RemoteControlReceiver " + KeyEvent.KEYCODE_HEADSETHOOK);
+
+        if (Intent.ACTION_MEDIA_BUTTON.equals(intentAction)) {
             KeyEvent event = (KeyEvent)intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-            Log.i("100fm", "RemoteControlReceiver " + event.getKeyCode());
-            if (KeyEvent.KEYCODE_MEDIA_PLAY == event.getKeyCode()) {
-                NotificationBusEvent e = new NotificationBusEvent("play");
-                EventBus.getDefault().post(e);
-            } else if (KeyEvent.KEYCODE_MEDIA_PAUSE == event.getKeyCode()) {
-                Log.i("100fm", "KEYCODE_MEDIA_PAUSE");
-                NotificationBusEvent e = new NotificationBusEvent("pause");
-                EventBus.getDefault().post(e);
-            } else if (KeyEvent.KEYCODE_MEDIA_NEXT == event.getKeyCode()) {
-                NotificationBusEvent e = new NotificationBusEvent("next");
-                EventBus.getDefault().post(e);
-            } else if (KeyEvent.KEYCODE_MEDIA_PREVIOUS == event.getKeyCode()) {
-                NotificationBusEvent e = new NotificationBusEvent("prev");
-                EventBus.getDefault().post(e);
+
+            if (event != null) {
+                int code = event.getKeyCode();
+                NotificationBusEvent e = null;
+
+                if (KeyEvent.KEYCODE_HEADSETHOOK == code ) {
+                    e = new NotificationBusEvent("headsethook");
+                } else if (KeyEvent.KEYCODE_MEDIA_PLAY == code) {
+                    e = new NotificationBusEvent("play");
+                } else if (KeyEvent.KEYCODE_MEDIA_PAUSE == code) {
+                    e = new NotificationBusEvent("pause");
+                } else if (KeyEvent.KEYCODE_MEDIA_NEXT == code) {
+                    e = new NotificationBusEvent("next");
+                } else if (KeyEvent.KEYCODE_MEDIA_PREVIOUS == code) {
+                    e = new NotificationBusEvent("prev");
+                }
+
+                if( e != null ) {
+                    EventBus.getDefault().post(e);
+                }
             }
         }
     }

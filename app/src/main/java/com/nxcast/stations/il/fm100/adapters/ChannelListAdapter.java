@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.nxcast.stations.il.fm100.models.Station;
 import com.squareup.picasso.Picasso;
 
 import com.nxcast.stations.il.fm100.MainActivity;
@@ -26,11 +27,11 @@ import static com.nxcast.stations.il.fm100.R.drawable.fm100;
 
 public class ChannelListAdapter extends BaseAdapter {
     Context context;
-    ArrayList<Channel> nameObjArray;
+    ArrayList<Station> nameObjArray;
     LayoutInflater inflater = null;
-    Channel tempValues;
+    Station tempValues;
 
-    public ChannelListAdapter(Context context , ArrayList<Channel> namesList) {
+    public ChannelListAdapter(Context context , ArrayList<Station> namesList) {
         this.context = context;
         this.nameObjArray = namesList;
 
@@ -79,7 +80,7 @@ public class ChannelListAdapter extends BaseAdapter {
             tempValues = null;
             tempValues = nameObjArray.get(position);
 
-            Picasso.with(context).load(tempValues.getChannelLogo()).into(holder.channelItemImage);
+            Picasso.with(context).load(tempValues.getStationLogo()).into(holder.channelItemImage);
         }
 
         return rowView;

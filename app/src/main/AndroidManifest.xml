@@ -37,16 +37,25 @@
                 <action android:name="com.example.hpuser.rad100fm.ACTION_DELETE" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".RemoteControlReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
         <service android:enabled="true" android:name=".helpers.DistanceService">
             <intent-filter>
                 <action android:name="com.kns.MyService">
                 </action>
             </intent-filter>
         </service>
+        <provider android:authorities="com.facebook.app.FacebookContentProvider170868149938893"
+            android:name="com.facebook.FacebookContentProvider"
+            android:exported="true" />
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="772acf0f546ef70c34f4c92644ad73fcce66d19c"
             />
+        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
     </application>
 
 </manifest>

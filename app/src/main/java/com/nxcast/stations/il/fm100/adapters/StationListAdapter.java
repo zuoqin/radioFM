@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.nxcast.stations.il.fm100.models.Station;
 import com.squareup.picasso.Picasso;
 
 import com.nxcast.stations.il.fm100.MainActivity;
@@ -24,11 +25,11 @@ import java.util.ArrayList;
  ************************************************/
 public class StationListAdapter extends BaseAdapter{
     Context context;
-    ArrayList<Channel> nameObjArray;
+    ArrayList<Station> nameObjArray;
     LayoutInflater inflater = null;
-    Channel tempValues;
+    Station tempValues;
 
-    public StationListAdapter(Context context , ArrayList<Channel> namesList) {
+    public StationListAdapter(Context context , ArrayList<Station> namesList) {
         this.context = context;
         this.nameObjArray = namesList;
 
@@ -81,10 +82,10 @@ public class StationListAdapter extends BaseAdapter{
         else{
             tempValues = null;
             tempValues = nameObjArray.get(position);
-            holder.stationItemText.setText(tempValues.getChannelName());
+            holder.stationItemText.setText(tempValues.getStationName());
 
             //Log.i("ufo", "slug " + tempValues.getChannelSlug());
-            if( tempValues.getChannelSlug().equals("100FM שידור חי") ) {
+            if( tempValues.getStationSlug().equals("100fm") ) {
                 holder.stationItemText.setTextColor(0xFFFFEB3D);
             } else {
                 holder.stationItemText.setTextColor(0xFFFFFFFF);

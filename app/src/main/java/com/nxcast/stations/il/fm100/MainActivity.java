@@ -5,6 +5,7 @@ import java.util.ArrayList;
         import java.util.List;
         import java.util.Locale;
 
+import android.Manifest;
 import android.app.Notification;
         import android.app.NotificationManager;
         import android.app.PendingIntent;
@@ -13,6 +14,7 @@ import android.content.ComponentName;
 import android.content.Context;
         import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.session.MediaSession;
@@ -20,8 +22,10 @@ import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
         import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
         import android.support.v7.app.ActionBarActivity;
         import android.support.v7.app.ActionBarDrawerToggle;
@@ -111,6 +115,8 @@ public class MainActivity extends ActionBarActivity {
     MediaSession audioSession;
     RemoteControlReceiver mButtonReceiver;
 
+    private static final int PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
@@ -191,36 +197,13 @@ public class MainActivity extends ActionBarActivity {
             mAudioManager.registerMediaButtonEventReceiver(mReceiverComponent);*/
         }
 
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
 
-        /*NotificationBroadcast r = new NotificationBroadcast();
-        filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY + 1); //this line sets receiver priority
-        registerReceiver(r, filter);*/
-
-        //AudioManager am = (AudioManager)getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-
-        /*/IntentFilter mediaButtonFilter = new IntentFilter(
-                Intent.ACTION_MEDIA_BUTTON);
-        mediaButtonFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
-        BroadcastReceiver brMediaButton = new BroadcastReceiver() {
-            public void onReceive(Context context, Intent intent) {
-                Log.d("Event", "Media button!");
-                this.abortBroadcast();
-
-                KeyEvent key = (KeyEvent) intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-                if(key.getAction() == KeyEvent.ACTION_UP) {
-                    int keycode = key.getKeyCode();
-                    if(keycode == KeyEvent.KEYCODE_MEDIA_NEXT) {
-                        Log.d("TestApp", "Next Pressed");
-                    } else if(keycode == KeyEvent.KEYCODE_MEDIA_PREVIOUS) {
-                        Log.d("TestApp", "Previous pressed");
-                    } else if(keycode == KeyEvent.KEYCODE_HEADSETHOOK) {
-                        Log.d("TestApp", "Head Set Hook pressed");
-                    }
-                }
-
-            }
-        };
-        registerReceiver(brMediaButton, mediaButtonFilter);*/
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, PERMISSIONS_REQUEST_READ_PHONE_STATE);
+        } else {
+            //TODO
+        }
 
         drawerPane = (RelativeLayout) findViewById(R.id.drawer_pane);
         // flipLayouts();
@@ -268,7 +251,9 @@ public class MainActivity extends ActionBarActivity {
                         Log.i("100fm", finalObject.getString("name"));
                     }
 
-                    drawerListProgressBar.setVisibility(View.GONE);
+                    if( drawerListProgressBar != null ) {
+                        drawerListProgressBar.setVisibility(View.GONE);
+                    }
                     setListData(stationList);
                     myCustomAdapter = new StationListAdapter(myApplicationContext, channelsArray);
                     lvStations.setAdapter(myCustomAdapter);
@@ -298,7 +283,6 @@ public class MainActivity extends ActionBarActivity {
 
         Drawable titleDrawable = getResources().getDrawable(R.drawable.header);
         getSupportActionBar().setBackgroundDrawable(titleDrawable);
-        //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         setTitle("");
         //getActionBar().setIcon(R.drawable.fm100);
@@ -424,9 +408,9 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-       EventBus.getDefault().unregister(this);
+        EventBus.getDefault().unregister(this);
         if (notificationManager != null)
-        notificationManager.cancelAll();
+            notificationManager.cancelAll();
     }
 
     // a method that transfer Events happening on the Notification to MainActivity

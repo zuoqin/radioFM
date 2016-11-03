@@ -215,18 +215,7 @@ public class Music extends Fragment {
 		}
 
 		playPauseBtn = (ImageButton) v.findViewById(R.id.play_pause_btn);
-		if(mediaPlayer == null){
-			mediaPlayer = new MediaPlayer();
-			mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener(){
-				@Override
-				public void onPrepared(MediaPlayer mp){
-					mediaPlayer.start();
-					progressView.setVisibility(View.INVISIBLE);
-					playPauseBtn.setVisibility(View.VISIBLE);
-					imgRound.setVisibility(View.VISIBLE);
-				}
-			});
-		}
+
 		playPauseBtn.setOnClickListener(playPauseListener);
 		if (isPlaying == 1) {
 			playPauseBtn.setImageResource(R.drawable.stop);
@@ -292,6 +281,7 @@ public class Music extends Fragment {
 
 		startSongThread();
 
+
 		return v;
 	}
 
@@ -320,9 +310,11 @@ public class Music extends Fragment {
 		for (int i = 0; i < channelsArray.size(); i++) {
 			newMyObjList.add(new MyObject(channelsArray.get(i).getStationLogo()));
 		}
-		myWheelView.setWheelData(newMyObjList);
-		myWheelView.setSelection(0);
-		myWheelView.setVisibility(View.VISIBLE);
+		if( myWheelView != null ) {
+			myWheelView.setWheelData(newMyObjList);
+			myWheelView.setSelection(0);
+			myWheelView.setVisibility(View.VISIBLE);
+		}
 	}
 
 	private void initWheel() {
@@ -472,7 +464,12 @@ public class Music extends Fragment {
 		//EventBus.getDefault().post(new NotificationBusEvent("delete"));
 		customHandler.removeCallbacks(runnable);
 		if (mediaPlayer != null) {
+			if (mediaPlayer.isPlaying()) {
+				mediaPlayer.stop();
+			}
+
 			mediaPlayer.reset();
+			mediaPlayer.release();
 			mediaPlayer = null;
 		}
 		destroyed = 1;
@@ -735,6 +732,8 @@ public class Music extends Fragment {
 							if( imgCover.getDrawable() != null && imgCover.getVisibility() == View.VISIBLE ) {
 								Bitmap bitmap = ((BitmapDrawable)imgCover.getDrawable()).getBitmap();
 								flyingColor = bitmap.getPixel(0,0);
+							} else {
+								flyingColor = Color.parseColor("#F8F301");
 							}
 
 							if( getContext() != null ) {
@@ -825,8 +824,9 @@ public class Music extends Fragment {
 
 		if (eventSlug.equals("pause") ) {
 			playPauseBtn.setImageResource(R.drawable.play);
-			if (mediaPlayer.isPlaying())
+			if (mediaPlayer.isPlaying()) {
 				mediaPlayer.stop();
+			}
 
 			mediaPlayer.reset();
 			mediaPlayer.release();
@@ -855,44 +855,48 @@ public class Music extends Fragment {
 		} else if (eventSlug.equals("play")) {
 			playPauseBtn.setImageResource(R.drawable.stop);
 			if( mediaPlayer != null ) {
-				mediaPlayer.stop();
+				if( mediaPlayer.isPlaying() ) {
+					mediaPlayer.stop();
+				}
 				mediaPlayer.reset();
 				mediaPlayer.release();
 			}
 			mediaPlayer = new MediaPlayer();
-			mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-			mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+			if( mediaPlayer != null ) {
+				mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+				mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 
-				@Override
-				public void onPrepared(MediaPlayer mp) {
-					Log.i("100fm", "onPrepared MediaPlayer");
-					mp.start();
-					progressView.setVisibility(View.INVISIBLE);
-					playPauseBtn.setVisibility(View.VISIBLE);
-					imgRound.setVisibility(View.VISIBLE);
-				}
-			});
-			mediaPlayer.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
+					@Override
+					public void onPrepared(MediaPlayer mp) {
+						Log.i("100fm", "onPrepared MediaPlayer");
+						mp.start();
+						progressView.setVisibility(View.INVISIBLE);
+						playPauseBtn.setVisibility(View.VISIBLE);
+						imgRound.setVisibility(View.VISIBLE);
+					}
+				});
+				mediaPlayer.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
 
-				@Override
-				public void onBufferingUpdate(MediaPlayer mp, int percent) {
-					Log.i("100fm", "Buffering " + percent);
-				}
-			});
-			mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+					@Override
+					public void onBufferingUpdate(MediaPlayer mp, int percent) {
+						Log.i("100fm", "Buffering " + percent);
+					}
+				});
+				mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
 
-				@Override
-				public boolean onError(MediaPlayer mp, int what, int extra) {
-					Log.i("100fm", "onError MediaPlayer");
-					mp.release();
-					progressView.setVisibility(View.INVISIBLE);
-					playPauseBtn.setVisibility(View.VISIBLE);
-					imgRound.setVisibility(View.VISIBLE);
-					return false;
-				}
-			});
-			mediaPlayer.setDataSource(currentChannel.getStationAudio());
-			mediaPlayer.prepareAsync(); // might take long! (for buffering, etc)
+					@Override
+					public boolean onError(MediaPlayer mp, int what, int extra) {
+						Log.i("100fm", "onError MediaPlayer");
+						mp.release();
+						progressView.setVisibility(View.INVISIBLE);
+						playPauseBtn.setVisibility(View.VISIBLE);
+						imgRound.setVisibility(View.VISIBLE);
+						return false;
+					}
+				});
+				mediaPlayer.setDataSource(currentChannel.getStationAudio());
+				mediaPlayer.prepareAsync(); // might take long! (for buffering, etc)
+			}
 			progressView.setVisibility(View.VISIBLE);
 			playPauseBtn.setVisibility(View.INVISIBLE);
 			imgRound.setVisibility(View.INVISIBLE);

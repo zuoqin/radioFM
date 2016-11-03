@@ -161,7 +161,9 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 	}
 
 	public void openSubmenu() {
-		this.drawer.openDrawer(this.pane);
+		if( this.drawer != null ) {
+			this.drawer.openDrawer(this.pane);
+		}
 	}
 
 	private void setTabsIcons(Drawable[] drawables) {

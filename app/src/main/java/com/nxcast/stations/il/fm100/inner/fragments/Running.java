@@ -25,6 +25,7 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -51,6 +52,9 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.share.model.ShareHashtag;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareDialog;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Legend;
@@ -197,12 +201,17 @@ public class Running extends Fragment {
 		btnLike.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-				sharingIntent.setType("text/plain");
-				String shareBody = "http://digital.100fm.co.il/";
-				//sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
-				sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
-				startActivity(Intent.createChooser(sharingIntent, "Share via"));
+				ShareLinkContent linkContent = new ShareLinkContent.Builder()
+						.setContentTitle("")
+						.setContentDescription("")
+						.setContentUrl(Uri.parse("http://digital.100fm.co.il/"))
+						.setShareHashtag(new ShareHashtag.Builder()
+								.setHashtag("#100fmDigital")
+								.build())
+						.build();
+
+				ShareDialog shareDialog = new ShareDialog(getActivity());
+				shareDialog.show(linkContent, ShareDialog.Mode.AUTOMATIC);
 			}
 		});
 

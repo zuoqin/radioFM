@@ -3,6 +3,7 @@ package com.nxcast.stations.il.fm100.inner.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,6 +15,9 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
+import com.facebook.share.model.ShareHashtag;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareDialog;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
@@ -83,12 +87,17 @@ public class Schedule extends Fragment {
         btnLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-                sharingIntent.setType("text/plain");
-                String shareBody = "http://digital.100fm.co.il/";
-                //sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
-                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
-                startActivity(Intent.createChooser(sharingIntent, "Share via"));
+                ShareLinkContent linkContent = new ShareLinkContent.Builder()
+                        .setContentTitle("")
+                        .setContentDescription("")
+                        .setContentUrl(Uri.parse("http://digital.100fm.co.il/"))
+                        .setShareHashtag(new ShareHashtag.Builder()
+                                .setHashtag("#100fmDigital")
+                                .build())
+                        .build();
+
+                ShareDialog shareDialog = new ShareDialog(getActivity());
+                shareDialog.show(linkContent, ShareDialog.Mode.AUTOMATIC);
             }
         });
 

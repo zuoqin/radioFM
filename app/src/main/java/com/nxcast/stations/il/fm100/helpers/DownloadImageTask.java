@@ -28,7 +28,7 @@ import java.net.URL;
  */
 public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
     private static final float BITMAP_SCALE = 0.4f;
-    private static final float BLUR_RADIUS = 3.5f;
+    private static final float BLUR_RADIUS = 1.5f;
 
     ImageView bmImage;
     int color;
@@ -77,6 +77,9 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
     }
 
     protected void onPostExecute(Bitmap result) {
+        if( bmImage == null ) {
+            return;
+        }
         Animation a = new AlphaAnimation(0.00f, 1.00f);
 
         a.setDuration(300);

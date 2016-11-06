@@ -161,7 +161,9 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 	}
 
 	public void openSubmenu() {
-		this.drawer.openDrawer(this.pane);
+		if( this.drawer != null ) {
+			this.drawer.openDrawer(this.pane);
+		}
 	}
 
 	private void setTabsIcons(Drawable[] drawables) {
@@ -195,25 +197,9 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 		if(null != getActivity() ) {
 			int pos = this.tabHost.getCurrentTab();
 
-			if(isRTL()==true){
-				this.viewPager.setCurrentItem(fragmentsList.size() - 1 - pos);
-			}else {
-				this.viewPager.setCurrentItem(pos);
-			}
+			this.viewPager.setCurrentItem(pos);
 
-			//this.viewPager.setCurrentItem(pos);
-			//method makes tab selected icon change to selected icon(with circle)
 			highlightCurrentTab(pos);
-
-			/*HorizontalScrollView hScrollView = (HorizontalScrollView) v
-					.findViewById(R.id.hScrollView);
-			View tabView = tabHost.getCurrentTabView();
-			int scrollPos = tabView.getLeft()
-					- (hScrollView.getWidth() - tabView.getWidth()) / 2;
-			hScrollView.smoothScrollTo(scrollPos, 0);*/
-
-
-			//getSupportActionBar().hide();
 		}
 	}
 
@@ -221,22 +207,12 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 		int [] resurce_off = new int[] {R.drawable.radio_off, R.drawable.video_off, R.drawable.run_off, R.drawable.menu_off};
 		int [] resurce_on = new int[] {R.drawable.radio_on, R.drawable.video_on, R.drawable.run_on, R.drawable.menu_on};
 
-		//int [] resurce_off = new int[] {R.drawable.menu_off, /*R.drawable.run_off, */R.drawable.video_off, R.drawable.radio_off};
-		//int [] resurce_on = new int[] {R.drawable.menu_on, /*R.drawable.run_on, */R.drawable.video_on, R.drawable.radio_on};
-
-
 		for( int i = 0; i < resurce_off.length; i++ ) {
 			ImageView iv = (ImageView) tabHost.getTabWidget().getChildAt(i).findViewById(R.id.tabImage);
 			iv.setImageResource(resurce_off[i]);
 		}
 		ImageView iv = (ImageView) tabHost.getTabWidget().getChildAt(selectedItem).findViewById(R.id.tabImage);
 		iv.setImageResource(resurce_on[selectedItem]);
-
-		/*if( selectedItem == 0 ) {
-			bar.hide();
-		} else {
-			bar.show();
-		}*/
 	}
 
 	@Override
@@ -250,13 +226,7 @@ public class MyHome extends Fragment implements OnTabChangeListener,
 	@Override
 	public void onPageSelected(int position) {
 		if(null != getActivity() ) {
-			// set current tab set for flipped order to make the swipe go the right way
-			if(isRTL()==true){
-				this.tabHost.setCurrentTab(fragmentsList.size() - 1 - position);
-			}else {
-				this.tabHost.setCurrentTab(position);
-			}
-			//this.tabHost.setCurrentTab(position);
+			this.tabHost.setCurrentTab(position);
 		}
 	}
 

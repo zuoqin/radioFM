@@ -1,23 +1,31 @@
 package com.nxcast.stations.il.fm100;
 
+import java.io.IOException;
 import java.util.ArrayList;
         import java.util.List;
         import java.util.Locale;
 
+import android.Manifest;
 import android.app.Notification;
         import android.app.NotificationManager;
         import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
         import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.media.AudioManager;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
         import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
         import android.support.v7.app.ActionBarActivity;
         import android.support.v7.app.ActionBarDrawerToggle;
@@ -36,6 +44,8 @@ import android.widget.LinearLayout;
         import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
@@ -46,6 +56,7 @@ import com.nxcast.stations.il.fm100.adapters.StationListAdapter;
         import com.nxcast.stations.il.fm100.busEvents.NewSongBusEvent;
         import com.nxcast.stations.il.fm100.busEvents.NotificationBusEvent;
 import com.nxcast.stations.il.fm100.fragments.MyHome;
+import com.nxcast.stations.il.fm100.helpers.DownloadImageTask;
 import com.nxcast.stations.il.fm100.models.Channel;
 import com.nxcast.stations.il.fm100.models.NavItem;
         import com.nxcast.stations.il.fm100.models.Station;
@@ -57,6 +68,8 @@ import com.nxcast.stations.il.fm100.models.VideoObj;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.crashlytics.android.Crashlytics;
+import com.squareup.picasso.Picasso;
+
 import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends ActionBarActivity {
@@ -85,7 +98,7 @@ public class MainActivity extends ActionBarActivity {
     private static Context myApplicationContext = null;
 
     // ---------------------------------------
-    public static ArrayList<Channel> channelsArray = new ArrayList<>();
+    public static ArrayList<Station> channelsArray = new ArrayList<>();
     StationListAdapter myCustomAdapter;
     public List<Station> stationList = new ArrayList<>();
     public List<VideoObj> videoList = new ArrayList<>();
@@ -102,14 +115,14 @@ public class MainActivity extends ActionBarActivity {
     MediaSession audioSession;
     RemoteControlReceiver mButtonReceiver;
 
+    private static final int PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         super.onCreate(savedInstanceState);
         myBundle = savedInstanceState;
-        if(isRTL()==false) {
-            //getWindow().getDecorView().setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-        }
+
         setContentView(R.layout.activity_main);
         myApplicationContext = this;
 
@@ -118,110 +131,79 @@ public class MainActivity extends ActionBarActivity {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerListProgressBar = (ProgressBar) findViewById(R.id.progressBarView);
         inDrawLayout = (LinearLayout) findViewById(R.id.inDrawLayout);
-        //flipLayouts();
-       /* if(isRTL()==false) {
-            ArrayList<View> views = new ArrayList<View>();
-            for (int x = 0; x < inDrawLayout.getChildCount(); x++) {
-                views.add(inDrawLayout.getChildAt(x));
-                Log.e("mynewlog" , "FALSE WAS HERE");
-            }
-            inDrawLayout.removeAllViews();
-            for (int x = views.size() - 1; x >= 0; x--) {
-                inDrawLayout.addView(views.get(x));
-            }
-        }
-        */
 
-        /*mButtonReceiver = new RemoteControlReceiver();
 
-        IntentFilter filter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);//"android.intent.action.MEDIA_BUTTON"
-        filter.setPriority(1000);
 
-        registerReceiver(mButtonReceiver, filter);*/
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        AppEventsLogger.activateApp(this);
 
-        audioSession = new MediaSession(getApplicationContext(), "100fm");
-        audioSession.setCallback(new MediaSession.Callback() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            audioSession = new MediaSession(getApplicationContext(), "100fm");
 
-            @Override
-            public boolean onMediaButtonEvent(final Intent mediaButtonIntent) {
-                String intentAction = mediaButtonIntent.getAction();
-                Log.d("100fm", "mediaButtonIntent " + mediaButtonIntent);
-                if (Intent.ACTION_MEDIA_BUTTON.equals(intentAction)) {
-                    KeyEvent event = mediaButtonIntent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+            audioSession.setCallback(new MediaSession.Callback() {
 
-                    if (event != null) {
-                        int code = event.getKeyCode();
-                        NotificationBusEvent e = null;
+                @Override
+                public boolean onMediaButtonEvent(final Intent mediaButtonIntent) {
+                    String intentAction = mediaButtonIntent.getAction();
+                    if (Intent.ACTION_MEDIA_BUTTON.equals(intentAction)) {
+                        KeyEvent event = mediaButtonIntent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
 
-                        Log.d("100fm", "onMediaButtonEvent " + code);
+                        if (event != null) {
+                            int code = event.getKeyCode();
+                            NotificationBusEvent e = null;
 
-                        if (KeyEvent.KEYCODE_HEADSETHOOK == code) {
-                            if( home.isPlaying() ) {
+                            if (KeyEvent.KEYCODE_HEADSETHOOK == code) {
+                                e = new NotificationBusEvent("headsethook");
+                            } else if (KeyEvent.KEYCODE_MEDIA_PLAY == code) {
+                                e = new NotificationBusEvent("play");
+                            } else if (KeyEvent.KEYCODE_MEDIA_PAUSE == code) {
                                 e = new NotificationBusEvent("pause");
-                            } else {
-                                //e = new NotificationBusEvent("play");
+                            } else if (KeyEvent.KEYCODE_MEDIA_NEXT == code) {
+                                e = new NotificationBusEvent("next");
+                            } else if (KeyEvent.KEYCODE_MEDIA_PREVIOUS == code) {
+                                e = new NotificationBusEvent("prev");
                             }
-                            e = new NotificationBusEvent("pause");
-                        } else if (KeyEvent.KEYCODE_MEDIA_PLAY == code) {
-                            e = new NotificationBusEvent("play");
-                        } else if (KeyEvent.KEYCODE_MEDIA_PAUSE == code) {
-                            e = new NotificationBusEvent("pause");
-                        } else if (KeyEvent.KEYCODE_MEDIA_NEXT == code) {
-                            e = new NotificationBusEvent("next");
-                        } else if (KeyEvent.KEYCODE_MEDIA_PREVIOUS == code) {
-                            e = new NotificationBusEvent("prev");
-                        }
 
-                        if( e != null ) {
-                            EventBus.getDefault().post(e);
+                            if( e != null ) {
+                                EventBus.getDefault().post(e);
+                            }
                         }
                     }
-                }
-                return true;
-            }
-
-
-        });
-
-        PlaybackState state = new PlaybackState.Builder()
-                .setActions(PlaybackState.ACTION_PLAY_PAUSE)
-                .setState(PlaybackState.STATE_PLAYING, 0, 0, 0)
-                .build();
-        audioSession.setPlaybackState(state);
-
-        audioSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS | MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
-
-        audioSession.setActive(true);
-
-        /*NotificationBroadcast r = new NotificationBroadcast();
-        filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY + 1); //this line sets receiver priority
-        registerReceiver(r, filter);*/
-
-        //AudioManager am = (AudioManager)getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-
-        /*/IntentFilter mediaButtonFilter = new IntentFilter(
-                Intent.ACTION_MEDIA_BUTTON);
-        mediaButtonFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
-        BroadcastReceiver brMediaButton = new BroadcastReceiver() {
-            public void onReceive(Context context, Intent intent) {
-                Log.d("Event", "Media button!");
-                this.abortBroadcast();
-
-                KeyEvent key = (KeyEvent) intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-                if(key.getAction() == KeyEvent.ACTION_UP) {
-                    int keycode = key.getKeyCode();
-                    if(keycode == KeyEvent.KEYCODE_MEDIA_NEXT) {
-                        Log.d("TestApp", "Next Pressed");
-                    } else if(keycode == KeyEvent.KEYCODE_MEDIA_PREVIOUS) {
-                        Log.d("TestApp", "Previous pressed");
-                    } else if(keycode == KeyEvent.KEYCODE_HEADSETHOOK) {
-                        Log.d("TestApp", "Head Set Hook pressed");
-                    }
+                    return true;
                 }
 
-            }
-        };
-        registerReceiver(brMediaButton, mediaButtonFilter);*/
+
+            });
+
+            PlaybackState state = new PlaybackState.Builder()
+                    .setActions(PlaybackState.ACTION_PLAY_PAUSE)
+                    .setState(PlaybackState.STATE_PLAYING, 0, 0, 0)
+                    .build();
+            audioSession.setPlaybackState(state);
+
+            audioSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS | MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
+            audioSession.setActive(true);
+        } else {
+            mButtonReceiver = new RemoteControlReceiver();
+
+            IntentFilter filter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);//"android.intent.action.MEDIA_BUTTON"
+            filter.setPriority(1000);
+
+            registerReceiver(mButtonReceiver, filter);
+
+            /*AudioManager mAudioManager =  (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            ComponentName mReceiverComponent = new ComponentName(this,RemoteControlReceiver.class);
+            mAudioManager.registerMediaButtonEventReceiver(mReceiverComponent);*/
+        }
+
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
+
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, PERMISSIONS_REQUEST_READ_PHONE_STATE);
+        } else {
+            //TODO
+        }
 
         drawerPane = (RelativeLayout) findViewById(R.id.drawer_pane);
         // flipLayouts();
@@ -258,16 +240,20 @@ public class MainActivity extends ActionBarActivity {
                         tempStation = new Station();
                         JSONObject finalObject = parentArray.getJSONObject(i);
                         tempStation.setStationName(finalObject.getString("name"));
-                        tempStation.setStationAudio(finalObject.getString("audio"));
+                        tempStation.setStationAudio(finalObject.getString("audioA"));
                         tempStation.setSongInfo(finalObject.getString("info"));
                         tempStation.setStationSlug(finalObject.getString("slug"));
                         tempStation.setStationLogo(finalObject.getString("logo"));
                         stationList.add(tempStation);
 
-                        //Log.i("100fm", finalObject.getString("slug"));
+                        //new DownloadImageTask(null, getApplicationContext()).execute(tempStation.getStationLogo());
+                        Picasso.with(getMyApplicationContext()).load(tempStation.getStationLogo()).fetch();//.into(viewHolder.imageView);
+                        Log.i("100fm", finalObject.getString("name"));
                     }
 
-                    drawerListProgressBar.setVisibility(View.GONE);
+                    if( drawerListProgressBar != null ) {
+                        drawerListProgressBar.setVisibility(View.GONE);
+                    }
                     setListData(stationList);
                     myCustomAdapter = new StationListAdapter(myApplicationContext, channelsArray);
                     lvStations.setAdapter(myCustomAdapter);
@@ -297,7 +283,6 @@ public class MainActivity extends ActionBarActivity {
 
         Drawable titleDrawable = getResources().getDrawable(R.drawable.header);
         getSupportActionBar().setBackgroundDrawable(titleDrawable);
-        //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         setTitle("");
         //getActionBar().setIcon(R.drawable.fm100);
@@ -423,9 +408,9 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-       EventBus.getDefault().unregister(this);
+        EventBus.getDefault().unregister(this);
         if (notificationManager != null)
-        notificationManager.cancelAll();
+            notificationManager.cancelAll();
     }
 
     // a method that transfer Events happening on the Notification to MainActivity
@@ -521,9 +506,7 @@ public class MainActivity extends ActionBarActivity {
 
     private void setListData(List<Station> stations) {
         for (int i = 0 ; i<stations.size() ; i++){
-            final Channel newChannel = new Channel(stations.get(i).getStationName()
-                    , stations.get(i).getStationAudio()
-                    , stations.get(i).getSongInfo(),stations.get(i).getStationLogo(),stations.get(i).getStationName());
+            final Station newChannel = new Station(stations.get(i).getSongInfo(), stations.get(i).getStationAudio(), stations.get(i).getStationLogo(), stations.get(i).getStationName(), stations.get(i).getStationSlug());
             channelsArray.add(newChannel);
         }
     }

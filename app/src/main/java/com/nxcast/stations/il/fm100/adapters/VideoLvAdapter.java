@@ -28,7 +28,6 @@ import java.util.List;
 
 import com.nxcast.stations.il.fm100.MainActivity;
 import com.nxcast.stations.il.fm100.R;
-import com.nxcast.stations.il.fm100.models.Channel;
 import com.nxcast.stations.il.fm100.models.VideoObj;
 
 public class VideoLvAdapter  extends BaseAdapter {

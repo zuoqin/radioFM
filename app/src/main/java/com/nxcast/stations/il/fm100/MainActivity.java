@@ -57,7 +57,6 @@ import com.nxcast.stations.il.fm100.adapters.StationListAdapter;
         import com.nxcast.stations.il.fm100.busEvents.NotificationBusEvent;
 import com.nxcast.stations.il.fm100.fragments.MyHome;
 import com.nxcast.stations.il.fm100.helpers.DownloadImageTask;
-import com.nxcast.stations.il.fm100.models.Channel;
 import com.nxcast.stations.il.fm100.models.NavItem;
         import com.nxcast.stations.il.fm100.models.Station;
 import com.nxcast.stations.il.fm100.models.VideoObj;
@@ -244,11 +243,12 @@ public class MainActivity extends ActionBarActivity {
                         tempStation.setSongInfo(finalObject.getString("info"));
                         tempStation.setStationSlug(finalObject.getString("slug"));
                         tempStation.setStationLogo(finalObject.getString("logo"));
+                        tempStation.setStationDescription(finalObject.getString("description"));
                         stationList.add(tempStation);
 
                         //new DownloadImageTask(null, getApplicationContext()).execute(tempStation.getStationLogo());
                         Picasso.with(getMyApplicationContext()).load(tempStation.getStationLogo()).fetch();//.into(viewHolder.imageView);
-                        Log.i("100fm", finalObject.getString("name"));
+                        //Log.i("100fm", tempStation.getStationDescription());
                     }
 
                     if( drawerListProgressBar != null ) {
@@ -506,7 +506,7 @@ public class MainActivity extends ActionBarActivity {
 
     private void setListData(List<Station> stations) {
         for (int i = 0 ; i<stations.size() ; i++){
-            final Station newChannel = new Station(stations.get(i).getSongInfo(), stations.get(i).getStationAudio(), stations.get(i).getStationLogo(), stations.get(i).getStationName(), stations.get(i).getStationSlug());
+            final Station newChannel = new Station(stations.get(i).getSongInfo(), stations.get(i).getStationAudio(), stations.get(i).getStationLogo(), stations.get(i).getStationName(), stations.get(i).getStationSlug(), stations.get(i).getStationDescription());
             channelsArray.add(newChannel);
         }
     }

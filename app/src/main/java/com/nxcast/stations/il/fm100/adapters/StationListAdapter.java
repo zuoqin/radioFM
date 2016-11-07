@@ -16,7 +16,6 @@ import com.squareup.picasso.Picasso;
 
 import com.nxcast.stations.il.fm100.MainActivity;
 import com.nxcast.stations.il.fm100.R;
-import com.nxcast.stations.il.fm100.models.Channel;
 
 import java.util.ArrayList;
 

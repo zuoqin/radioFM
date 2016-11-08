@@ -20,7 +20,7 @@
         android:logo="@drawable/fm100"
         >
         <activity android:name=".MainActivity"
-            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|keyboardHidden"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -42,7 +42,7 @@
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
-        <service android:enabled="true" android:name=".helpers.DistanceService">
+        <service android:enabled="true" android:name=".helpers.DistanceService" android:stopWithTask="false">
             <intent-filter>
                 <action android:name="com.kns.MyService">
                 </action>

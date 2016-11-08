@@ -4,19 +4,29 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.shapes.Shape;
 import android.media.AudioManager;
+import android.media.MediaMetadata;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
+import android.media.RemoteControlClient;
+import android.media.session.MediaSession;
+import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.telephony.PhoneStateListener;
@@ -43,6 +53,7 @@ import com.facebook.share.model.ShareHashtag;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
 import com.nxcast.stations.il.fm100.RemoteControlReceiver;
+import com.nxcast.stations.il.fm100.helpers.TriangleView;
 import com.wx.wheelview.common.WheelData;
 import com.wx.wheelview.widget.WheelView;
 
@@ -60,7 +71,6 @@ import com.nxcast.stations.il.fm100.R;
 import com.nxcast.stations.il.fm100.helpers.ScheduleXMLParser;
 import com.nxcast.stations.il.fm100.helpers.SongXMLParser;
 import com.nxcast.stations.il.fm100.adapters.ChannelListAdapter;
-import com.nxcast.stations.il.fm100.models.Channel;
 import com.nxcast.stations.il.fm100.models.MyObject;
 import com.nxcast.stations.il.fm100.models.ScheduleItem;
 import com.nxcast.stations.il.fm100.models.Song;
@@ -160,12 +170,16 @@ public class Music extends Fragment {
 	private List<ScheduleItem> scheduleItemList = new ArrayList<>();
 
 	RelativeLayout flying;
-	public ArrayList<View> monkeys = new ArrayList<>();
+	public ArrayList<TriangleView> monkeys = new ArrayList<>();
 	int monkeysIndex = 0;
 	int flyingColor = 0xFFF8F301;
 	Timer timer_flying = null;
 
 	private int wheelLastPos;
+
+	AudioManager mAudioManager;
+	RemoteControlClient mRemoteControlClient;
+	MediaSession mMediaSession;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater,
@@ -236,6 +250,30 @@ public class Music extends Fragment {
 			}
 		});
 
+		if (mAudioManager == null) {
+			mAudioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
+		}
+
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+			if (mRemoteControlClient == null) {
+				Log.d("init()", "API " + Build.VERSION.SDK_INT + " lower then " + Build.VERSION_CODES.LOLLIPOP);
+				Log.d("init()", "Using RemoteControlClient API.");
+
+				mRemoteControlClient = new RemoteControlClient(PendingIntent.getBroadcast(getContext(), 0, new Intent(Intent.ACTION_MEDIA_BUTTON), 0));
+				mAudioManager.registerRemoteControlClient(mRemoteControlClient);
+			}
+		} else {
+			if (mMediaSession == null) {
+				Log.d("init()", "API " + Build.VERSION.SDK_INT + " greater or equals " + Build.VERSION_CODES.LOLLIPOP);
+				Log.d("init()", "Using MediaSession API.");
+
+				mMediaSession = new MediaSession(getContext(), "PlayerServiceMediaSession");
+				mMediaSession.setFlags(MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
+				mMediaSession.setActive(true);
+
+			}
+		}
+
 		ImageButton btnLike = (ImageButton) v.findViewById(R.id.btnLike);
 		btnLike.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -245,7 +283,7 @@ public class Music extends Fragment {
 						.setContentTitle("")
 						.setContentDescription("")
 						.setContentUrl(Uri.parse("http://digital.100fm.co.il/#" + currentChannel.getStationSlug()))
-						.setQuote("I'm listening to " + currentSong.getSongName() + " on " + currentChannel.getStationName() + " radios 100fm app")
+						.setQuote("I'm listening to " + currentSong.getSongName() + " on " + currentChannel.getStationName() + " - radios 100fm app")
 						.setShareHashtag(new ShareHashtag.Builder()
 								.setHashtag("#100fmDigital")
 								.build())
@@ -256,31 +294,46 @@ public class Music extends Fragment {
 			}
 		});
 
+		ImageButton btnInfo = (ImageButton) v.findViewById(R.id.channelInfo);
+		btnInfo.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+			new AlertDialog.Builder(getContext())
+						.setTitle(currentChannel.getStationName())
+						.setMessage(currentChannel.getStationDescription())
+						.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								dialog.cancel();
+							}
+						})
+						.show();
+			}
+		});
+
 
 		ImageButton btn100 = (ImageButton) v.findViewById(R.id.img100fm);
 		btn100.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				playStation(0);
 				myWheelView.smoothScrollToPosition(0);
 			}
 		});
 
 		for( int i = 0; i < 6; i++ ) {
 			Random r = new Random();
-			View myButton = new View(getContext());
-			int s = r.nextInt(60) + 40;
-			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(s, s);
+			TriangleView myButton = new TriangleView(getContext());
+			int s = r.nextInt(100) + 40;
+			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(s / 2, s);
 			myButton.setLayoutParams(params);
-			myButton.setBackgroundColor(flyingColor);
+			//myButton.setBackgroundColor(flyingColor);
 			myButton.setAlpha(.8f);
 			myButton.setVisibility(View.INVISIBLE);
+			myButton.setDirection(TriangleView.Direction.LEFT);
 			flying.addView(myButton);
 			monkeys.add(myButton);
 		}
 
 		startSongThread();
-
 
 		return v;
 	}
@@ -299,6 +352,7 @@ public class Music extends Fragment {
 			tempStation.setSongInfo(finalObject.getString("info"));
 			tempStation.setStationSlug(finalObject.getString("slug"));
 			tempStation.setStationLogo(finalObject.getString("logo"));
+			tempStation.setStationDescription(finalObject.getString("description"));
 			stationList.add(tempStation);
 		}
 
@@ -365,10 +419,12 @@ public class Music extends Fragment {
 
 		playPauseBtn.setImageResource(R.drawable.stop);
 		lastChannel.setStationName(currentChannel.getStationName());
+		lastChannel.setStationDescription(currentChannel.getStationDescription());
 		lastChannel.setStationAudio(currentChannel.getStationAudio());
 		event = new NotificationBusEvent("play");
 		EventBus.getDefault().post(event);
 	}
+
 	private void stopStation() {
 		NotificationBusEvent event = new NotificationBusEvent("pause");
 		EventBus.getDefault().post(event);
@@ -409,7 +465,7 @@ public class Music extends Fragment {
 			/*final Station newChannel = new Station(stations.get(i).getStationSlug()
 					, stations.get(i).getStationAudio()
 					, stations.get(i).getSongInfo(), stations.get(i).getStationLogo());*/
-			final Station newChannel = new Station(stations.get(i).getSongInfo(), stations.get(i).getStationAudio(), stations.get(i).getStationLogo(), stations.get(i).getStationName(), stations.get(i).getStationSlug());
+			final Station newChannel = new Station(stations.get(i).getSongInfo(), stations.get(i).getStationAudio(), stations.get(i).getStationLogo(), stations.get(i).getStationName(), stations.get(i).getStationSlug(), stations.get(i).getStationDescription());
 			channelsArray.add(newChannel);
 		}
 	}
@@ -425,6 +481,41 @@ public class Music extends Fragment {
 			}
 		}
 	};
+
+	private void onTrackChanged(String title, String artist, String album, long duration, long position, long trackNumber) {
+
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+
+			RemoteControlClient.MetadataEditor ed = mRemoteControlClient.editMetadata(true);
+			ed.putString(MediaMetadataRetriever.METADATA_KEY_TITLE, title);
+			ed.putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, artist);
+			ed.putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, album);
+			ed.putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, duration);
+			ed.putLong(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER, trackNumber);
+			ed.apply();
+
+			mRemoteControlClient.setPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING, position, 1.0f);
+		} else {
+
+			MediaMetadata metadata = new MediaMetadata.Builder()
+					.putString(MediaMetadata.METADATA_KEY_TITLE, title)
+					.putString(MediaMetadata.METADATA_KEY_ARTIST, artist)
+					.putString(MediaMetadata.METADATA_KEY_ALBUM, album)
+					.putLong(MediaMetadata.METADATA_KEY_DURATION, duration)
+					.putLong(MediaMetadata.METADATA_KEY_TRACK_NUMBER, trackNumber)
+					.build();
+
+			mMediaSession.setMetadata(metadata);
+
+			PlaybackState state = new PlaybackState.Builder()
+					.setActions(PlaybackState.ACTION_PLAY)
+					.setState(PlaybackState.STATE_PLAYING, position, 1.0f, SystemClock.elapsedRealtime())
+					.build();
+
+			mMediaSession.setPlaybackState(state);
+		}
+	}
+
 
 	public boolean isPlaying() {
 		return isPlaying == 1;
@@ -460,23 +551,23 @@ public class Music extends Fragment {
 
 	@Override
 	public void onDestroy() {
-		super.onDestroy();
-		//EventBus.getDefault().post(new NotificationBusEvent("delete"));
+		EventBus.getDefault().post(new NotificationBusEvent("delete"));
 		customHandler.removeCallbacks(runnable);
 		if (mediaPlayer != null) {
-			if (mediaPlayer.isPlaying()) {
-				mediaPlayer.stop();
-			}
-
-			mediaPlayer.reset();
+			//mediaPlayer.reset();
 			mediaPlayer.release();
 			mediaPlayer = null;
+		}
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+			mAudioManager.unregisterRemoteControlClient(mRemoteControlClient);
+		} else {
+			mMediaSession.release();
 		}
 		destroyed = 1;
 		if (phoneStateListener !=null){
 			telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
 		}
-
+		super.onDestroy();
 	}
 
 	private void reload100fmName() {
@@ -500,6 +591,11 @@ public class Music extends Fragment {
 			currentSong = new Song( itemCurrent.getProgramName(), itemCurrent.getProgramAutor() );
 			songNameTv.setText(currentSong.getSongName());
 			artistNameTv.setText(currentSong.getArtist());
+
+			if (mAudioManager.isBluetoothA2dpOn()) {
+				Log.d("AudioManager", "isBluetoothA2dpOn() = true");
+				onTrackChanged(currentSong.getSongName(), currentSong.getArtist(), "", 0, 0, 0);
+			}
 
 			if( !itemCurrent.getProgramImage().isEmpty() ) {
 				showCover(itemCurrent.getProgramImage());
@@ -620,7 +716,8 @@ public class Music extends Fragment {
 		protected Void doInBackground(Void... arg0) {
 			//Download the file
 			try {
-				Downloader.DownloadFromUrl(currentChannel.getSongInfo(), MainActivity.getMyApplicationContext().openFileOutput("Song.xml", Context.MODE_PRIVATE));
+				Date d = new Date();
+				Downloader.DownloadFromUrl(currentChannel.getSongInfo() + "?a=" + d.getTime(), MainActivity.getMyApplicationContext().openFileOutput("Song.xml", Context.MODE_PRIVATE));
 				String path=MainActivity.getMyApplicationContext().getFilesDir().getAbsolutePath()+"/Song.xml";
 				File file = new File ( path );
 				if ( file.exists() ){
@@ -643,6 +740,11 @@ public class Music extends Fragment {
 						lastSong.setArtist(currentSong.getArtist());
 						EventBus.getDefault().post(new NewSongBusEvent(currentSong.getSongName(), currentSong.getArtist()));
 
+						if (mAudioManager.isBluetoothA2dpOn()) {
+							Log.d("AudioManager", "isBluetoothA2dpOn() = true");
+							onTrackChanged(currentSong.getSongName(), currentSong.getArtist(), "", 0, 0, 0);
+						}
+
 						String key = currentSong.getSongName() + " " + currentSong.getArtist();
 
 						AsyncHttpClient client = new AsyncHttpClient();
@@ -652,18 +754,19 @@ public class Music extends Fragment {
 							@Override
 							public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
 								try {
-									JSONObject obj = new JSONObject(new String(responseBody));
+									if( statusCode == 200 ) {
+										JSONObject obj = new JSONObject(new String(responseBody));
 
-									if( obj.getInt("resultCount") > 0 ) {
-										JSONObject song = (JSONObject) obj.getJSONArray("results").get(0);
+										if( obj.getInt("resultCount") > 0 ) {
+											JSONObject song = (JSONObject) obj.getJSONArray("results").get(0);
 
-										Log.d("fm100", "artworkUrl100 : " + song.getString("artworkUrl100").replace("100x100bb", "400x400bb") );
+											Log.d("fm100", "artworkUrl100 : " + song.getString("artworkUrl100").replace("100x100bb", "400x400bb") );
 
-										showCover(song.getString("artworkUrl100").replace("100x100bb", "400x400bb"));
-									} else {
-										hideCover();
+											showCover(song.getString("artworkUrl100").replace("100x100bb", "400x400bb"));
+										} else {
+											hideCover();
+										}
 									}
-
 								} catch (JSONException e) {
 									e.printStackTrace();
 								}
@@ -729,16 +832,20 @@ public class Music extends Fragment {
 						public void run() {
 							Random r = new Random();
 
-							if( imgCover.getDrawable() != null && imgCover.getVisibility() == View.VISIBLE ) {
-								Bitmap bitmap = ((BitmapDrawable)imgCover.getDrawable()).getBitmap();
-								flyingColor = bitmap.getPixel(0,0);
-							} else {
-								flyingColor = Color.parseColor("#F8F301");
+							flyingColor = Color.parseColor("#F8F301");
+							try {
+								if( imgCover.getDrawable() != null && imgCover.getVisibility() == View.VISIBLE ) {
+									Bitmap bitmap = ((BitmapDrawable)imgCover.getDrawable()).getBitmap();
+									flyingColor = bitmap.getPixel(0,0);
+								}
+							} catch (Exception e) {
+
 							}
 
 							if( getContext() != null ) {
-								View myButton = monkeys.get(monkeysIndex);
-								myButton.setBackgroundColor(flyingColor);
+								TriangleView myButton = monkeys.get(monkeysIndex);
+								//myButton.setBackgroundColor(flyingColor);
+								myButton.setColor(flyingColor);
 
 								monkeysIndex = (monkeysIndex + 1) % monkeys.size();
 
@@ -751,7 +858,7 @@ public class Music extends Fragment {
 								myButton.setAlpha(1f);
 								myButton.setRotation(0);
 
-								ObjectAnimator animY = ObjectAnimator.ofFloat(myButton, "y", -50f);
+								ObjectAnimator animY = ObjectAnimator.ofFloat(myButton, "y", -100f);
 								animY.addListener(new AnimatorListenerAdapter() {
 									@Override
 									public void onAnimationEnd(Animator animation) {
@@ -771,30 +878,6 @@ public class Music extends Fragment {
 								animSetXY.start();
 
 								myButton.setVisibility(View.VISIBLE);
-								/*AnimationSet snowMov1 = new AnimationSet(true);
-								RotateAnimation rotate1 = new RotateAnimation(0, -40 + r.nextInt(80), myButton.getWidth(), myButton.getHeight());
-
-								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-									rotate1 = new RotateAnimation(-90, r.nextInt(180), myButton.getWidth(), myButton.getHeight());
-								}
-
-								rotate1.setDuration(3000);
-								snowMov1.addAnimation(rotate1);
-
-								int x = r.nextInt(flying.getWidth());
-								int y = flying.getHeight();
-
-								if( isRTL() ) {
-									x = x * -1;
-								}
-								TranslateAnimation trans1 = new TranslateAnimation(x, x, y, -150);
-
-								trans1.setDuration(3000);
-								snowMov1.addAnimation(trans1);
-
-								myButton.setVisibility(View.VISIBLE);
-								myButton.setPadding(1,1,1,1);
-								myButton.startAnimation(snowMov1);*/
 							}
 						}
 					});
@@ -828,7 +911,7 @@ public class Music extends Fragment {
 				mediaPlayer.stop();
 			}
 
-			mediaPlayer.reset();
+			//mediaPlayer.reset();
 			mediaPlayer.release();
 			mediaPlayer = null;
 
@@ -860,10 +943,10 @@ public class Music extends Fragment {
 				}
 				mediaPlayer.reset();
 				mediaPlayer.release();
+				mediaPlayer = null;
 			}
 			mediaPlayer = new MediaPlayer();
 			if( mediaPlayer != null ) {
-				mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 				mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 
 					@Override
@@ -886,22 +969,28 @@ public class Music extends Fragment {
 
 					@Override
 					public boolean onError(MediaPlayer mp, int what, int extra) {
-						Log.i("100fm", "onError MediaPlayer");
+						Log.i("100fm", "onError MediaPlayer what " + what + " extra " + extra);
+						mp.reset();
 						mp.release();
 						progressView.setVisibility(View.INVISIBLE);
 						playPauseBtn.setVisibility(View.VISIBLE);
 						imgRound.setVisibility(View.VISIBLE);
-						return false;
+						return true;
 					}
 				});
+				mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 				mediaPlayer.setDataSource(currentChannel.getStationAudio());
-				mediaPlayer.prepareAsync(); // might take long! (for buffering, etc)
+				mediaPlayer.prepare(); // might take long! (for buffering, etc)
 			}
 			progressView.setVisibility(View.VISIBLE);
 			playPauseBtn.setVisibility(View.INVISIBLE);
 			imgRound.setVisibility(View.INVISIBLE);
 
 			isPlaying = 1;
+			if (mAudioManager.isBluetoothA2dpOn()) {
+				Log.d("AudioManager", "isBluetoothA2dpOn() = true");
+				onTrackChanged(currentChannel.getStationName(), "רדיוס 100FM", "", 0, 0, 0);
+			}
 			reloadSongName();
 
 			Animation an = new RotateAnimation(0.0f, 360.0f, rLayout.getWidth()/2, rLayout.getHeight()/2);

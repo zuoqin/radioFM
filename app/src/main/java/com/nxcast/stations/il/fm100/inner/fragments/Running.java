@@ -234,6 +234,7 @@ public class Running extends Fragment {
 					customHandler.postDelayed(updateTimerThread, 0);
 				}
 				isPoused = !isPoused;
+				Log.i("100fm", "isPoused " + isPoused);
 			}
 		});
 

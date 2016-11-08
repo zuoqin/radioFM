@@ -16,13 +16,13 @@ repositories {
 }
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 25
     buildToolsVersion "23.0.3"
     defaultConfig {
         applicationId "com.nxcast.stations.il.fm100"
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 10
+        versionCode 12
         versionName "1.0"
         //multiDexEnabled true
     }

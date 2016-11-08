@@ -11,16 +11,18 @@ public class Station {
     private String SongInfo;
     private String StationSlug;
     private String StationLogo;
+    private String StationDescription;
 
     public Station() {
     }
 
-    public Station(String songInfo, String stationAudio, String stationLogo, String stationName, String stationSlug) {
+    public Station(String songInfo, String stationAudio, String stationLogo, String stationName, String stationSlug, String stationDescription) {
         SongInfo = songInfo;
         StationAudio = stationAudio;
         StationLogo = stationLogo;
         StationName = stationName;
         StationSlug = stationSlug;
+        StationDescription = stationDescription;
     }
 
     public String getSongInfo() {
@@ -61,6 +63,14 @@ public class Station {
 
     public void setStationSlug(String stationSlug) {
         StationSlug = stationSlug;
+    }
+
+    public String getStationDescription() {
+        return StationDescription;
+    }
+
+    public void setStationDescription(String stationSlug) {
+        StationDescription = stationSlug;
     }
 
 }

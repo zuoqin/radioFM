@@ -30,168 +30,6 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:minHeight="150dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="false"
-        android:layout_above="@+id/songBarLL">
-
-        <RelativeLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:background="#6effffff"
-            android:id="@+id/whiteLine"
-            android:layout_marginRight="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_alignParentTop="false"
-            android:paddingBottom="10dp"
-            android:layout_alignParentBottom="true"
-            android:layout_height="0.5dp"></RelativeLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="ערוצים דיגיטליים:"
-            android:id="@+id/channelNameTv"
-            android:textSize="20sp"
-            android:layout_alignParentTop="false"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="0dp"
-            android:paddingBottom="5dp"
-            android:textColor="#deffffff"
-            android:layout_gravity="center_horizontal"
-            android:layout_below="@+id/header" />
-
-        <FrameLayout
-            android:layout_width="15dp"
-            android:layout_height="15dp"
-            android:background="@drawable/arrow_right"
-            android:id="@+id/wheelPickerLeft"
-            android:layout_centerVertical="false"
-            android:layout_alignParentStart="false"
-            android:layout_alignParentEnd="false"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="false"
-            android:layout_marginTop="240dp"
-            android:layout_alignParentTop="true" />
-
-        <FrameLayout
-            android:layout_width="15dp"
-            android:layout_height="15dp"
-            android:id="@+id/wheelPickerRight"
-            android:background="@drawable/arrow_left"
-            android:layout_centerVertical="false"
-            android:layout_alignParentStart="false"
-            android:layout_alignParentEnd="false"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_alignParentRight="true"
-            android:layout_marginTop="240dp"
-            android:layout_alignParentTop="true" />
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="false"
-            android:layout_alignParentBottom="false"
-            android:layout_alignParentTop="false">
-
-            <com.wx.wheelview.widget.WheelView
-                android:id="@+id/wheelview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:scrollingCache="false"
-                android:smoothScrollbar="false"
-                android:stackFromBottom="true"
-                android:fastScrollEnabled="false"
-                android:layout_alignWithParentIfMissing="false"
-                android:layout_alignParentBottom="false"
-                android:layout_centerInParent="true"></com.wx.wheelview.widget.WheelView>
-
-            <ProgressBar
-                style="?android:attr/progressBarStyleLarge"
-                android:id="@+id/lvProgress"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="visible"
-                android:padding="100dp"
-                android:startColor="#ffffffff"
-                android:endColor="#fffff400"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentStart="true" />
-
-
-        </RelativeLayout>
-
-        <Button
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Download this song on iTunes"
-            android:id="@+id/itunesIb"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:textColor="@android:color/white"
-            android:background="@android:color/holo_red_light"
-            android:clickable="false"
-            android:visibility="gone" />
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:id="@+id/header"
-            android:gravity="top"
-            android:layout_height="60dp">
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/menu"
-                android:layout_alignParentTop="false"
-                android:layout_alignParentEnd="false"
-                android:layout_centerHorizontal="true"
-                android:id="@+id/btnMenu"
-                android:background="@android:color/transparent"
-                android:paddingBottom="5dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:paddingTop="5dp"
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true" />
-
-            <ImageButton
-                android:layout_height="fill_parent"
-                android:id="@+id/img100fm"
-                android:scaleType="fitCenter"
-                android:src="@drawable/fm1003"
-                android:background="@android:color/transparent"
-                android:layout_width="100dp"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true" />
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/like"
-                android:id="@+id/btnLike"
-                android:background="@android:color/transparent"
-                android:paddingBottom="5dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:paddingTop="5dp"
-                android:layout_centerVertical="true"
-                android:layout_alignParentLeft="true" />
-        </RelativeLayout>
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/songBarLL"
         android:minHeight="80dp"
@@ -297,6 +135,179 @@
                 android:layout_weight="1" />
 
         </LinearLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:minHeight="150dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_above="@id/songBarLL">
+
+        <RelativeLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:background="#6effffff"
+            android:id="@+id/whiteLine"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_alignParentTop="false"
+            android:paddingBottom="10dp"
+            android:layout_alignParentBottom="true"
+            android:layout_height="0.5dp"></RelativeLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="ערוצים דיגיטליים:"
+            android:id="@+id/channelNameTv"
+            android:textSize="20sp"
+            android:layout_alignParentTop="false"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="0dp"
+            android:paddingBottom="5dp"
+            android:textColor="#deffffff"
+            android:layout_gravity="center_horizontal"
+            android:layout_below="@+id/header" />
+
+        <FrameLayout
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:background="@drawable/arrow_right"
+            android:id="@+id/wheelPickerLeft"
+            android:layout_centerVertical="false"
+            android:layout_alignParentStart="false"
+            android:layout_alignParentEnd="false"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="false"
+            android:layout_marginTop="240dp"
+            android:layout_alignParentTop="true" />
+
+        <FrameLayout
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:id="@+id/wheelPickerRight"
+            android:background="@drawable/arrow_left"
+            android:layout_centerVertical="false"
+            android:layout_alignParentStart="false"
+            android:layout_alignParentEnd="false"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="240dp"
+            android:layout_alignParentTop="true" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="false"
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentTop="false">
+
+            <com.wx.wheelview.widget.WheelView
+                android:id="@+id/wheelview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:scrollingCache="false"
+                android:smoothScrollbar="false"
+                android:stackFromBottom="true"
+                android:fastScrollEnabled="false"
+                android:layout_alignWithParentIfMissing="false"
+                android:layout_alignParentBottom="false"
+                android:layout_centerInParent="true"></com.wx.wheelview.widget.WheelView>
+
+
+        </RelativeLayout>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/channelInfo"
+            android:layout_toLeftOf="@+id/channelNameTv"
+            android:src="@android:drawable/ic_menu_info_details"
+            android:background="@android:color/transparent"
+            android:layout_alignTop="@id/channelNameTv"
+            android:layout_marginTop="-5dp"
+            android:layout_marginRight="5dp" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Download this song on iTunes"
+            android:id="@+id/itunesIb"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:textColor="@android:color/white"
+            android:background="@android:color/holo_red_light"
+            android:clickable="false"
+            android:visibility="gone" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/header"
+            android:gravity="top"
+            android:layout_height="60dp">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/menu"
+                android:layout_alignParentTop="false"
+                android:layout_alignParentEnd="false"
+                android:layout_centerHorizontal="true"
+                android:id="@+id/btnMenu"
+                android:background="@android:color/transparent"
+                android:paddingBottom="5dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="5dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true" />
+
+            <ImageButton
+                android:layout_height="fill_parent"
+                android:id="@+id/img100fm"
+                android:scaleType="fitCenter"
+                android:src="@drawable/fm1003"
+                android:background="@android:color/transparent"
+                android:layout_width="100dp"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/like"
+                android:id="@+id/btnLike"
+                android:background="@android:color/transparent"
+                android:paddingBottom="5dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="5dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true" />
+        </RelativeLayout>
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:id="@+id/lvProgress"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible"
+            android:padding="100dp"
+            android:startColor="#ffffffff"
+            android:endColor="#fffff400"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true" />
 
     </RelativeLayout>
 

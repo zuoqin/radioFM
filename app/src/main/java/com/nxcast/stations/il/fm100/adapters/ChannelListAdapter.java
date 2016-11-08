@@ -15,14 +15,13 @@ import com.squareup.picasso.Picasso;
 
 import com.nxcast.stations.il.fm100.MainActivity;
 import com.nxcast.stations.il.fm100.R;
-import com.nxcast.stations.il.fm100.models.Channel;
 
 import java.util.ArrayList;
 
 import static com.nxcast.stations.il.fm100.R.drawable.fm100;
 
 /************************************************
- * Adapter For the Channel(Station) List from Music class
+ * Adapter For the Station(Station) List from Music class
  ************************************************/
 
 public class ChannelListAdapter extends BaseAdapter {

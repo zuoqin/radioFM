@@ -116,6 +116,8 @@ public class MainActivity extends ActionBarActivity {
 
     private static final int PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
 
+    String deepLinkingSlug = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
@@ -131,7 +133,14 @@ public class MainActivity extends ActionBarActivity {
         drawerListProgressBar = (ProgressBar) findViewById(R.id.progressBarView);
         inDrawLayout = (LinearLayout) findViewById(R.id.inDrawLayout);
 
-
+        Intent in = getIntent();
+        Uri data = in.getData();
+        if( data != null ) {
+            if( data.toString().indexOf("fm100://play?") != -1 ) {
+                deepLinkingSlug = data.toString().substring(data.toString().indexOf("?") + 1);
+                Log.v("100fm", "data: " + data + " deepLinkingSlug: " + deepLinkingSlug);
+            }
+        }
 
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
@@ -258,6 +267,16 @@ public class MainActivity extends ActionBarActivity {
                     myCustomAdapter = new StationListAdapter(myApplicationContext, channelsArray);
                     lvStations.setAdapter(myCustomAdapter);
                     lvStations.setOnItemClickListener(itemClickListener);
+
+                    if( deepLinkingSlug != "" ) {
+                        for (int i = 0; i < stationList.size(); i++) {
+                            Station s = stationList.get(i);
+                            if( s.getStationSlug().equals(deepLinkingSlug) ) {
+                                IntBusEvent event = new IntBusEvent(i);
+                                EventBus.getDefault().post(event);
+                            }
+                        }
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

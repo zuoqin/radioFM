@@ -283,14 +283,14 @@ public class Music extends Fragment {
 						.setContentTitle("")
 						.setContentDescription("")
 						.setContentUrl(Uri.parse("http://digital.100fm.co.il/#" + currentChannel.getStationSlug()))
-						.setQuote("I'm listening to " + currentSong.getSongName() + " on " + currentChannel.getStationName() + " - radios 100fm app")
 						.setShareHashtag(new ShareHashtag.Builder()
 								.setHashtag("#100fmDigital")
 								.build())
+						.setQuote("I'm listening to " + currentSong.getSongName() + " on " + currentChannel.getStationName() + " - radios 100fm app")
 						.build();
 
 				ShareDialog shareDialog = new ShareDialog(getActivity());
-				shareDialog.show(linkContent, ShareDialog.Mode.AUTOMATIC);
+				shareDialog.show(linkContent, ShareDialog.Mode.WEB);
 			}
 		});
 

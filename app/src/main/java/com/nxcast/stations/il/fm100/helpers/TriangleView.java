@@ -67,6 +67,12 @@ public class TriangleView extends View {
     // Initialization
     //
 
+
+    @Override
+    public boolean hasOverlappingRendering() {
+        return true;
+    }
+
     private void init(AttributeSet attrs) {
         if (attrs != null) {
             TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.TriangleView);

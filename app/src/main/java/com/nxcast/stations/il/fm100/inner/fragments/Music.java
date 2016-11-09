@@ -278,19 +278,20 @@ public class Music extends Fragment {
 		btnLike.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				if( currentChannel != null && currentSong != null ) {
+					ShareLinkContent linkContent = new ShareLinkContent.Builder()
+							.setContentTitle("")
+							.setContentDescription("")
+							.setContentUrl(Uri.parse("http://digital.100fm.co.il/#" + currentChannel.getStationSlug()))
+							.setQuote("I'm listening to " + currentSong.getSongName() + " on " + currentChannel.getStationName() + " - radios 100fm app")
+							.setShareHashtag(new ShareHashtag.Builder()
+									.setHashtag("#100fmDigital")
+									.build())
+							.build();
 
-				ShareLinkContent linkContent = new ShareLinkContent.Builder()
-						.setContentTitle("")
-						.setContentDescription("")
-						.setContentUrl(Uri.parse("http://digital.100fm.co.il/#" + currentChannel.getStationSlug()))
-						.setQuote("I'm listening to " + currentSong.getSongName() + " on " + currentChannel.getStationName() + " - radios 100fm app")
-						.setShareHashtag(new ShareHashtag.Builder()
-								.setHashtag("#100fmDigital")
-								.build())
-						.build();
-
-				ShareDialog shareDialog = new ShareDialog(getActivity());
-				shareDialog.show(linkContent, ShareDialog.Mode.WEB);
+					ShareDialog shareDialog = new ShareDialog(getActivity());
+					shareDialog.show(linkContent, ShareDialog.Mode.AUTOMATIC);
+				}
 			}
 		});
 
@@ -339,6 +340,9 @@ public class Music extends Fragment {
 	}
 
 	public void setStationData(JSONObject obj) throws JSONException {
+		if( obj == null ) {
+			return;
+		}
 		JSONArray parentArray = obj.getJSONArray("stations");
 
 		Station tempStation = null;
@@ -982,7 +986,7 @@ public class Music extends Fragment {
 				});
 				mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 				mediaPlayer.setDataSource(currentChannel.getStationAudio());
-				mediaPlayer.prepare(); // might take long! (for buffering, etc)
+				mediaPlayer.prepareAsync(); // might take long! (for buffering, etc)
 			}
 			progressView.setVisibility(View.VISIBLE);
 			playPauseBtn.setVisibility(View.INVISIBLE);

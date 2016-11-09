@@ -53,7 +53,7 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
     }
 
     public static Bitmap blur(Context context, Bitmap image) {
-        if( context == null ) {
+        if( context == null || image == null ) {
             return null;
         }
         int width = Math.round(image.getWidth() * BITMAP_SCALE);

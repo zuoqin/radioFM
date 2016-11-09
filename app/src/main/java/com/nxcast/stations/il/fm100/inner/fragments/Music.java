@@ -283,10 +283,10 @@ public class Music extends Fragment {
 						.setContentTitle("")
 						.setContentDescription("")
 						.setContentUrl(Uri.parse("http://digital.100fm.co.il/#" + currentChannel.getStationSlug()))
+						.setQuote("I'm listening to " + currentSong.getSongName() + " on " + currentChannel.getStationName() + " - radios 100fm app")
 						.setShareHashtag(new ShareHashtag.Builder()
 								.setHashtag("#100fmDigital")
 								.build())
-						.setQuote("I'm listening to " + currentSong.getSongName() + " on " + currentChannel.getStationName() + " - radios 100fm app")
 						.build();
 
 				ShareDialog shareDialog = new ShareDialog(getActivity());
@@ -581,7 +581,7 @@ public class Music extends Fragment {
 			ScheduleItem item = scheduleItemList.get(i);
 			if( day.equals(item.getProgramDay()) ) {
 				int h = Integer.parseInt( item.getProgramStartHoure().replace(":","") );
-				if( hours > h ) {
+				if( hours >= h ) {
 					itemCurrent = item;
 					//Log.i("100fm", "reload100fmName | " + item.getProgramName() + " | " + item.getProgramAutor() );
 				}
@@ -907,13 +907,15 @@ public class Music extends Fragment {
 
 		if (eventSlug.equals("pause") ) {
 			playPauseBtn.setImageResource(R.drawable.play);
-			if (mediaPlayer.isPlaying()) {
-				mediaPlayer.stop();
-			}
+			if( mediaPlayer != null ) {
+				if (mediaPlayer.isPlaying()) {
+					mediaPlayer.stop();
+				}
 
-			//mediaPlayer.reset();
-			mediaPlayer.release();
-			mediaPlayer = null;
+				//mediaPlayer.reset();
+				mediaPlayer.release();
+				mediaPlayer = null;
+			}
 
 			isPlaying = 0;
 			rLayout.clearAnimation();

@@ -191,7 +191,9 @@ public class Video extends Fragment {
 			videoList.add(tempVideo);
 		}
 
-		videoLvProgress.setVisibility(View.GONE);
+		if( videoLvProgress != null ) {
+			videoLvProgress.setVisibility(View.GONE);
+		}
 		videoLvAdapter = new VideoLvAdapter(getActivity() , videoList);
 		videoLv.setAdapter(videoLvAdapter);
 		videoLv.setOnItemClickListener(onVideoClick);

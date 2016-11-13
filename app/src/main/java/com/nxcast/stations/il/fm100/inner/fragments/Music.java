@@ -363,7 +363,9 @@ public class Music extends Fragment {
 		setListData(stationList);
 		myCustomAdapter = new ChannelListAdapter(getActivity(), MainActivity.channelsArray);
 		listCreated = 1;
-		lvProgressView.setVisibility(View.INVISIBLE);
+		if( lvProgressView != null ) {
+			lvProgressView.setVisibility(View.INVISIBLE);
+		}
 		List<MyObject> newMyObjList = new ArrayList<>();
 		for (int i = 0; i < channelsArray.size(); i++) {
 			newMyObjList.add(new MyObject(channelsArray.get(i).getStationLogo()));
@@ -534,9 +536,12 @@ public class Music extends Fragment {
 					case TelephonyManager.CALL_STATE_OFFHOOK:
 					case TelephonyManager.CALL_STATE_RINGING:
 						if (mediaPlayer != null){
-							if(mediaPlayer.isPlaying()){
-								stopStation();
-								isPausedInCall = true;
+							try {
+								if(mediaPlayer.isPlaying()){
+									stopStation();
+									isPausedInCall = true;
+								}
+							} catch (Exception e) {
 							}
 					}
 						break;

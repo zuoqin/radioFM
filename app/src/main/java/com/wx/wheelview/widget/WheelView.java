@@ -174,13 +174,14 @@ public class WheelView<T> extends ListView implements IWheelView<T> {
                     if( minSelected + mid - i == 0 ) alpha = 255;
                     imageView.setImageAlpha(alpha);
 
+                    float scale = 0.5f + (float)alpha / 255f * 0.7f;
                     //RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) imageView.getLayoutParams();
                     //params.height = 50 + 70 * alpha / 255;
                     //imageView.setLayoutParams(params);
-                    //imageView.setScaleY(alpha / 250);
-                    //imageView.setScaleX(alpha / 250);
+                    imageView.setScaleY(scale);
+                    imageView.setScaleX(scale);
 
-                    //Log.i("100fm", "mid : " + mid + ", i : " + i + ", alpha : " + alpha + ", mCurrentPositon : " + mCurrentPositon + ", mItemH : " + mItemH );
+                    Log.i("100fm", "i : " + i + ", alpha : " + alpha + ", scale : " + scale );
                 }
             }
         }

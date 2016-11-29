@@ -327,7 +327,9 @@ public class MainActivity extends ActionBarActivity {
 
         };
 
-        drawerLayout.setDrawerListener(actionBarDrawerToggle);
+        if( drawerLayout != null ) {
+            drawerLayout.setDrawerListener(actionBarDrawerToggle);
+        }
 
         Intent intent = new Intent(MainActivity.this, Loading.class);
         startActivity(intent);

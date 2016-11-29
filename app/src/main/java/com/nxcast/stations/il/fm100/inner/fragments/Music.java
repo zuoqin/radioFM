@@ -421,14 +421,16 @@ public class Music extends Fragment {
 
 		NotificationBusEvent event = null;
 
-		currentChannel = channelsArray.get(position);
+		if( position < channelsArray.size() ) {
+			currentChannel = channelsArray.get(position);
 
-		playPauseBtn.setImageResource(R.drawable.stop);
-		lastChannel.setStationName(currentChannel.getStationName());
-		lastChannel.setStationDescription(currentChannel.getStationDescription());
-		lastChannel.setStationAudio(currentChannel.getStationAudio());
-		event = new NotificationBusEvent("play");
-		EventBus.getDefault().post(event);
+			playPauseBtn.setImageResource(R.drawable.stop);
+			lastChannel.setStationName(currentChannel.getStationName());
+			lastChannel.setStationDescription(currentChannel.getStationDescription());
+			lastChannel.setStationAudio(currentChannel.getStationAudio());
+			event = new NotificationBusEvent("play");
+			EventBus.getDefault().post(event);
+		}
 	}
 
 	private void stopStation() {
@@ -459,7 +461,7 @@ public class Music extends Fragment {
 		WheelData item;
 		for (int i = 0; i < 20; i++) {
 			item = new WheelData();
-			item.setId(R.mipmap.ic_launcher);
+			item.setId(R.mipmap.icon100);
 			item.setName((i < 10) ? ("0" + i) : ("" + i));
 			list.add(item);
 		}

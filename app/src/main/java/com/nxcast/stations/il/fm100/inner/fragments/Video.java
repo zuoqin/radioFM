@@ -195,8 +195,10 @@ public class Video extends Fragment {
 			videoLvProgress.setVisibility(View.GONE);
 		}
 		videoLvAdapter = new VideoLvAdapter(getActivity() , videoList);
-		videoLv.setAdapter(videoLvAdapter);
-		videoLv.setOnItemClickListener(onVideoClick);
+		if( videoLv != null ) {
+			videoLv.setAdapter(videoLvAdapter);
+			videoLv.setOnItemClickListener(onVideoClick);
+		}
 	}
 
 	public void changeVideoUrl(String url) {

@@ -27,7 +27,7 @@ import java.net.URL;
  * Created by leonidangarov on 30/11/15.
  */
 public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-    private static final float BITMAP_SCALE = 0.4f;
+    private static final float BITMAP_SCALE = 0.7f;
     private static final float BLUR_RADIUS = 1.5f;
 
     ImageView bmImage;
@@ -58,6 +58,10 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         }
         int width = Math.round(image.getWidth() * BITMAP_SCALE);
         int height = Math.round(image.getHeight() * BITMAP_SCALE);
+
+        if( height == 0 || width == 0 ) {
+            return null;
+        }
 
         Bitmap inputBitmap = Bitmap.createScaledBitmap(image, width, height,
                 false);

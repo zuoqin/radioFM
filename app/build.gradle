@@ -22,8 +22,8 @@ android {
         applicationId "com.nxcast.stations.il.fm100"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 23
-        versionName "2.3"
+        versionCode 25
+        versionName "2.3.2"
         //multiDexEnabled true
     }
     buildTypes {

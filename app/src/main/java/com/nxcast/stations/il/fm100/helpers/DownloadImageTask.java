@@ -10,6 +10,7 @@ import android.graphics.LightingColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.RenderScript;
@@ -99,8 +100,9 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
                 bmImage.setVisibility(View.VISIBLE);
             }
         });
-
-        bmImage.setImageBitmap(blur(ctx, result));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            bmImage.setImageBitmap(blur(ctx, result));
+        }
         bmImage.clearAnimation();
         bmImage.startAnimation(a);
     }

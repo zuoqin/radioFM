@@ -181,7 +181,7 @@ public class WheelView<T> extends ListView implements IWheelView<T> {
                     imageView.setScaleY(scale);
                     imageView.setScaleX(scale);
 
-                    Log.i("100fm", "i : " + i + ", alpha : " + alpha + ", scale : " + scale );
+                    //Log.i("100fm", "i : " + i + ", alpha : " + alpha + ", scale : " + scale );
                 }
             }
         }

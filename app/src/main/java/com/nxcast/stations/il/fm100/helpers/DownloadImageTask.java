@@ -10,6 +10,7 @@ import android.graphics.LightingColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.RenderScript;
@@ -27,7 +28,7 @@ import java.net.URL;
  * Created by leonidangarov on 30/11/15.
  */
 public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-    private static final float BITMAP_SCALE = 0.4f;
+    private static final float BITMAP_SCALE = 0.7f;
     private static final float BLUR_RADIUS = 1.5f;
 
     ImageView bmImage;
@@ -58,6 +59,10 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         }
         int width = Math.round(image.getWidth() * BITMAP_SCALE);
         int height = Math.round(image.getHeight() * BITMAP_SCALE);
+
+        if( height == 0 || width == 0 ) {
+            return null;
+        }
 
         Bitmap inputBitmap = Bitmap.createScaledBitmap(image, width, height,
                 false);
@@ -95,8 +100,9 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
                 bmImage.setVisibility(View.VISIBLE);
             }
         });
-
-        bmImage.setImageBitmap(blur(ctx, result));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            bmImage.setImageBitmap(blur(ctx, result));
+        }
         bmImage.clearAnimation();
         bmImage.startAnimation(a);
     }

@@ -112,7 +112,7 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:id="@+id/songNameTv"
                 android:text="רדיוס 100FM"
-                android:textSize="30sp"
+                android:textSize="26sp"
                 android:textColor="#FFFFFFFF"
                 android:textAlignment="textStart"
                 android:layout_weight="1" />

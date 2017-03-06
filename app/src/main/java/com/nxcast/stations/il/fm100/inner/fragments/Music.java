@@ -97,6 +97,8 @@ import java.util.TimerTask;
 import org.json.*;
 import com.loopj.android.http.*;
 
+import static android.media.AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK;
+
 /************************************************
  * the activity of the music fragment
  ************************************************/
@@ -420,15 +422,16 @@ public class Music extends Fragment {
 		lastSelectionLoaded = position;
 
 		NotificationBusEvent event = null;
+		if( position < channelsArray.size() && position >= 0 ) {
+			currentChannel = channelsArray.get(position);
 
-		currentChannel = channelsArray.get(position);
-
-		playPauseBtn.setImageResource(R.drawable.stop);
-		lastChannel.setStationName(currentChannel.getStationName());
-		lastChannel.setStationDescription(currentChannel.getStationDescription());
-		lastChannel.setStationAudio(currentChannel.getStationAudio());
-		event = new NotificationBusEvent("play");
-		EventBus.getDefault().post(event);
+			playPauseBtn.setImageResource(R.drawable.stop);
+			lastChannel.setStationName(currentChannel.getStationName());
+			lastChannel.setStationDescription(currentChannel.getStationDescription());
+			lastChannel.setStationAudio(currentChannel.getStationAudio());
+			event = new NotificationBusEvent("play");
+			EventBus.getDefault().post(event);
+		}
 	}
 
 	private void stopStation() {
@@ -459,7 +462,7 @@ public class Music extends Fragment {
 		WheelData item;
 		for (int i = 0; i < 20; i++) {
 			item = new WheelData();
-			item.setId(R.mipmap.ic_launcher);
+			item.setId(R.mipmap.icon100);
 			item.setName((i < 10) ? ("0" + i) : ("" + i));
 			list.add(item);
 		}
@@ -490,9 +493,9 @@ public class Music extends Fragment {
 
 	private void onTrackChanged(String title, String artist, String album, long duration, long position, long trackNumber) {
 
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
-			RemoteControlClient.MetadataEditor ed = mRemoteControlClient.editMetadata(true);
+			/*RemoteControlClient.MetadataEditor ed = mRemoteControlClient.editMetadata(true);
 			ed.putString(MediaMetadataRetriever.METADATA_KEY_TITLE, title);
 			ed.putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, artist);
 			ed.putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, album);
@@ -501,7 +504,7 @@ public class Music extends Fragment {
 			ed.apply();
 
 			mRemoteControlClient.setPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING, position, 1.0f);
-		} else {
+			} else {*/
 
 			MediaMetadata metadata = new MediaMetadata.Builder()
 					.putString(MediaMetadata.METADATA_KEY_TITLE, title)
@@ -977,7 +980,6 @@ public class Music extends Fragment {
 					}
 				});
 				mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-
 					@Override
 					public boolean onError(MediaPlayer mp, int what, int extra) {
 						Log.i("100fm", "onError MediaPlayer what " + what + " extra " + extra);
@@ -989,6 +991,27 @@ public class Music extends Fragment {
 						return true;
 					}
 				});
+				mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener(){
+					@Override
+					public void onCompletion(MediaPlayer mediaPlayer) {
+						Log.i("100fm", "onCompletion MediaPlayer");
+					}
+				});
+				/*AudioManager.OnAudioFocusChangeListener afChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+					public void onAudioFocusChange(int focusChange) {
+						if (focusChange == AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
+							Log.i("100fm", "AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK");
+							mediaPlayer.setVolume(0.2f , 0.2f);
+						} else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+							Log.i("100fm", "AUDIOFOCUS_GAIN");
+							mediaPlayer.setVolume(1.0f , 1.0f);
+							// Raise it back to normal
+						}
+						Log.i("100fm", "focusChange");
+					}
+				};
+				mAudioManager.abandonAudioFocus(afChangeListener);*/
+
 				mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 				mediaPlayer.setDataSource(currentChannel.getStationAudio());
 				mediaPlayer.prepareAsync(); // might take long! (for buffering, etc)

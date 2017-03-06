@@ -20,10 +20,10 @@ android {
     buildToolsVersion "23.0.3"
     defaultConfig {
         applicationId "com.nxcast.stations.il.fm100"
-        minSdkVersion 19
+        minSdkVersion 16
         targetSdkVersion 25
-        versionCode 21
-        versionName "2.1.1"
+        versionCode 25
+        versionName "2.3.2"
         //multiDexEnabled true
     }
     buildTypes {

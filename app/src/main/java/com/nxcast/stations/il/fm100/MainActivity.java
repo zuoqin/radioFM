@@ -327,7 +327,9 @@ public class MainActivity extends ActionBarActivity {
 
         };
 
-        drawerLayout.setDrawerListener(actionBarDrawerToggle);
+        if( drawerLayout != null ) {
+            drawerLayout.setDrawerListener(actionBarDrawerToggle);
+        }
 
         Intent intent = new Intent(MainActivity.this, Loading.class);
         startActivity(intent);
@@ -404,12 +406,22 @@ public class MainActivity extends ActionBarActivity {
 
             default:
                // return super.onOptionsItemSelected(item);
-                if (actionBarDrawerToggle.onOptionsItemSelected(item))
-                    return true;
+                if( actionBarDrawerToggle != null ) {
+                    if (actionBarDrawerToggle.onOptionsItemSelected(item))
+                        return true;
+                }
 
                 return super.onOptionsItemSelected(item);
         }
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     @Override

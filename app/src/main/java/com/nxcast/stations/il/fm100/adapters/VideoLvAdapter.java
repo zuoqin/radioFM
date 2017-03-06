@@ -40,7 +40,9 @@ public class VideoLvAdapter  extends BaseAdapter {
         this.context = context;
         this.videoList = videoList;
 
-        inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        if( context != null ) {
+            inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        }
     }
     @Override
     public int getCount() {
@@ -71,7 +73,7 @@ public class VideoLvAdapter  extends BaseAdapter {
 
         View rowView = convertView;
         ViewHolder holder;
-        if (rowView == null){
+        if (rowView == null && inflater != null){
             rowView = inflater.inflate(R.layout.video_list_item , parent , false);
 
             holder = new ViewHolder();

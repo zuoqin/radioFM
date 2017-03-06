@@ -60,7 +60,7 @@ public class Schedule extends Fragment {
     private ListView scheduleList;
     private ScheduleListAdapter myScheduleListAdapter;
     private List<ScheduleItem> scheduleItemList = new ArrayList<>();
-    private String[] daysList = MainActivity.getMyApplicationContext().getResources().getStringArray(R.array.days_list);
+    private String[] daysList;// = MainActivity.getMyApplicationContext().getResources().getStringArray(R.array.days_list);
     int currentRow = 0;
 
     @Override
@@ -100,6 +100,8 @@ public class Schedule extends Fragment {
                 shareDialog.show(linkContent, ShareDialog.Mode.AUTOMATIC);
             }
         });
+
+        daysList = getContext().getResources().getStringArray(R.array.days_list);
 
         return v;
     }

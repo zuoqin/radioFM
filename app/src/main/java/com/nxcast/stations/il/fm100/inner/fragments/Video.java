@@ -195,8 +195,10 @@ public class Video extends Fragment {
 			videoLvProgress.setVisibility(View.GONE);
 		}
 		videoLvAdapter = new VideoLvAdapter(getActivity() , videoList);
-		videoLv.setAdapter(videoLvAdapter);
-		videoLv.setOnItemClickListener(onVideoClick);
+		if( videoLv != null ) {
+			videoLv.setAdapter(videoLvAdapter);
+			videoLv.setOnItemClickListener(onVideoClick);
+		}
 	}
 
 	public void changeVideoUrl(String url) {
@@ -232,8 +234,8 @@ public class Video extends Fragment {
 
 			if( videoId.equals("live") ) {
 				webView.loadUrl("");
-				webView.loadData("<html><body style=\"margin: 0;  background: #132f54;\"><video width=\"100%\" height=\"100%\" preload=\"none\" poster=\"http://assets-jpcust.jwpsrv.com/thumbs/teD8sDdM-720.jpg\"><source type=\"application/x-mpegURL\" src=\"http://hlscdn.streamgates.net/radios100fm/abr/playlist.m3u8\" /></video></body></html>", "text/html; charset=UTF-8", null);
-				webView.reload();
+				webView.loadData("<html><body style=\"margin: 0; background: #132f54;\"><video width=\"100%\" height=\"100%\" preload=\"none\" poster=\"http://assets-jpcust.jwpsrv.com/thumbs/teD8sDdM-720.jpg\"><source type=\"application/x-mpegURL\" src=\"http://hlscdn.streamgates.net/radios100fm/abr/playlist.m3u8\" /></video></body></html>", "text/html; charset=UTF-8", null);
+				//webView.reload();
 			} else {
 				webView.loadData("", "text/html; charset=UTF-8", null);
 				changeVideoUrl(itemURL);

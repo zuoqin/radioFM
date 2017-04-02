@@ -10,13 +10,14 @@ import android.app.Notification;
         import android.app.NotificationManager;
         import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
+import android.app.ActivityManager.MemoryInfo;
 import android.content.Context;
         import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
-import android.media.AudioManager;
+import android.app.ActivityManager;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
 import android.net.Uri;
@@ -125,6 +126,7 @@ public class MainActivity extends ActionBarActivity {
         myBundle = savedInstanceState;
 
         setContentView(R.layout.activity_main);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         myApplicationContext = this;
 
         Fabric.with(this, new Crashlytics());
@@ -405,12 +407,15 @@ public class MainActivity extends ActionBarActivity {
                 return true;
 
             default:
-               // return super.onOptionsItemSelected(item);
-                if( actionBarDrawerToggle != null ) {
-                    if (actionBarDrawerToggle.onOptionsItemSelected(item))
-                        return true;
-                }
+                try{
+                    // return super.onOptionsItemSelected(item);
+                    if( actionBarDrawerToggle != null ) {
+                        if (actionBarDrawerToggle.onOptionsItemSelected(item))
+                            return true;
+                    }
+                }catch(Exception e){
 
+                }
                 return super.onOptionsItemSelected(item);
         }
 
@@ -448,6 +453,22 @@ public class MainActivity extends ActionBarActivity {
         super.onDestroy();
     }
 
+    public void CheckMemory(){
+        MemoryInfo mi = new MemoryInfo();
+        ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        activityManager.getMemoryInfo(mi);
+        double availableMegs = mi.availMem / 0x100000L;
+
+        //Percentage can be calculated for API 16+
+        //double percentAvail = mi.availMem / (double)mi.totalMem;
+        if(availableMegs < 200){
+
+            //this.finishAndRemoveTask();
+            android.os.Process.killProcess(android.os.Process.myPid());
+            System.exit(1);
+        }
+    }
+
     public void onTaskRemoved(Intent rootIntent) {
         onDestroy();
     }
@@ -455,6 +476,7 @@ public class MainActivity extends ActionBarActivity {
         // a method that transfer Events happening on the Notification to MainActivity
     @Subscribe
       public void onEvent(NotificationBusEvent event) {
+        CheckMemory();
         // set a "pause" notification
         if (event.getNotificationBusMsg().equals("pause")){
             int buttonImage = R.drawable.play2;
@@ -479,48 +501,53 @@ public class MainActivity extends ActionBarActivity {
                     notificationManager.cancelAll();
                     lastAction = "delete";
                 }
-            finish();
-            System.exit(0);
+            //this.finish();
+            this.finishAndRemoveTask();
+            //System.exit(0);
         }
     }
 
 
     // set a new notification with data in order to make changes on notification on button pressess and song changes
     public void setNotification(int playPauseImage , String actionName , String songName , String artistName){
-        String ns = Context.NOTIFICATION_SERVICE;
-        notificationManager = (NotificationManager) getSystemService(ns);
+        try{
+            String ns = Context.NOTIFICATION_SERVICE;
+            notificationManager = (NotificationManager) getSystemService(ns);
 
-        @SuppressWarnings("deprecation")
+            @SuppressWarnings("deprecation")
 
-        Notification notification = new Notification(R.drawable.fm100, null, System.currentTimeMillis());
+            Notification notification = new Notification(R.drawable.fm100, null, System.currentTimeMillis());
 
-        RemoteViews notificationView = new RemoteViews(getPackageName(), R.layout.custom_notifications);
-        notificationView.setImageViewResource(R.id.playPauseIb , playPauseImage);
+            RemoteViews notificationView = new RemoteViews(getPackageName(), R.layout.custom_notifications);
+            notificationView.setImageViewResource(R.id.playPauseIb , playPauseImage);
 
-        //the intent that is started when the notification is clicked
-        Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
-        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent pendingNotificationIntent = PendingIntent.getActivity(this, (int)System.currentTimeMillis(), notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            //the intent that is started when the notification is clicked
+            Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
+            notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            PendingIntent pendingNotificationIntent = PendingIntent.getActivity(this, (int)System.currentTimeMillis(), notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        notification.contentView = notificationView;
-        notification.contentIntent = pendingNotificationIntent;
-        notification.flags |= Notification.FLAG_NO_CLEAR;
+            notification.contentView = notificationView;
+            notification.contentIntent = pendingNotificationIntent;
+            notification.flags |= Notification.FLAG_NO_CLEAR;
 
-        //this is the intent that is supposed to be called when the playPause button is clicked
-        Intent switchIntent = new Intent(actionName);
-        PendingIntent pendingSwitchIntent = PendingIntent.getBroadcast(this, 100, switchIntent, 0);
-        notificationView.setOnClickPendingIntent(R.id.playPauseIb, pendingSwitchIntent);
+            //this is the intent that is supposed to be called when the playPause button is clicked
+            Intent switchIntent = new Intent(actionName);
+            PendingIntent pendingSwitchIntent = PendingIntent.getBroadcast(this, 100, switchIntent, 0);
+            notificationView.setOnClickPendingIntent(R.id.playPauseIb, pendingSwitchIntent);
 
-        //this is the intent that is supposed to be called when the delete button is clicked
-        Intent deleteIntent = new Intent("com.example.hpuser.rad100fm.ACTION_DELETE");
-        PendingIntent pendingDeleteIntent = PendingIntent.getBroadcast(this, 100, deleteIntent, 0);
-        notificationView.setOnClickPendingIntent(R.id.btnDelete, pendingDeleteIntent);
+            //this is the intent that is supposed to be called when the delete button is clicked
+            Intent deleteIntent = new Intent("com.example.hpuser.rad100fm.ACTION_DELETE");
+            PendingIntent pendingDeleteIntent = PendingIntent.getBroadcast(this, 100, deleteIntent, 0);
+            notificationView.setOnClickPendingIntent(R.id.btnDelete, pendingDeleteIntent);
 
-        // setting the texts in the textviews
-        notificationView.setTextViewText(R.id.notiSongNameTv , songName);
-        notificationView.setTextViewText(R.id.notiArtistNameTv , artistName);
+            // setting the texts in the textviews
+            notificationView.setTextViewText(R.id.notiSongNameTv , songName);
+            notificationView.setTextViewText(R.id.notiArtistNameTv , artistName);
 
-        notificationManager.notify(1, notification);
+            notificationManager.notify(1, notification);
+        } catch(Exception e){
+            Log.e("100fm", "onSongChange exception : " + e.getMessage());
+        }
     }
 
     // method activated when song change on Music class

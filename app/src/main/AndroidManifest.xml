@@ -16,6 +16,7 @@
         android:icon="@mipmap/icon100"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:persistent="true"
         android:theme="@style/AppTheme"
         android:logo="@drawable/fm100"
         >

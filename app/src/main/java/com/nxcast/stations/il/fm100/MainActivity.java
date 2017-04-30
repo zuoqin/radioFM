@@ -6,6 +6,7 @@ import java.util.ArrayList;
         import java.util.Locale;
 
 import android.Manifest;
+import android.app.IntentService;
 import android.app.Notification;
         import android.app.NotificationManager;
         import android.app.PendingIntent;
@@ -26,6 +27,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
         import android.support.v4.app.FragmentManager;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
         import android.support.v7.app.ActionBarActivity;
@@ -119,7 +121,26 @@ public class MainActivity extends ActionBarActivity {
 
     String deepLinkingSlug = "";
 
+    public void exitapp(){
+        if(android.os.Build.VERSION.SDK_INT >= 21)
+        {
+            finishAndRemoveTask();
+        }
+        else
+        {
+            finish();
+        }
+        System.exit(0);
+    }
+
     @Override
+    public void onLowMemory(){
+        exitapp();
+    }
+
+    public void onTrimMemory(int level){
+        CheckMemory();
+    }
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         super.onCreate(savedInstanceState);
@@ -362,6 +383,58 @@ public class MainActivity extends ActionBarActivity {
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.100fm.co.il/")));
             }
         });
+
+
+        Intent intent1 = new Intent(this, HelloIntentService.class);
+        startService(intent1);
+    }
+    public class HelloIntentService extends IntentService {
+
+        /**
+         * A constructor is required, and must call the super IntentService(String)
+         * constructor with a name for the worker thread.
+         */
+        public HelloIntentService() {
+            super("HelloIntentService");
+        }
+        @Override public void onCreate(){
+            Intent notificationIntent = new Intent(this, MainActivity.class);
+
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+                    notificationIntent, 0);
+
+            Notification notification = new NotificationCompat.Builder(this)
+                    .setSmallIcon(R.mipmap.icon100)
+                    .setContentTitle("My Awesome App")
+                    .setContentText("Doing some work...")
+                    .setContentIntent(pendingIntent).build();
+
+            startForeground(1337, notification);
+        }
+        /**
+         * The IntentService calls this method from the default worker thread with
+         * the intent that started the service. When this method returns, IntentService
+         * stops the service, as appropriate.
+         */
+        @Override
+        protected void onHandleIntent(Intent intent) {
+            // Normally we would do some work here, like download a file.
+            // For our sample, we just sleep for 5 seconds.
+            long endTime = System.currentTimeMillis() + 5*1000;
+            while (System.currentTimeMillis() < endTime) {
+                synchronized (this) {
+                    try {
+                        wait(endTime - System.currentTimeMillis());
+                    } catch (Exception e) {
+                    }
+                }
+            }
+        }
+        @Override
+        public int onStartCommand(Intent intent, int flags, int startId) {
+            Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
+            return super.onStartCommand(intent,flags,startId);
+        }
     }
 
     // Broadcast Receiver for Music play.
@@ -454,18 +527,20 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void CheckMemory(){
-        MemoryInfo mi = new MemoryInfo();
-        ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-        activityManager.getMemoryInfo(mi);
-        double availableMegs = mi.availMem / 0x100000L;
+        try{
+            MemoryInfo mi = new MemoryInfo();
+            ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+            activityManager.getMemoryInfo(mi);
+            double availableMegs = mi.availMem / 0x100000L;
 
-        //Percentage can be calculated for API 16+
-        //double percentAvail = mi.availMem / (double)mi.totalMem;
-        if(availableMegs < 200){
-
-            this.finishAndRemoveTask();
-            //android.os.Process.killProcess(android.os.Process.myPid());
-            //System.exit(1);
+            //Percentage can be calculated for API 16+
+            //double percentAvail = mi.availMem / (double)mi.totalMem;
+            if(availableMegs < 200){
+                //exitapp();
+            }
+        }
+        catch(Exception e){
+            Log.e("100fm", "onCheckMememory exception : " + e.getMessage());
         }
     }
 
@@ -497,13 +572,18 @@ public class MainActivity extends ActionBarActivity {
 
         // remove notification
         else if (event.getNotificationBusMsg().equals("delete")){
-                if(notificationManager != null){
-                    notificationManager.cancelAll();
-                    lastAction = "delete";
-                }
-            //this.finish();
-            this.finishAndRemoveTask();
-            //System.exit(0);
+            if(notificationManager != null){
+                notificationManager.cancelAll();
+                lastAction = "delete";
+            }
+            if(android.os.Build.VERSION.SDK_INT >= 21)
+            {
+                finishAndRemoveTask();
+            }
+            else
+            {
+                finish();
+            }
         }
     }
 
@@ -511,6 +591,7 @@ public class MainActivity extends ActionBarActivity {
     // set a new notification with data in order to make changes on notification on button pressess and song changes
     public void setNotification(int playPauseImage , String actionName , String songName , String artistName){
         try{
+            CheckMemory();
             String ns = Context.NOTIFICATION_SERVICE;
             notificationManager = (NotificationManager) getSystemService(ns);
 
@@ -545,6 +626,8 @@ public class MainActivity extends ActionBarActivity {
             notificationView.setTextViewText(R.id.notiArtistNameTv , artistName);
 
             notificationManager.notify(1, notification);
+
+
         } catch(Exception e){
             Log.e("100fm", "onSongChange exception : " + e.getMessage());
         }
